@@ -251,7 +251,7 @@ def handle_unfollow(event):
         int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
     blockMessage = "blocked:" + str(time)
     for f in cell:
-        useridSheet.update_cell(f.row, 5, "not-change-notify-on")
+        useridSheet.update_cell(f.row, 5, "not-change-notify-off")
         if useridSheet.cell(f.row, 4).value == "":
             useridSheet.update_cell(f.row, 4, blockMessage)
 
