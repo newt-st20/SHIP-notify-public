@@ -135,7 +135,7 @@ try:
         mail = "【" + time + "】\n" + message1 + message2
         if "連絡事項:更新はありません" in message1 and "学習教材:更新はありません" in message2:
             userId = useridSheet.col_values(1)
-            userSetting = useridSheet.col_values(4)
+            userSetting = useridSheet.col_values(5)
             sendList = []
             userNum = 0
             for userEach in userId:
