@@ -140,18 +140,17 @@ try:
             userNum = 0
             for userEach in userId:
                 print(userEach)
-                if "not-chenge-notify-off" in userSetting[userNum]:
-                    pass
-                else:
+                print(userSetting[userNum])
+                if "not-change-notify-on" == userSetting[userNum]:
                     sendList.append(userEach)
-                userNum += 1
-            finalSendList = list(set(sendList))
-            line_bot_api.multicast(
-                sendList, messages=TextSendMessage(text=mail))
-            logMessage = "send message:" + \
-                str(mail)+" send for:"+str(finalSendList)
-            print(logMessage)
-            reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
+            userNum += 1
+        finalSendList = list(set(sendList))
+        line_bot_api.multicast(
+            sendList, messages=TextSendMessage(text=mail))
+        logMessage = "send message:" + \
+            str(mail)+" send for:"+str(finalSendList)
+        print(logMessage)
+        reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
         else:
             line_bot_api.broadcast(TextSendMessage(text=mail))
             logMessage = "send message:" + \
