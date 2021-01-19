@@ -144,13 +144,13 @@ try:
                 if "not-change-notify-on" == userSetting[userNum]:
                     sendList.append(userEach)
             userNum += 1
-        finalSendList = list(set(sendList))
-        line_bot_api.multicast(
-            sendList, messages=TextSendMessage(text=mail))
-        logMessage = "send message:" + \
-            str(mail)+" send for:"+str(finalSendList)
-        print(logMessage)
-        reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
+            finalSendList = list(set(sendList))
+            line_bot_api.multicast(
+                sendList, messages=TextSendMessage(text=mail))
+            logMessage = "send message:" + \
+                str(mail)+" send for:"+str(finalSendList)
+            print(logMessage)
+            reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
         else:
             line_bot_api.broadcast(TextSendMessage(text=mail))
             logMessage = "send message:" + \
