@@ -218,11 +218,10 @@ def handle_follow(event):
     useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
     useridSheet.update_cell(useridSheetLow + 1, 4, "")
     useridSheet.update_cell(useridSheetLow + 1, 5, "not-change-notify-on")
+    messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
+    messageData = messageSheet.cell(1, 2).value
     line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(
-            text="【ship-notify】\nSHIP( https://ship.sakae-higashi.jp/ )の更新を通知するbotです。\nコマンド一覧は !command から確認してください。\n更新がない時の通知は「!not-change-notify-off」コマンドよりオフにできます。\nこのbotの詳細は newt-house.web.app/ship-notify/ で確認できます")
-    )
+        event.reply_token, TextSendMessage(text=messageData))
 
 
 @ handler.add(UnfollowEvent)
