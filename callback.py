@@ -29,8 +29,7 @@ if os.environ['CHANNEL_TYPE'] == "staging":
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
-line_bot_api.reply_message(
-    event.reply_token, TextSendMessage(text="読込中..."))
+
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 credential_list = {
@@ -70,6 +69,8 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    line_bot_api.reply_message(
+        event.reply_token, TextSendMessage(text="読込中..."))
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
     getlogsSheet.update_cell(getlogsSheetLow + 1, 1, str(event.source.user_id))
