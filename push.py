@@ -112,7 +112,7 @@ studyOldData = studySheet.cell(studySheetLow, 2).value
 studyNewData = studyList
 message2 = ""
 try:
-    if oldData != str(studyNewData):
+    if studyOldData != str(studyNewData):
         for b in studyNewData:
             print(str(b))
             if str(b) in str(studyOldData):
@@ -146,8 +146,6 @@ def main():
         sendList = []
         userNum = 0
         for userEach in userId:
-            print(userEach)
-            print(userSetting[userNum])
             if "not-change-notify-on" == userSetting[userNum]:
                 sendList.append(userEach)
         userNum += 1
