@@ -22,7 +22,7 @@ app = Flask(__name__)
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
 YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
 
-if os.environ['RACK_ENV'] != 'production':
+if os.environ['CHANNEL_TYPE'] == "staging":
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
 
