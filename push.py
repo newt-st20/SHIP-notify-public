@@ -79,11 +79,10 @@ for i in range(len(studySoup.find_all('table')[7].find_all('tr'))):
             7].find_all('tr')[i].find_all('td')[2].text])
 studyList.pop(0)
 
-
-connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
-connectionSheetLow = len(connectionSheet.col_values(1))
 now = datetime.datetime.now()
 time = now.strftime('%Y-%m-%d %H:%M:%S')
+connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
+connectionSheetLow = len(connectionSheet.col_values(1))
 connectionData = [str(connectionText), str(connectionList), time]
 connectionSheet.append_row(connectionData)
 connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
@@ -100,12 +99,10 @@ try:
     else:
         message1 = "\n連絡事項:更新はありません"
 except:
-    message1 = "\n連絡事項:更新はありません"
+    message1 = "\n連絡事項取得エラー:更新の有無を取得できませんでした"
 
 studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
 studySheetLow = len(connectionSheet.col_values(1))
-now = datetime.datetime.now()
-time = now.strftime('%Y-%m-%d %H:%M:%S')
 studyData = [str(studyText), str(studyList), time]
 studySheet.append_row(studyData)
 studyOldData = studySheet.cell(studySheetLow, 2).value
@@ -122,7 +119,7 @@ try:
     else:
         message2 = "\n学習教材:更新はありません"
 except:
-    message2 = "\n学習教材:更新はありません"
+    message2 = "\n学習教材取得エラー:更新の有無を取得できませんでした"
 
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
 YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
