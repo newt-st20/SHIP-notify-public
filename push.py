@@ -102,7 +102,7 @@ except:
     message1 = "\n連絡事項取得エラー:更新の有無を取得できませんでした"
 
 studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
-studySheetLow = len(connectionSheet.col_values(1))
+studySheetLow = len(studySheet.col_values(1))
 studyData = [str(studyText), str(studyList), time]
 studySheet.append_row(studyData)
 studyOldData = studySheet.cell(studySheetLow, 2).value
