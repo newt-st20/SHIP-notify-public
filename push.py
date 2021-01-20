@@ -95,7 +95,7 @@ try:
             if str(a) in str(connectionOldData):
                 pass
             else:
-                message1 += "\n連絡事項:" + a[0] + "-" + a[1] + "-" + a[2]
+                message1 += "\n連絡事項:" + a[0] + "-" + a[1] + "-" + a[2].replace("\n","")
     else:
         message1 = "\n連絡事項:更新はありません"
 except:
@@ -115,7 +115,8 @@ try:
             if str(b) in str(studyOldData):
                 pass
             else:
-                message2 += "\n学習教材:" + b[0] + "-" + b[1] + "-" + b[2]
+                message2 += "\n学習教材:" + b[0] + "-" + \
+                    b[1] + "-" + b[2].replace("\n", "")
     else:
         message2 = "\n学習教材:更新はありません"
 except:
