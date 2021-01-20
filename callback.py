@@ -29,6 +29,29 @@ if os.environ['CHANNEL_TYPE'] == "staging":
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
+line_bot_api.reply_message(
+    event.reply_token, TextSendMessage(text="読込中..."))
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+credential_list = {
+    "type": "service_account",
+    "project_id": os.environ['SHEET_PROJECT_ID'],
+    "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
+    "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
+    "client_email": os.environ['SHEET_CLIENT_EMAIL'],
+    "client_id": os.environ['SHEET_CLIENT_ID'],
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
+}
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+    credential_list, scope)
+gc = gspread.authorize(credentials)
+SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
+if os.environ['CHANNEL_TYPE'] == "staging":
+    SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -47,26 +70,6 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text="読込中..."))
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    credential_list = {
-        "type": "service_account",
-        "project_id": os.environ['SHEET_PROJECT_ID'],
-        "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
-        "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
-        "client_email": os.environ['SHEET_CLIENT_EMAIL'],
-        "client_id": os.environ['SHEET_CLIENT_ID'],
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                    "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
-    }
-    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-        credential_list, scope)
-    gc = gspread.authorize(credentials)
-    SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
     getlogsSheet.update_cell(getlogsSheetLow + 1, 1, str(event.source.user_id))
@@ -74,7 +77,6 @@ def handle_message(event):
     time = datetime.datetime.fromtimestamp(
         int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
     getlogsSheet.update_cell(getlogsSheetLow + 1, 3, str(time))
-
     if event.message.text == "!about":
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageData = messageSheet.cell(1, 2).value
@@ -196,24 +198,6 @@ def handle_message(event):
 
 @handler.add(FollowEvent)
 def handle_follow(event):
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    credential_list = {
-        "type": "service_account",
-        "project_id": os.environ['SHEET_PROJECT_ID'],
-        "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
-        "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
-        "client_email": os.environ['SHEET_CLIENT_EMAIL'],
-        "client_id": os.environ['SHEET_CLIENT_ID'],
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                    "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
-    }
-    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-        credential_list, scope)
-    gc = gspread.authorize(credentials)
-    SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
     profile = line_bot_api.get_profile(event.source.user_id)
@@ -234,24 +218,6 @@ def handle_follow(event):
 
 @ handler.add(UnfollowEvent)
 def handle_unfollow(event):
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    credential_list = {
-        "type": "service_account",
-        "project_id": os.environ['SHEET_PROJECT_ID'],
-        "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
-        "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
-        "client_email": os.environ['SHEET_CLIENT_EMAIL'],
-        "client_id": os.environ['SHEET_CLIENT_ID'],
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                    "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
-    }
-    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-        credential_list, scope)
-    gc = gspread.authorize(credentials)
-    SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
     cell = useridSheet.findall(str(event.source.user_id))

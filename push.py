@@ -12,6 +12,26 @@ import os
 import time
 import re
 
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+credential_list = {
+    "type": "service_account",
+    "project_id": os.environ['SHEET_PROJECT_ID'],
+    "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
+    "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
+    "client_email": os.environ['SHEET_CLIENT_EMAIL'],
+    "client_id": os.environ['SHEET_CLIENT_ID'],
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
+}
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+    credential_list, scope)
+gc = gspread.authorize(credentials)
+SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
+if os.environ['CHANNEL_TYPE'] == "staging":
+    SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
 
 driver_path = '/app/.chromedriver/bin/chromedriver'
 
@@ -59,25 +79,6 @@ for i in range(len(studySoup.find_all('table')[7].find_all('tr'))):
             7].find_all('tr')[i].find_all('td')[2].text])
 studyList.pop(0)
 
-scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
-credential_list = {
-    "type": "service_account",
-    "project_id": os.environ['SHEET_PROJECT_ID'],
-    "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
-    "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
-    "client_email": os.environ['SHEET_CLIENT_EMAIL'],
-    "client_id": os.environ['SHEET_CLIENT_ID'],
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
-}
-credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-    credential_list, scope)
-gc = gspread.authorize(credentials)
-
-SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
 
 connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
 connectionSheetLow = len(connectionSheet.col_values(1))
