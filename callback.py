@@ -125,7 +125,7 @@ def handle_message(event):
         newestConnectionTime = connectionSheet.cell(
             connectionSheetLow, 3).value
         newestConnectionMessage = "連絡事項最終取得:" + \
-            newestConnectionTime + "\n" + newestConnectionBaseMessage
+            newestConnectionTime + "\n" + newestConnectionBaseMessage.replace("\u3000", "")
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=newestConnectionMessage))
@@ -145,7 +145,8 @@ def handle_message(event):
         newestStudyTime = studySheet.cell(
             studySheetLow, 3).value
         newestStudyMessage = "学習教材最終取得:" + \
-            newestStudyTime + "\n" + newestStudyBaseMessage
+            newestStudyTime + "\n" + \
+            newestStudyBaseMessage.replace("\u3000", "")
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=newestStudyMessage))
