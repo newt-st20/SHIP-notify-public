@@ -71,15 +71,6 @@ def callback():
 def handle_message(event):
     if event.reply_token == "00000000000000000000000000000000":
         return
-    line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text="読込中..."))
-    getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
-    getlogsSheetLow = len(getlogsSheet.col_values(1))
-    getlogsSheet.update_cell(getlogsSheetLow + 1, 1, str(event.source.user_id))
-    getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(event))
-    time = datetime.datetime.fromtimestamp(
-        int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
-    getlogsSheet.update_cell(getlogsSheetLow + 1, 3, str(time))
     if event.message.text == "!about":
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageData = messageSheet.cell(1, 2).value
@@ -197,6 +188,13 @@ def handle_message(event):
             event.reply_token, TextSendMessage(text=sendMessage))
     else:
         pass
+    getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
+    getlogsSheetLow = len(getlogsSheet.col_values(1))
+    getlogsSheet.update_cell(getlogsSheetLow + 1, 1, str(event.source.user_id))
+    getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(event))
+    time = datetime.datetime.fromtimestamp(
+        int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
+    getlogsSheet.update_cell(getlogsSheetLow + 1, 3, str(time))
 
 
 @handler.add(FollowEvent)
