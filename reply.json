@@ -1,0 +1,88 @@
+{
+    "ownerVerify": {
+        "to": "U849a20ed82bb7f8a9d6fc3ead21c7582",
+        "messages": [{
+            "type": "text",
+            "text": "",
+            "altText": "this is a confirm template",
+            "quickReply": {
+                "items": [{
+                        "type": "action",
+                        "imageUrl": "https://example.com/sushi.png",
+                        "action": {
+                            "type": "message",
+                            "label": "Sushi",
+                            "text": "Sushi"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "imageUrl": "https://example.com/tempura.png",
+                        "action": {
+                            "type": "message",
+                            "label": "Tempura",
+                            "text": "Tempura"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "location",
+                            "label": "Send location"
+                        }
+                    }
+                ]
+            }
+        }]
+    },
+    "test": {
+        "to": "U849a20ed82bb7f8a9d6fc3ead21c7582",
+        "messages": [{
+            "type": "template",
+            "altText": "this is a confirm template",
+            "template": {
+                "type": "confirm",
+                "text": "Are you sure?",
+                "actions": [{
+                        "type": "message",
+                        "label": "Yes",
+                        "text": "yes"
+                    },
+                    {
+                        "type": "message",
+                        "label": "No",
+                        "text": "no"
+                    }
+                ]
+            },
+            "quickReply": {
+                "items": [{
+                        "type": "action",
+                        "imageUrl": "https://example.com/sushi.png",
+                        "action": {
+                            "type": "message",
+                            "label": "Sushi",
+                            "text": "Sushi"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "imageUrl": "https://example.com/tempura.png",
+                        "action": {
+                            "type": "message",
+                            "label": "Tempura",
+                            "text": "Tempura"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "location",
+                            "label": "Send location"
+                        }
+                    }
+                ]
+            }
+        }]
+    }
+}

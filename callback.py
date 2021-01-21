@@ -18,11 +18,10 @@ import datetime
 
 app = Flask(__name__)
 
-
-YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
-YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
-
-if os.environ['CHANNEL_TYPE'] == "staging":
+if os.environ['CHANNEL_TYPE'] == "public":
+    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
+    YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
+else:
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
 
@@ -125,7 +124,8 @@ def handle_message(event):
         newestConnectionTime = connectionSheet.cell(
             connectionSheetLow, 3).value
         newestConnectionMessage = "連絡事項最終取得:" + \
-            newestConnectionTime + "\n" + newestConnectionBaseMessage.replace("\u3000", "")
+            newestConnectionTime + "\n" + \
+            newestConnectionBaseMessage.replace("\u3000", "")
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=newestConnectionMessage))

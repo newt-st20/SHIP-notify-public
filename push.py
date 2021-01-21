@@ -29,8 +29,9 @@ credential_list = {
 credentials = ServiceAccountCredentials.from_json_keyfile_dict(
     credential_list, scope)
 gc = gspread.authorize(credentials)
-SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
-if os.environ['CHANNEL_TYPE'] == "staging":
+if os.environ['CHANNEL_TYPE'] == "public":
+    SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
+else:
     SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
 
 driver_path = '/app/.chromedriver/bin/chromedriver'
@@ -95,7 +96,8 @@ try:
             if str(a) in str(connectionOldData):
                 pass
             else:
-                message1 += "\n連絡事項:" + a[0] + "-" + a[1] + "-" + a[2].replace("\n","")
+                message1 += "\n連絡事項:" + a[0] + "-" + \
+                    a[1] + "-" + a[2].replace("\n", "")
     else:
         message1 = "\n連絡事項:更新はありません"
 except:
@@ -122,10 +124,10 @@ try:
 except:
     message2 = "\n学習教材取得エラー:更新の有無を取得できませんでした"
 
-YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
-YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
-
-if os.environ['CHANNEL_TYPE'] == "staging":
+if os.environ['CHANNEL_TYPE'] == "public":
+    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
+    YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
+else:
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
 
