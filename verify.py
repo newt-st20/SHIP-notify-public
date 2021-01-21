@@ -38,11 +38,12 @@ def main():
     followersData = requests.get(followers, headers=headers)
     sendText = deviveryDay + str(deliveryData.json()) + \
         "\n" + followersDay + str(followersData.json())
-    print(send)
-    object = json_load['ownerVerify']
-    data = object['messages'][0].update({'text': sendText})
+    jsonOpen = open('push.json', 'r', encoding="utf-8_sig")
+    jsonLoad = json.load(jsonOpen)
+    jsonData = jsonLoad['ownerVerify']
+    jsonFixedData = jsonData['messages'][0].update({'text': sendText})
     pushEndPoint = "https://api.line.me/v2/bot/message/push"
-    requests.post(pushEndPoint, json=data, headers=headers)
+    requests.post(pushEndPoint, json=jsonFixedData, headers=headers)
 
 
 if __name__ == "__main__":
