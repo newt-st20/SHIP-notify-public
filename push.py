@@ -135,6 +135,12 @@ line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 
 
 def main():
+    headers = {
+        'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
+        'Content-type': 'application/json'
+    }
+    jsonOpen = open('push.json', 'r', encoding="utf-8_sig")
+    jsonLoad = json.load(jsonOpen)
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
     reportSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('report')
@@ -152,11 +158,21 @@ def main():
         finalSendList = list(set(sendList))
         line_bot_api.multicast(
             sendList, messages=TextSendMessage(text=mail))
+        jsonData = jsonLoad['sendForAll']
+        jsonFixedData = jsonData['messages'][0].update({'text': sendText})
+        jsonFixedData2 = jsonFixedData['messages'][0].update(
+            {'to': finalSendList})
+        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
+        requests.post(multicastEndPoint, json=jsonFixedData2, headers=headers)
         logMessage = "send message:" + \
             str(mail)+" send for:"+str(finalSendList)
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
     else:
+        jsonData = jsonLoad['sendForAll']
+        jsonFixedData = object['messages'][0].update({'text': mail})
+        broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
+        requests.post(broadcastEndPoint, json=jsonFixedData, headers=headers)
         line_bot_api.broadcast(TextSendMessage(text=mail))
         logMessage = "send message:" + \
             str(mail)+" send for all followed user."

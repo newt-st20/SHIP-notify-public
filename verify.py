@@ -36,8 +36,8 @@ def main():
     }
     deliveryData = requests.get(delivery, headers=headers)
     followersData = requests.get(followers, headers=headers)
-    sendText = deviveryDay + deliveryData.json() + "\n" + followersDay + \
-        followersData.json()
+    sendText = deviveryDay + str(deliveryData.json()) + \
+        "\n" + followersDay + str(followersData.json())
     print(send)
     object = json_load['ownerVerify']
     data = object['messages'][0].update({'text': sendText})
