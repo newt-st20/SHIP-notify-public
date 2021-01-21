@@ -154,9 +154,9 @@ def main():
         for userEach in userId:
             if "not-change-notify-on" == userSetting[userNum]:
                 sendList.append(userEach)
-        userNum += 1
-        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
+            userNum += 1
         finalSendList = list(set(sendList))
+        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonData = jsonLoad['pushForNotifyEnabledUser']
         jsonData['messages'][0]['text'] = mail
         jsonData['to'] = finalSendList
