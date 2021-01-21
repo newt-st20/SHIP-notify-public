@@ -1,8 +1,8 @@
 {
-    "ownerVerify": {
-        "to": "U849a20ed82bb7f8a9d6fc3ead21c7582",
+    "pushForAll": {
         "messages": [{
             "type": "text",
+            "text": "",
             "altText": "this is a confirm template",
             "quickReply": {
                 "items": [{
@@ -34,26 +34,12 @@
             }
         }]
     },
-    "test": {
-        "to": "U849a20ed82bb7f8a9d6fc3ead21c7582",
+    "pushForNotifyEnabledUser": {
+        "to": [],
         "messages": [{
-            "type": "template",
+            "type": "text",
+            "text": "",
             "altText": "this is a confirm template",
-            "template": {
-                "type": "confirm",
-                "text": "Are you sure?",
-                "actions": [{
-                        "type": "message",
-                        "label": "Yes",
-                        "text": "yes"
-                    },
-                    {
-                        "type": "message",
-                        "label": "No",
-                        "text": "no"
-                    }
-                ]
-            },
             "quickReply": {
                 "items": [{
                         "type": "action",
