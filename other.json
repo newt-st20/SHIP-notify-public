@@ -3,6 +3,7 @@
         "to": "U849a20ed82bb7f8a9d6fc3ead21c7582",
         "messages": [{
             "type": "text",
+            "text": "",
             "altText": "this is a confirm template",
             "quickReply": {
                 "items": [{
