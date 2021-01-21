@@ -158,7 +158,7 @@ def main():
         finalSendList = list(set(sendList))
         line_bot_api.multicast(
             sendList, messages=TextSendMessage(text=mail))
-        jsonData = jsonLoad['sendForAll']
+        jsonData = jsonLoad['pushForNotifyEnabledUser']
         jsonFixedData = jsonData['messages'][0].update({'text': sendText})
         jsonFixedData2 = jsonFixedData['messages'][0].update(
             {'to': finalSendList})
@@ -169,7 +169,7 @@ def main():
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
     else:
-        jsonData = jsonLoad['sendForAll']
+        jsonData = jsonLoad['pushForAll']
         jsonFixedData = object['messages'][0].update({'text': mail})
         broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
         requests.post(broadcastEndPoint, json=jsonFixedData, headers=headers)
