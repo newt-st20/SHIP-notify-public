@@ -1,16 +1,20 @@
 {
+    "default": {
+        "messages": [{
+            "type": "text"
+        }]
+    },
     "about": {
         "messages": [{
             "type": "text",
-            "altText": "this is a confirm template",
             "quickReply": {
                 "items": [{
                         "type": "action",
                         "imageUrl": "https://example.com/sushi.png",
                         "action": {
                             "type": "message",
-                            "label": "Sushi",
-                            "text": "Sushi"
+                            "label": "「連絡事項」を取得",
+                            "text": "!connection"
                         }
                     },
                     {
@@ -18,8 +22,8 @@
                         "imageUrl": "https://example.com/tempura.png",
                         "action": {
                             "type": "message",
-                            "label": "Tempura",
-                            "text": "Tempura"
+                            "label": "「学習教材」を取得",
+                            "text": "!study"
                         }
                     },
                     {
@@ -33,53 +37,49 @@
             }
         }]
     },
-    "test": {
-        "to": "U849a20ed82bb7f8a9d6fc3ead21c7582",
+    "issueReject": {
         "messages": [{
-            "type": "template",
-            "altText": "this is a confirm template",
-            "template": {
-                "type": "confirm",
-                "text": "Are you sure?",
-                "actions": [{
-                        "type": "message",
-                        "label": "Yes",
-                        "text": "yes"
-                    },
-                    {
-                        "type": "message",
-                        "label": "No",
-                        "text": "no"
-                    }
-                ]
-            },
+            "type": "text",
+            "text": "不具合報告・機能改善要望コマンドは「!issue 内容」の形で送ってください"
+        }]
+    },
+    "issueComplete": {
+        "messages": [{
+            "type": "text",
+            "text": "回答を記録しました。不具合報告・機能改善要望ありがとうございます"
+        }]
+    },
+    "not-change-notify-off": {
+        "messages": [{
+            "type": "text",
+            "text": "更新がない時の通知をオフにしました。「!not-change-notify-on」コマンドよりオンにできます",
             "quickReply": {
                 "items": [{
-                        "type": "action",
-                        "imageUrl": "https://example.com/sushi.png",
-                        "action": {
-                            "type": "message",
-                            "label": "Sushi",
-                            "text": "Sushi"
-                        }
-                    },
-                    {
-                        "type": "action",
-                        "imageUrl": "https://example.com/tempura.png",
-                        "action": {
-                            "type": "message",
-                            "label": "Tempura",
-                            "text": "Tempura"
-                        }
-                    },
-                    {
-                        "type": "action",
-                        "action": {
-                            "type": "location",
-                            "label": "Send location"
-                        }
+                    "type": "action",
+                    "imageUrl": "https://example.com/sushi.png",
+                    "action": {
+                        "type": "message",
+                        "label": "オンにする",
+                        "text": "!not-change-notify-on"
                     }
-                ]
+                }]
+            }
+        }]
+    },
+    "not-change-notify-on": {
+        "messages": [{
+            "type": "text",
+            "text": "更新がない時の通知をオンにしました。「!not-change-notify-off」コマンドよりオフにできます",
+            "quickReply": {
+                "items": [{
+                    "type": "action",
+                    "imageUrl": "https://example.com/sushi.png",
+                    "action": {
+                        "type": "message",
+                        "label": "オフにする",
+                        "text": "!not-change-notify-off"
+                    }
+                }]
             }
         }]
     }

@@ -35,38 +35,18 @@
         }]
     },
     "pushForNotifyEnabledUser": {
-        "to": [],
         "messages": [{
             "type": "text",
-            "text": "",
-            "altText": "this is a confirm template",
             "quickReply": {
                 "items": [{
-                        "type": "action",
-                        "imageUrl": "https://example.com/sushi.png",
-                        "action": {
-                            "type": "message",
-                            "label": "Sushi",
-                            "text": "Sushi"
-                        }
-                    },
-                    {
-                        "type": "action",
-                        "imageUrl": "https://example.com/tempura.png",
-                        "action": {
-                            "type": "message",
-                            "label": "Tempura",
-                            "text": "Tempura"
-                        }
-                    },
-                    {
-                        "type": "action",
-                        "action": {
-                            "type": "location",
-                            "label": "Send location"
-                        }
+                    "type": "action",
+                    "imageUrl": "https://example.com/sushi.png",
+                    "action": {
+                        "type": "message",
+                        "label": "この通知をオフにする",
+                        "text": "!not-change-notify-off"
                     }
-                ]
+                }]
             }
         }]
     }
