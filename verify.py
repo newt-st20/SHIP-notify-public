@@ -41,6 +41,7 @@ def main():
     jsonOpen = open('other.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     jsonData = jsonLoad['ownerVerify']
+    jsonData['to'] = os.environ["OWNER_USER_ID"]
     jsonData['messages'][0]['text'] = sendText.replace('"', "'")
     pushEndPoint = "https://api.line.me/v2/bot/message/push"
     requests.post(pushEndPoint, json=jsonFixedData, headers=headers)
