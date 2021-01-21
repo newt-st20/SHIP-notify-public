@@ -38,7 +38,7 @@ def main():
     followersData = requests.get(followers, headers=headers)
     sendText = deviveryDay + str(deliveryData.json()) + \
         "\n" + followersDay + str(followersData.json())
-    jsonOpen = open('push.json', 'r', encoding="utf-8_sig")
+    jsonOpen = open('other.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     jsonData = jsonLoad['ownerVerify']
     jsonFixedData = jsonData['messages'][0].update({'text': sendText})

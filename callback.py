@@ -70,9 +70,21 @@ def callback():
 def handle_message(event):
     if event.reply_token == "00000000000000000000000000000000":
         return
+    headers = {
+        'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
+        'Content-type': 'application/json'
+    }
+    jsonOpen = open('reply.json', 'r', encoding="utf-8_sig")
+    jsonLoad = json.load(jsonOpen)
+    replyEndPoint = "https://api.line.me/v2/bot/message/reply"
     if event.message.text == "!about":
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageData = messageSheet.cell(1, 2).value
+        jsonData = jsonLoad['about']
+        jsonFixedData = jsonData.update({'replyToken': event.reply_token})
+        jsonFixedData2 = jsonFixedData['messages'][0].update(
+            {'text': messageData})
+        requests.post(replyEndPoint, json=jsonFixedData2, headers=headers)
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=messageData))
     elif event.message.text == "!command":
