@@ -81,10 +81,10 @@ def handle_message(event):
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageData = messageSheet.cell(1, 2).value
         jsonData = jsonLoad['about']
-        jsonFixedData = jsonData.update({'replyToken': event.reply_token})
-        jsonFixedData2 = jsonFixedData['messages'][0].update(
-            {'text': messageData})
-        requests.post(replyEndPoint, json=jsonFixedData2, headers=headers)
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = messageData
+        print(jsonData)
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=messageData))
     elif event.message.text == "!command":

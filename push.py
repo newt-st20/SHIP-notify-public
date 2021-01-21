@@ -158,23 +158,26 @@ def main():
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         finalSendList = list(set(sendList))
         jsonData = jsonLoad['pushForNotifyEnabledUser']
-        jsonFixedData = jsonData['messages'][0].update({'text': mail})
-        jsonFixedData2 = jsonFixedData['messages'][0].update(
-            {'to': finalSendList})
-        requests.post(multicastEndPoint, json=jsonFixedData2, headers=headers)
+        jsonData['messages'][0]['text'] = mail
+        jsonData['messages'][0]['to'] = finalSendList
+        print(jsonData)
+        requests.post(multicastEndPoint, json=jsonData, headers=headers)
         logMessage = "send message:" + \
             str(mail)+" send for:"+str(finalSendList)
         print(logMessage)
-        reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
+        reportSheet.update_cell(reportSheetLow+1, 1,
+                                logMessage.replace("\n", ""))
     else:
         broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
         jsonData = jsonLoad['pushForAll']
-        jsonFixedData = object['messages'][0].update({'text': mail})
-        requests.post(broadcastEndPoint, json=jsonFixedData, headers=headers)
+        jsonData['messages'][0]['text'] = mail
+        print(jsonData)
+        requests.post(broadcastEndPoint, json=jsonData, headers=headers)
         logMessage = "send message:" + \
             str(mail)+" send for all followed user."
         print(logMessage)
-        reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
+        reportSheet.update_cell(reportSheetLow+1, 1,
+                                logMessage.replace("\n", ""))
 
 
 if __name__ == "__main__":
