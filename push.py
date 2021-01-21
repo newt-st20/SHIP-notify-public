@@ -155,25 +155,22 @@ def main():
             if "not-change-notify-on" == userSetting[userNum]:
                 sendList.append(userEach)
         userNum += 1
+        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         finalSendList = list(set(sendList))
-        line_bot_api.multicast(
-            sendList, messages=TextSendMessage(text=mail))
         jsonData = jsonLoad['pushForNotifyEnabledUser']
-        jsonFixedData = jsonData['messages'][0].update({'text': sendText})
+        jsonFixedData = jsonData['messages'][0].update({'text': mail})
         jsonFixedData2 = jsonFixedData['messages'][0].update(
             {'to': finalSendList})
-        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         requests.post(multicastEndPoint, json=jsonFixedData2, headers=headers)
         logMessage = "send message:" + \
             str(mail)+" send for:"+str(finalSendList)
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1, logMessage)
     else:
+        broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
         jsonData = jsonLoad['pushForAll']
         jsonFixedData = object['messages'][0].update({'text': mail})
-        broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
         requests.post(broadcastEndPoint, json=jsonFixedData, headers=headers)
-        line_bot_api.broadcast(TextSendMessage(text=mail))
         logMessage = "send message:" + \
             str(mail)+" send for all followed user."
         print(logMessage)
