@@ -10,7 +10,7 @@
             "quickReply": {
                 "items": [{
                         "type": "action",
-                        "imageUrl": "https://newt-house.web.app/ship-notify/ship-notify-connection.jpg",
+                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-connection.jpg",
                         "action": {
                             "type": "message",
                             "label": "「連絡事項」を取得",
@@ -19,7 +19,7 @@
                     },
                     {
                         "type": "action",
-                        "imageUrl": "https://newt-house.web.app/ship-notify/ship-notify-study.jpg",
+                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-study.jpg",
                         "action": {
                             "type": "message",
                             "label": "「学習教材」を取得",
@@ -28,10 +28,10 @@
                     },
                     {
                         "type": "action",
-                        "imageUrl": "https://newt-house.web.app/ship-notify/ship-notify-notify-off.jpg",
+                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-issue.jpg",
                         "action": {
                             "type": "message",
-                            "label": "更新がない時の通知をオフにする"
+                            "label": "不具合報告・機能要望を送る"
                         }
                     }
                 ]
@@ -57,7 +57,7 @@
             "quickReply": {
                 "items": [{
                     "type": "action",
-                    "imageUrl": "https://newt-house.web.app/ship-notify/ship-notify-notify-on.jpg",
+                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-on.jpg",
                     "action": {
                         "type": "message",
                         "label": "オンにする",
@@ -74,7 +74,7 @@
             "quickReply": {
                 "items": [{
                     "type": "action",
-                    "imageUrl": "https://newt-house.web.app/ship-notify/ship-notify-notify-off.jpg",
+                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-off.jpg",
                     "action": {
                         "type": "message",
                         "label": "オフにする",
@@ -90,7 +90,7 @@
             "quickReply": {
                 "items": [{
                     "type": "action",
-                    "imageUrl": "https://newt-house.web.app/ship-notify/ship-notify-study.jpg",
+                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-study.jpg",
                     "action": {
                         "type": "message",
                         "label": "「学習教材」を取得",
@@ -106,7 +106,7 @@
             "quickReply": {
                 "items": [{
                     "type": "action",
-                    "imageUrl": "https://newt-house.web.app/ship-notify/ship-notify-connection.jpg",
+                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-connection.jpg",
                     "action": {
                         "type": "message",
                         "label": "「連絡事項」を取得",
