@@ -159,7 +159,7 @@ def main():
         finalSendList = list(set(sendList))
         jsonData = jsonLoad['pushForNotifyEnabledUser']
         jsonData['messages'][0]['text'] = mail
-        jsonData['messages'][0]['to'] = finalSendList
+        jsonData['to'] = finalSendList
         print(jsonData)
         requests.post(multicastEndPoint, json=jsonData, headers=headers)
         logMessage = "send message:" + \

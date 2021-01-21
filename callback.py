@@ -85,27 +85,33 @@ def handle_message(event):
         jsonData['messages'][0]['text'] = messageData
         print(jsonData)
         requests.post(replyEndPoint, json=jsonData, headers=headers)
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=messageData))
     elif event.message.text == "!command":
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageData = messageSheet.cell(2, 2).value
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=messageData))
+        jsonData = jsonLoad['default']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = messageData
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif event.message.text == "!settings":
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageData = messageSheet.cell(3, 2).value
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=messageData))
+        jsonData = jsonLoad['default']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = messageData
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif event.message.text == "!when":
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageData = messageSheet.cell(4, 2).value
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=messageData))
+        jsonData = jsonLoad['default']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = messageData
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!issue" in event.message.text:
         if event.message.text == "!issue":
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(
-                text="不具合報告・機能改善要望コマンドは「!issue 内容」の形で送ってください"))
+            jsonData = jsonLoad['issueReject']
+            jsonData['replyToken'] = event.reply_token
+            jsonData['messages'][0]['text'] = messageData
+            requests.post(replyEndPoint, json=jsonData, headers=headers)
         else:
             useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('issue')
             useridSheetLow = len(useridSheet.col_values(1))
@@ -117,9 +123,10 @@ def handle_message(event):
             time = datetime.datetime.fromtimestamp(
                 int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
             useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="回答を記録しました。不具合報告・機能改善要望ありがとうございます"))
+            jsonData = jsonLoad['issueComplete']
+            jsonData['replyToken'] = event.reply_token
+            jsonData['messages'][0]['text'] = messageData
+            requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif event.message.text == "!connection":
         connectionSheet = gc.open_by_key(
             SPREADSHEET_KEY).worksheet('connection')
@@ -138,9 +145,10 @@ def handle_message(event):
         newestConnectionMessage = "連絡事項最終取得:" + \
             newestConnectionTime + "\n" + \
             newestConnectionBaseMessage.replace("\u3000", "")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=newestConnectionMessage))
+        jsonData = jsonLoad['default']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = newestConnectionMessage
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif event.message.text == "!study":
         studySheet = gc.open_by_key(
             SPREADSHEET_KEY).worksheet('study')
@@ -159,9 +167,10 @@ def handle_message(event):
         newestStudyMessage = "学習教材最終取得:" + \
             newestStudyTime + "\n" + \
             newestStudyBaseMessage.replace("\u3000", "")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=newestStudyMessage))
+        jsonData = jsonLoad['default']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = newestStudyMessage
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!not-change-notify-off" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
@@ -169,9 +178,9 @@ def handle_message(event):
         blockMessage = "not-change-notify-off"
         for f in cell:
             useridSheet.update_cell(f.row, 5, blockMessage)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="更新がない時の通知をオフにしました。「!not-change-notify-on」コマンドよりオフにできます"))
+        jsonData = jsonLoad['not-change-notify-off']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!not-change-notify-on" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
@@ -179,9 +188,9 @@ def handle_message(event):
         blockMessage = "not-change-notify-on"
         for f in cell:
             useridSheet.update_cell(f.row, 5, blockMessage)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="更新がない時の通知をオンにしました。「!not-change-notify-off」コマンドよりオフにできます"))
+        jsonData = jsonLoad['not-change-notify-on']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!" in event.message.text:
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageSheetList = messageSheet.col_values(1)
@@ -197,8 +206,10 @@ def handle_message(event):
                 pass
         if sendMessage == "":
             sendMessage == "It isn't a command, couldn't understand: " + event.message.text
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=sendMessage))
+        jsonData = jsonLoad['default']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = sendMessage
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     else:
         pass
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
@@ -226,8 +237,11 @@ def handle_follow(event):
     useridSheet.update_cell(useridSheetLow + 1, 5, "not-change-notify-on")
     messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
     messageData = messageSheet.cell(1, 2).value
-    line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text=messageData))
+    jsonData = jsonLoad['about']
+    jsonData['replyToken'] = event.reply_token
+    jsonData['messages'][0]['text'] = messageData
+    print(jsonData)
+    requests.post(replyEndPoint, json=jsonData, headers=headers)
 
 
 @ handler.add(UnfollowEvent)
