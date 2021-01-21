@@ -29,8 +29,8 @@
                     {
                         "type": "action",
                         "action": {
-                            "type": "location",
-                            "label": "Send location"
+                            "type": "message",
+                            "label": "更新がない時の通知をオフにする"
                         }
                     }
                 ]
@@ -78,6 +78,38 @@
                         "type": "message",
                         "label": "オフにする",
                         "text": "!not-change-notify-off"
+                    }
+                }]
+            }
+        }]
+    },
+    "connection": {
+        "messages": [{
+            "type": "text",
+            "quickReply": {
+                "items": [{
+                    "type": "action",
+                    "imageUrl": "https://example.com/sushi.png",
+                    "action": {
+                        "type": "message",
+                        "label": "「学習教材」を取得",
+                        "text": "!study"
+                    }
+                }]
+            }
+        }]
+    },
+    "study": {
+        "messages": [{
+            "type": "text",
+            "quickReply": {
+                "items": [{
+                    "type": "action",
+                    "imageUrl": "https://example.com/sushi.png",
+                    "action": {
+                        "type": "message",
+                        "label": "「連絡事項」を取得",
+                        "text": "!connection"
                     }
                 }]
             }

@@ -145,7 +145,7 @@ def handle_message(event):
         newestConnectionMessage = "連絡事項最終取得:" + \
             newestConnectionTime + "\n" + \
             newestConnectionBaseMessage.replace("\u3000", "")
-        jsonData = jsonLoad['default']
+        jsonData = jsonLoad['connection']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestConnectionMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
@@ -167,7 +167,7 @@ def handle_message(event):
         newestStudyMessage = "学習教材最終取得:" + \
             newestStudyTime + "\n" + \
             newestStudyBaseMessage.replace("\u3000", "")
-        jsonData = jsonLoad['default']
+        jsonData = jsonLoad['study']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestStudyMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
@@ -223,6 +223,13 @@ def handle_message(event):
 
 @handler.add(FollowEvent)
 def handle_follow(event):
+    headers = {
+        'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
+        'Content-type': 'application/json'
+    }
+    jsonOpen = open('reply.json', 'r', encoding="utf-8_sig")
+    jsonLoad = json.load(jsonOpen)
+    replyEndPoint = "https://api.line.me/v2/bot/message/reply"
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
     profile = line_bot_api.get_profile(event.source.user_id)
@@ -246,6 +253,13 @@ def handle_follow(event):
 
 @ handler.add(UnfollowEvent)
 def handle_unfollow(event):
+    headers = {
+        'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
+        'Content-type': 'application/json'
+    }
+    jsonOpen = open('reply.json', 'r', encoding="utf-8_sig")
+    jsonLoad = json.load(jsonOpen)
+    replyEndPoint = "https://api.line.me/v2/bot/message/reply"
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
     cell = useridSheet.findall(str(event.source.user_id))
