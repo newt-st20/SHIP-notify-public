@@ -28,10 +28,20 @@
                     },
                     {
                         "type": "action",
+                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-off.jpg",
+                        "action": {
+                            "type": "message",
+                            "label": "更新がない時の通知をオフにする",
+                            "text": "!not-change-notify-off"
+                        }
+                    },
+                    {
+                        "type": "action",
                         "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-issue.jpg",
                         "action": {
                             "type": "message",
-                            "label": "不具合報告・機能要望を送る"
+                            "label": "不具合報告・機能要望を送る",
+                            "text": "!issue"
                         }
                     }
                 ]

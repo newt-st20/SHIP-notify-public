@@ -110,7 +110,6 @@ def handle_message(event):
         if event.message.text == "!issue":
             jsonData = jsonLoad['issueReject']
             jsonData['replyToken'] = event.reply_token
-            jsonData['messages'][0]['text'] = messageData
             requests.post(replyEndPoint, json=jsonData, headers=headers)
         else:
             useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('issue')
@@ -125,7 +124,6 @@ def handle_message(event):
             useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
             jsonData = jsonLoad['issueComplete']
             jsonData['replyToken'] = event.reply_token
-            jsonData['messages'][0]['text'] = messageData
             requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif event.message.text == "!connection":
         connectionSheet = gc.open_by_key(
