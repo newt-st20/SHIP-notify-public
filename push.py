@@ -152,7 +152,7 @@ def main():
         sendList = []
         userNum = 0
         for userEach in userId:
-            if "not-change-notify-on" == userSetting[userNum]:
+            if userSetting[userNum] == "not-change-notify-on":
                 sendList.append(userEach)
             userNum += 1
         finalSendList = list(set(sendList))
