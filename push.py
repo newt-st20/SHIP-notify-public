@@ -37,6 +37,7 @@ else:
 driver_path = '/app/.chromedriver/bin/chromedriver'
 
 options = Options()
+options.binary_location = '/app/.apt/opt/google/chrome/google-chrome'
 options.add_argument('--disable-gpu')
 options.add_argument('--disable-extensions')
 options.add_argument('--proxy-server="direct://"')
