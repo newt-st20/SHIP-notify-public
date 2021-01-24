@@ -34,16 +34,15 @@ if os.environ['CHANNEL_TYPE'] == "public":
 else:
     SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
 
+driver_path = '/app/.chromedriver/bin/chromedriver'
 options = Options()
-options.binary_location = '/usr/bin/google-chrome'
 options.add_argument('--disable-gpu')
 options.add_argument('--disable-extensions')
 options.add_argument('--proxy-server="direct://"')
 options.add_argument('--proxy-bypass-list=*')
+options.add_argument('--start-maximized')
 options.add_argument('--headless')
-
-driver = webdriver.Chrome(
-    executable_path='/usr/local/bin/chromedriver', options=options)
+driver = webdriver.Chrome(executable_path=driver_path, chrome_options=options)
 driver.get('https://ship.sakae-higashi.jp/')
 time.sleep(1)
 ship_id = driver.find_element_by_name("ship_id")
