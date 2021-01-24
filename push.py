@@ -35,7 +35,7 @@ else:
     SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
 
 options = Options()
-options.binary_location = '/app/.apt/opt/google/chrome/google-chrome'
+options.binary_location = os.environ['GOOGLE_CHROME_BIN']
 options.add_argument('--disable-gpu')
 options.add_argument('--disable-extensions')
 options.add_argument('--proxy-server="direct://"')
