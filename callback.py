@@ -142,7 +142,7 @@ def handle_message(event):
             connectionSheetLow, 3).value
         newestConnectionMessage = "連絡事項最終取得:" + \
             newestConnectionTime + "\n" + \
-            newestConnectionBaseMessage.replace("\u3000", "")
+            str(newestConnectionBaseMessage).replace("\u3000", "")
         jsonData = jsonLoad['connection']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestConnectionMessage
@@ -164,7 +164,7 @@ def handle_message(event):
             studySheetLow, 3).value
         newestStudyMessage = "学習教材最終取得:" + \
             newestStudyTime + "\n" + \
-            newestStudyBaseMessage.replace("\u3000", "")
+            str(newestStudyBaseMessage).replace("\u3000", "")
         jsonData = jsonLoad['study']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestStudyMessage
