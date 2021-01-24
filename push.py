@@ -35,16 +35,15 @@ else:
     SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
 
 options = Options()
-options.binary_location = os.environ['GOOGLE_CHROME_BIN']
+options.binary_location = '/usr/bin/google-chrome'
 options.add_argument('--disable-gpu')
 options.add_argument('--disable-extensions')
 options.add_argument('--proxy-server="direct://"')
 options.add_argument('--proxy-bypass-list=*')
-options.add_argument('--start-maximized')
 options.add_argument('--headless')
 
 driver = webdriver.Chrome(
-    executable_path=os.environ['CHROMEDRIVER_PATH'], options=options)
+    executable_path='/usr/local/bin/chromedriver', options=options)
 driver.get('https://ship.sakae-higashi.jp/')
 time.sleep(1)
 ship_id = driver.find_element_by_name("ship_id")
