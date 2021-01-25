@@ -135,14 +135,19 @@ def handle_message(event):
         newestConnectionBaseMessage = ""
         print(newestConnectionList)
         for connectionEach in newestConnectionList:
-            newestConnectionBaseMessage += "\n" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "") + "-" + re.findall(
-                "\'(.*?)\'", connectionEach)[1].replace("\\n", "") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "")
+            newestConnectionBaseMessage += "\n" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ")
         print(newestConnectionBaseMessage)
         newestConnectionTime = connectionSheet.cell(
             connectionSheetLow, 3).value
-        newestConnectionMessage = "連絡事項最終取得:" + \
-            newestConnectionTime + "\n" + \
-            str(newestConnectionBaseMessage).replace("\u3000", "")
+        lastUpdateConnectionTime = connectionSheet.cell(
+            connectionSheetLow, 4).value
+        if lastUpdateConnectionTime == "":
+            lastUpdateConnectionTime = newestConnectionTime
+        newestConnectionMessage = "連絡事項最終更新:" + \
+            newestConnectionTime + "\n連絡事項最終取得:" + \
+            lastUpdateConnectionTime+"\n" + \
+            str(newestConnectionBaseMessage)
         jsonData = jsonLoad['connection']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestConnectionMessage
@@ -157,14 +162,19 @@ def handle_message(event):
         newestStudyBaseMessage = ""
         print(newestStudyList)
         for studyEach in newestStudyList:
-            newestStudyBaseMessage += "\n" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "") + "-" + re.findall(
-                "\'(.*?)\'", studyEach)[1].replace("\\n", "") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "")
+            newestStudyBaseMessage += "\n" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
         print(newestStudyBaseMessage)
-        newestStudyTime = studySheet.cell(
-            studySheetLow, 3).value
-        newestStudyMessage = "学習教材最終取得:" + \
-            newestStudyTime + "\n" + \
-            str(newestStudyBaseMessage).replace("\u3000", "")
+        newestStudyTime = StudySheet.cell(
+            StudySheetLow, 3).value
+        lastUpdateStudyTime = StudySheet.cell(
+            StudySheetLow, 4).value
+        if lastUpdateStudyTime == "":
+            lastUpdateStudyTime = newestStudyTime
+        newestStudyMessage = "学習教材最終更新:" + \
+            newestStudyTime + "\n学習教材最終取得:" + \
+            lastUpdateStudyTime+"\n" + \
+            str(newestStudyBaseMessage)
         jsonData = jsonLoad['study']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestStudyMessage
@@ -230,10 +240,11 @@ def handle_follow(event):
     replyEndPoint = "https://api.line.me/v2/bot/message/reply"
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
-    profile = line_bot_api.get_profile(event.source.user_id)
-    useridSheet.update_cell(useridSheetLow + 1, 1, str(event.source.user_id))
-    displayName = profile.display_name
-    userData = displayName + "," + str(profile)
+    userid = event.source.user_id
+    userDataEndPoint = "https://api.line.me/v2/bot/profile/" + userid
+    userDataJson = requests.get(userDataEndPoint, headers=headers).json()
+    userData = json.dumps(userDataJson, ensure_ascii=False)
+    useridSheet.update_cell(useridSheetLow + 1, 1, userid)
     useridSheet.update_cell(useridSheetLow + 1, 2, str(userData))
     time = datetime.datetime.fromtimestamp(
         int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
