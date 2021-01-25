@@ -13,7 +13,7 @@ import time
 import re
 
 now = datetime.datetime.now()
-time = now.strftime('%Y-%m-%d %H:%M:%S')
+getTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
@@ -84,7 +84,7 @@ studyList.pop(0)
 
 connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
 connectionSheetLow = len(connectionSheet.col_values(1))
-connectionData = [str(connectionText), str(connectionList), time]
+connectionData = [str(connectionText), str(connectionList), getTime]
 connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
 connectionNewData = connectionList
 message1 = ""
@@ -99,7 +99,7 @@ try:
                 message1 += "\n連絡事項:" + a[0] + "-" + \
                     a[1] + "-" + a[2].replace("\n", "")
     else:
-        connectionSheet.update_cell(connectionSheetLow, 4, time)
+        connectionSheet.update_cell(connectionSheetLow, 4, getTime)
         message1 = "\n連絡事項:更新はありません"
 except:
     message1 = "\n連絡事項取得エラー:更新の有無を取得できませんでした"
@@ -122,7 +122,7 @@ try:
                 message2 += "\n学習教材:" + b[0] + "-" + \
                     b[1] + "-" + b[2].replace("\n", "")
     else:
-        studySheet.update_cell(studySheetLow, 4, time)
+        studySheet.update_cell(studySheetLow, 4, getTime)
         message2 = "\n学習教材:更新はありません"
 except:
     message2 = "\n学習教材取得エラー:更新の有無を取得できませんでした"
