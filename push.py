@@ -83,12 +83,12 @@ time = now.strftime('%Y-%m-%d %H:%M:%S')
 connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
 connectionSheetLow = len(connectionSheet.col_values(1))
 connectionData = [str(connectionText), str(connectionList), time]
-connectionSheet.append_row(connectionData)
 connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
 connectionNewData = connectionList
 message1 = ""
 try:
     if connectionOldData != str(connectionNewData):
+        connectionSheet.append_row(connectionData)
         for a in connectionNewData:
             print(str(a))
             if str(a) in str(connectionOldData):
@@ -97,19 +97,20 @@ try:
                 message1 += "\n連絡事項:" + a[0] + "-" + \
                     a[1] + "-" + a[2].replace("\n", "")
     else:
+        connectionSheet.update_cell(connectionSheetLow + 1, 4, time)
         message1 = "\n連絡事項:更新はありません"
 except:
     message1 = "\n連絡事項取得エラー:更新の有無を取得できませんでした"
 
 studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
 studySheetLow = len(studySheet.col_values(1))
-studyData = [str(studyText), str(studyList), time]
-studySheet.append_row(studyData)
+studyData = [str(studyText).replace("\\n", "").replace("\\u3000", " "), str(studyList), time]
 studyOldData = studySheet.cell(studySheetLow, 2).value
 studyNewData = studyList
 message2 = ""
 try:
     if studyOldData != str(studyNewData):
+        studySheet.append_row(studyData)
         for b in studyNewData:
             print(str(b))
             if str(b) in str(studyOldData):
@@ -118,6 +119,7 @@ try:
                 message2 += "\n学習教材:" + b[0] + "-" + \
                     b[1] + "-" + b[2].replace("\n", "")
     else:
+        studySheet.update_cell(studySheetLow + 1, 4, time)
         message2 = "\n学習教材:更新はありません"
 except:
     message2 = "\n学習教材取得エラー:更新の有無を取得できませんでした"
