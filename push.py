@@ -12,6 +12,9 @@ import os
 import time
 import re
 
+now = datetime.datetime.now()
+time = now.strftime('%Y-%m-%d %H:%M:%S')
+
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 credential_list = {
@@ -78,8 +81,7 @@ for i in range(len(studySoup.find_all('table')[7].find_all('tr'))):
             7].find_all('tr')[i].find_all('td')[2].text])
 studyList.pop(0)
 
-now = datetime.datetime.now()
-time = now.strftime('%Y-%m-%d %H:%M:%S')
+
 connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
 connectionSheetLow = len(connectionSheet.col_values(1))
 connectionData = [str(connectionText), str(connectionList), time]
@@ -97,14 +99,15 @@ try:
                 message1 += "\n連絡事項:" + a[0] + "-" + \
                     a[1] + "-" + a[2].replace("\n", "")
     else:
-        connectionSheet.update_cell(connectionSheetLow + 1, 4, time)
+        connectionSheet.update_cell(connectionSheetLow, 4, time)
         message1 = "\n連絡事項:更新はありません"
 except:
     message1 = "\n連絡事項取得エラー:更新の有無を取得できませんでした"
 
 studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
 studySheetLow = len(studySheet.col_values(1))
-studyData = [str(studyText).replace("\\n", "").replace("\\u3000", " "), str(studyList), time]
+studyData = [str(studyText).replace("\\n", "").replace(
+    "\\u3000", " "), str(studyList), time]
 studyOldData = studySheet.cell(studySheetLow, 2).value
 studyNewData = studyList
 message2 = ""
@@ -119,7 +122,7 @@ try:
                 message2 += "\n学習教材:" + b[0] + "-" + \
                     b[1] + "-" + b[2].replace("\n", "")
     else:
-        studySheet.update_cell(studySheetLow + 1, 4, time)
+        studySheet.update_cell(studySheetLow, 4, time)
         message2 = "\n学習教材:更新はありません"
 except:
     message2 = "\n学習教材取得エラー:更新の有無を取得できませんでした"

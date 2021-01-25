@@ -165,10 +165,10 @@ def handle_message(event):
             newestStudyBaseMessage += "\n" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
                 "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
         print(newestStudyBaseMessage)
-        newestStudyTime = StudySheet.cell(
-            StudySheetLow, 3).value
-        lastUpdateStudyTime = StudySheet.cell(
-            StudySheetLow, 4).value
+        newestStudyTime = studySheet.cell(
+            studySheetLow, 3).value
+        lastUpdateStudyTime = studySheet.cell(
+            studySheetLow, 4).value
         if lastUpdateStudyTime == "":
             lastUpdateStudyTime = newestStudyTime
         newestStudyMessage = "学習教材最終更新:" + \
@@ -222,11 +222,10 @@ def handle_message(event):
         pass
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
-    getlogsSheet.update_cell(getlogsSheetLow + 1, 1, str(event.source.user_id))
-    getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(event))
+    getlogsSheet.update_cell(getlogsSheetLow + 1, 1, str(event))
     time = datetime.datetime.fromtimestamp(
         int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
-    getlogsSheet.update_cell(getlogsSheetLow + 1, 3, str(time))
+    getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(time))
 
 
 @handler.add(FollowEvent)
