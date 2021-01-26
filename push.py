@@ -158,7 +158,7 @@ def main():
         if random.randrange(3) == 0:
             userNum = 0
             for userEach in userId:
-                if "notify-all" in userSetting[userNum] or == "notify-middle" in userSetting[userNum]:
+                if "notify-all" in userSetting[userNum] or "notify-middle" in userSetting[userNum]:
                     sendList.append(userEach)
                 userNum += 1
         else:
