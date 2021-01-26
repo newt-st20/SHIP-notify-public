@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 import os
 import time
 import re
+import random
 
 now = datetime.datetime.now()
 getTime = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -148,19 +149,26 @@ def main():
     reportSheetLow = len(reportSheet.col_values(1))
     mail = "【" + getTime + "】\n" + message1 + message2
     if "連絡事項:更新はありません" in message1 and "学習教材:更新はありません" in message2:
-        userId = useridSheet.col_values(1)
-        userSetting = useridSheet.col_values(5)
-        sendList = []
-        userNum = 0
-        for userEach in userId:
-            if userSetting[userNum] == "not-change-notify-on":
-                sendList.append(userEach)
-            userNum += 1
-        finalSendList = list(set(sendList))
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonData = jsonLoad['pushForNotifyEnabledUser']
         jsonData['messages'][0]['text'] = mail
-        jsonData['to'] = finalSendList
+        userId = useridSheet.col_values(1)
+        userSetting = useridSheet.col_values(5)
+        sendList = []
+        if random.randrange(3) == 0:
+            userNum = 0
+            for userEach in userId:
+                if "notify-all" in userSetting[userNum] or == "notify-middle" in userSetting[userNum]:
+                    sendList.append(userEach)
+                userNum += 1
+        else:
+            userNum = 0
+            for userEach in userId:
+                if "notify-all" in userSetting[userNum]:
+                    sendList.append(userEach)
+                userNum += 1
+        finalSendList = list(set(sendList))
+        jsonData['to'] = finalAllSendList
         print(jsonData)
         requests.post(multicastEndPoint, json=jsonData, headers=headers)
         logMessage = "send message:" + \

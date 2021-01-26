@@ -179,24 +179,34 @@ def handle_message(event):
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestStudyMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
-    elif "!not-change-notify-off" in event.message.text:
+    elif "!notify-all" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
         cell = useridSheet.findall(str(event.source.user_id))
-        blockMessage = "not-change-notify-off"
+        changeMessage = "notify-all"
         for f in cell:
-            useridSheet.update_cell(f.row, 5, blockMessage)
-        jsonData = jsonLoad['not-change-notify-off']
+            useridSheet.update_cell(f.row, 5, changeMessage)
+        jsonData = jsonLoad['notify-all']
         jsonData['replyToken'] = event.reply_token
         requests.post(replyEndPoint, json=jsonData, headers=headers)
-    elif "!not-change-notify-on" in event.message.text:
+    elif "!notify-middle" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
         cell = useridSheet.findall(str(event.source.user_id))
-        blockMessage = "not-change-notify-on"
+        changeMessage = "notify-middle"
         for f in cell:
-            useridSheet.update_cell(f.row, 5, blockMessage)
-        jsonData = jsonLoad['not-change-notify-on']
+            useridSheet.update_cell(f.row, 5, changeMessage)
+        jsonData = jsonLoad['notify-middle']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!notify-few" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        changeMessage = "notify-few"
+        for f in cell:
+            useridSheet.update_cell(f.row, 5, changeMessage)
+        jsonData = jsonLoad['notify-few']
         jsonData['replyToken'] = event.reply_token
         requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!" in event.message.text:
