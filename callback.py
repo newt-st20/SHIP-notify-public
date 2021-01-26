@@ -16,6 +16,8 @@ import requests
 import re
 import datetime
 
+import push
+
 app = Flask(__name__)
 
 if os.environ['CHANNEL_TYPE'] == "public":
@@ -230,9 +232,12 @@ def handle_message(event):
         requests.post(replyEndPoint, json=jsonData, headers=headers)
     else:
         pass
+    if event.source.user_id == os.environ['OWNER_USER_ID']:
+        if "!get" in event.message.text:
+            push.main()
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
-    fixedEvent = str(event).encode().decode()
+    fixedEvent = str(event)
     getlogsSheet.update_cell(getlogsSheetLow + 1, 1,
                              fixedEvent.encode().decode())
     time = datetime.datetime.fromtimestamp(
