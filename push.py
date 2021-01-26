@@ -86,12 +86,11 @@ connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
 connectionSheetLow = len(connectionSheet.col_values(1))
 connectionData = [str(connectionText), str(connectionList), getTime]
 connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
-connectionNewData = connectionList
 message1 = ""
 try:
-    if connectionOldData != str(connectionNewData):
+    if connectionOldData != str(connectionList):
         connectionSheet.append_row(connectionData)
-        for a in connectionNewData:
+        for a in connectionList:
             print(str(a))
             if str(a) in str(connectionOldData):
                 pass
@@ -106,15 +105,14 @@ except:
 
 studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
 studySheetLow = len(studySheet.col_values(1))
-studyData = [str(studyText).replace("\\n", "").replace(
-    "\\u3000", " "), str(studyList), time]
+studyData = [str(studyText), str(studyList), getTime]
 studyOldData = studySheet.cell(studySheetLow, 2).value
 studyNewData = studyList
 message2 = ""
 try:
-    if studyOldData != str(studyNewData):
+    if studyOldData != str(studyList):
         studySheet.append_row(studyData)
-        for b in studyNewData:
+        for b in studyList:
             print(str(b))
             if str(b) in str(studyOldData):
                 pass

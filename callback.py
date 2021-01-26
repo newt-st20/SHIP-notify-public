@@ -223,7 +223,8 @@ def handle_message(event):
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
     fixedEvent = str(event).encode().decode()
-    getlogsSheet.update_cell(getlogsSheetLow + 1, 1, fixedEvent)
+    getlogsSheet.update_cell(getlogsSheetLow + 1, 1,
+                             fixedEvent.encode().decode())
     time = datetime.datetime.fromtimestamp(
         int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
     getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(time))
