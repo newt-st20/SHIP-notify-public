@@ -113,7 +113,7 @@
     "notify-few": {
         "messages": [{
             "type": "text",
-            "text": "通知の量を最低限に設定しました。「!notify-all」コマンドからすべての通知をオンに、「!notify-middle」コマンドからある程度の通知量に変更できます。",
+            "text": "通知の量を最低限にしました。「!notify-all」コマンドからすべての通知をオンに、「!notify-middle」コマンドからある程度の通知量に変更できます。",
             "quickReply": {
                 "items": [{
                     "type": "action",

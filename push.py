@@ -154,7 +154,8 @@ def main():
         userId = useridSheet.col_values(1)
         userSetting = useridSheet.col_values(5)
         sendList = []
-        if random.randrange(3) == 0:
+        num = random.randrange(10)
+        if num == 0:
             userNum = 0
             for userEach in userId:
                 if "notify-all" in userSetting[userNum] or "notify-middle" in userSetting[userNum]:
@@ -170,7 +171,8 @@ def main():
         jsonData['to'] = finalSendList
         requests.post(multicastEndPoint, json=jsonData, headers=headers)
         logMessage = "send message:" + \
-            str(mail)+" send for:" + str(finalSendList)
+            str(mail)+" send for:" + str(finalSendList) + \
+            ". Random number is " + num
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
