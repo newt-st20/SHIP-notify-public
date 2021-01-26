@@ -28,10 +28,10 @@
                     },
                     {
                         "type": "action",
-                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-off.jpg",
+                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-all.jpg",
                         "action": {
                             "type": "message",
-                            "label": "すべての通知をオンにします",
+                            "label": "すべての通知をオンにする",
                             "text": "!notify-all"
                         }
                     },
@@ -46,7 +46,7 @@
                     },
                     {
                         "type": "action",
-                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-all.jpg",
+                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-issue.jpg",
                         "action": {
                             "type": "message",
                             "label": "不具合報告・機能要望を送る",

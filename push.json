@@ -10,11 +10,11 @@
             "quickReply": {
                 "items": [{
                     "type": "action",
-                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-off.jpg",
+                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-few.jpg",
                     "action": {
                         "type": "message",
                         "label": "この通知をオフにする",
-                        "text": "!not-change-notify-off"
+                        "text": "!notify-few"
                     }
                 }]
             }
