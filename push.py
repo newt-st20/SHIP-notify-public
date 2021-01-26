@@ -172,7 +172,7 @@ def main():
         requests.post(multicastEndPoint, json=jsonData, headers=headers)
         logMessage = "send message:" + \
             str(mail)+" send for:" + str(finalSendList) + \
-            ". Random number is " + num
+            ". Random number is " + str(num)
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
