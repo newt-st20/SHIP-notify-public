@@ -17,6 +17,7 @@ import re
 import datetime
 
 import push
+import verify
 
 app = Flask(__name__)
 
@@ -235,6 +236,8 @@ def handle_message(event):
     if event.source.user_id == os.environ['OWNER_USER_ID']:
         if "!get" in event.message.text:
             push.main()
+        if "!howmenyicansend" in event.message.text:
+            verify.main()
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
     fixedEvent = str(event)
