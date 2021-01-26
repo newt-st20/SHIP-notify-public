@@ -261,7 +261,7 @@ def handle_follow(event):
         int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
     useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
     useridSheet.update_cell(useridSheetLow + 1, 4, "")
-    useridSheet.update_cell(useridSheetLow + 1, 5, "not-change-notify-on")
+    useridSheet.update_cell(useridSheetLow + 1, 5, "notify-middle")
     messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
     messageData = messageSheet.cell(1, 2).value
     jsonData = jsonLoad['about']
@@ -287,7 +287,7 @@ def handle_unfollow(event):
         int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
     blockMessage = "blocked:" + str(time)
     for f in cell:
-        useridSheet.update_cell(f.row, 5, "not-change-notify-off")
+        useridSheet.update_cell(f.row, 5, "notify-few")
         if useridSheet.cell(f.row, 4).value == "":
             useridSheet.update_cell(f.row, 4, blockMessage)
 
