@@ -24,20 +24,23 @@ line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 
 def main():
     deviveryDay = (datetime.datetime.now() -
-                   datetime.timedelta(days=2)).strftime('%Y%m%d')
+                   datetime.timedelta(days=1)).strftime('%Y%m%d')
     followersDay = (datetime.datetime.now() -
                     datetime.timedelta(days=1)).strftime('%Y%m%d')
     print(deviveryDay)
     delivery = 'https://api.line.me/v2/bot/insight/message/delivery?date='+deviveryDay
     followers = 'https://api.line.me/v2/bot/insight/followers?date='+followersDay
+    left = 'https://api.line.me/v2/bot/message/quota/consumption'
     headers = {
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
     deliveryData = requests.get(delivery, headers=headers)
     followersData = requests.get(followers, headers=headers)
+    leftData = requests.get(left, headers=headers)
     sendText = deviveryDay + str(deliveryData.json()) + \
-        "\n" + followersDay + str(followersData.json())
+        "\n" + followersDay + str(followersData.json()) + \
+        "\n" + str(leftData.json())
     jsonOpen = open('other.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     jsonData = jsonLoad['ownerVerify']
