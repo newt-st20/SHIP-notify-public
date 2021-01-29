@@ -69,6 +69,7 @@ def main():
     driver.get("https://ship.sakae-higashi.jp/connection/connection_main.php")
     con = driver.page_source
     conSoup = BeautifulSoup(con, 'html.parser')
+    conSource = conSoup.find("body")
     conTable = conSoup.find_all(class_='allc')[0]
     conLinks = conTable.find_all('a')
     conTrs = conTable.find_all("tr")
@@ -86,6 +87,7 @@ def main():
         conLeft = conOnclick.find("'")
         conRight = conOnclick.find("'", conLeft+1)
         conId = format(conOnclick[conLeft+1:conRight])
+        time.sleep(getWaitSecs())
         driver.get(
             "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
         conEachPage = driver.page_source
@@ -122,7 +124,7 @@ def main():
 
     connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
     connectionSheetLow = len(connectionSheet.col_values(1))
-    connectionData = [str(connectionText), str(conAllDataList), getTime]
+    connectionData = [str(conSource), str(conAllDataList), getTime]
     connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
     message1 = ""
     try:
