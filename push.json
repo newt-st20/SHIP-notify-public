@@ -1,7 +1,70 @@
 {
-    "pushForAll": {
+    "default": {
         "messages": [{
             "type": "text"
+        }]
+    },
+    "pushForAll": {
+        "messages": [{
+            "type": "bubble",
+            "direction": "ltr",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [{
+                        "type": "text",
+                        "text": "test",
+                        "weight": "bold",
+                        "size": "xxl",
+                        "color": "#000000FF",
+                        "align": "start",
+                        "contents": []
+                    },
+                    {
+                        "type": "separator"
+                    }
+                ]
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [{
+                        "type": "text",
+                        "text": "連絡事項",
+                        "weight": "bold",
+                        "size": "xl",
+                        "contents": [{
+                            "type": "span",
+                            "text": "連絡事項"
+                        }]
+                    },
+                    {
+                        "type": "text",
+                        "text": "hello, world",
+                        "contents": []
+                    },
+                    {
+                        "type": "separator",
+                        "margin": "xl",
+                        "color": "#FFFFFFFF"
+                    },
+                    {
+                        "type": "text",
+                        "text": "学習教材",
+                        "weight": "bold",
+                        "size": "xl",
+                        "contents": [{
+                            "type": "span",
+                            "text": "学習教材"
+                        }]
+                    },
+                    {
+                        "type": "text",
+                        "text": "hello, world",
+                        "contents": []
+                    }
+                ]
+            }
         }]
     },
     "pushForNotifyAllUser": {
