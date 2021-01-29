@@ -139,7 +139,11 @@ def main():
                     message1 += "\n・連絡事項:" + \
                         a[0] + "-" + a[1] + "-" + \
                         a[2].replace("\n", "") + \
-                        "(" + a[3].replace("\n", "") + ")"
+                        "\n《" + a[3].replace("\n", "") + "》"
+                    conFlex0.append(a[0])
+                    conFlex1.append(a[1])
+                    conFlex2.append(a[2])
+                    conFlex3.append(a[3])
         else:
             connectionSheet.update_cell(connectionSheetLow, 4, getTime)
             message1 = "\n・連絡事項:更新はありません"
@@ -162,6 +166,9 @@ def main():
                 else:
                     message2 += "\n・学習教材:" + b[0] + "-" + \
                         b[1] + "-" + b[2].replace("\n", " ")
+                    studyFlex0.append(a[0])
+                    studyFlex1.append(a[1])
+                    studyFlex2.append(a[2])
         else:
             studySheet.update_cell(studySheetLow, 4, getTime)
             message2 = "\n・学習教材:更新はありません"
@@ -230,7 +237,7 @@ def main():
                                 logMessage.replace("\n", ""))
     else:
         broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
-        jsonData = jsonLoad['pushForAll']
+        jsonData = jsonLoad['default']
         jsonData['messages'][0]['text'] = mail
         print(jsonData)
         requests.post(broadcastEndPoint, json=jsonData, headers=headers)
@@ -239,6 +246,8 @@ def main():
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
+        jsonData = jsonLoad['pushForAll']
+        requests.post(broadcastEndPoint, json=jsonData, headers=headers)
 
 
 if __name__ == "__main__":

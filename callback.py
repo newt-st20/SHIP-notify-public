@@ -139,7 +139,7 @@ def handle_message(event):
         print(newestConnectionList)
         for connectionEach in newestConnectionList:
             newestConnectionBaseMessage += "\n" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
-                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ")
+                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ") + "\n《" + re.findall("\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
         print(newestConnectionBaseMessage)
         newestConnectionTime = connectionSheet.cell(
             connectionSheetLow, 3).value
