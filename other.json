@@ -4,7 +4,7 @@
             "type": "text"
         }]
     },
-    "instantNormal": {
+    "instantWithFewMenu": {
         "messages": [{
             "type": "text",
             "quickReply": {
@@ -20,7 +20,7 @@
             }
         }]
     },
-    "instantWithFewMenu": {
+    "instantNormal": {
         "messages": [{
             "type": "text"
         }]
