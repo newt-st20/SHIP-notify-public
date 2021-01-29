@@ -68,33 +68,32 @@ def main():
     time.sleep(getWaitSecs())
     driver.get("https://ship.sakae-higashi.jp/connection/connection_main.php")
     con = driver.page_source
-
-
-conSoup = BeautifulSoup(con, 'html.parser')
-conTable = conSoup.find_all(class_='allc')[0]
-conLinks = conTable.find_all('a')
-conTrs = conTable.find_all("tr")
-conDataLists = []
-for conTr in conTrs:
-    conDataList = []
-    conTds = conTr.find_all("td")
-    for conTd in conTds:
-        conDataList.append(conTd.text)
-    conDataLists.append(conDataList)
-conDataLists.pop(0)
-conPageDescriptions = []
-for conLink in conLinks:
-    conOnclick = conLink.attrs['onclick']
-    conLeft = conOnclick.find("'")
-    conRight = conOnclick.find("'", conLeft+1)
-    conId = format(conOnclick[conLeft+1:conRight])
-    driver.get(
-        "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
-    conEachPage = driver.page_source
-    conEachPageSoup = BeautifulSoup(conEachPage, 'html.parser')
-    conPageMain = conEachPageSoup.find_all(class_='ac')[0].find_all("table")[1]
-    conPageDescription = conPageMain.find_all("table")[-2].text
-    conPageDescriptions.append(conPageDescription)
+    conSoup = BeautifulSoup(con, 'html.parser')
+    conTable = conSoup.find_all(class_='allc')[0]
+    conLinks = conTable.find_all('a')
+    conTrs = conTable.find_all("tr")
+    conDataLists = []
+    for conTr in conTrs:
+        conDataList = []
+        conTds = conTr.find_all("td")
+        for conTd in conTds:
+            conDataList.append(conTd.text)
+        conDataLists.append(conDataList)
+    conDataLists.pop(0)
+    conPageDescriptions = []
+    for conLink in conLinks:
+        conOnclick = conLink.attrs['onclick']
+        conLeft = conOnclick.find("'")
+        conRight = conOnclick.find("'", conLeft+1)
+        conId = format(conOnclick[conLeft+1:conRight])
+        driver.get(
+            "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
+        conEachPage = driver.page_source
+        conEachPageSoup = BeautifulSoup(conEachPage, 'html.parser')
+        conPageMain = conEachPageSoup.find_all(
+            class_='ac')[0].find_all("table")[1]
+        conPageDescription = conPageMain.find_all("table")[-2].text
+        conPageDescriptions.append(conPageDescription)
     conAllDataCounter = 0
     conAllDataList = []
     for conData in range(len(conDataLists)):
