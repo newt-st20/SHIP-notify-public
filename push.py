@@ -14,6 +14,15 @@ import re
 import random
 
 
+def getWaitSecs():
+    # 画面の待機秒数の取得
+    max_wait = 7.0  # 最大待機秒
+    min_wait = 3.0  # 最小待機秒
+    mean_wait = 5.0  # 平均待機秒
+    sigma_wait = 1.0  # 標準偏差（ブレ幅）
+    return min([max_wait, max([min_wait, round(random.normalvariate(mean_wait, sigma_wait))])])
+
+
 def main():
     now = datetime.datetime.now()
     getTime = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -50,13 +59,13 @@ def main():
     options.add_argument('--headless')
     driver = webdriver.Chrome(executable_path=driver_path, options=options)
     driver.get('https://ship.sakae-higashi.jp/')
-    time.sleep(1)
+    time.sleep(getWaitSecs())
     ship_id = driver.find_element_by_name("ship_id")
     password = driver.find_element_by_name("pass")
     ship_id.send_keys(os.environ['SHIP_ID'])
     password.send_keys(os.environ['SHIP_PASS'])
     driver.find_element_by_name('login').click()
-    time.sleep(1)
+    time.sleep(getWaitSecs())
     driver.get("https://ship.sakae-higashi.jp/connection/connection_main.php")
     connection = driver.page_source
     driver.get("https://ship.sakae-higashi.jp/study/study_main.php")
@@ -149,30 +158,41 @@ def main():
     mail = "【" + getTime + "】\n" + message1 + message2
     if "連絡事項:更新はありません" in message1 and "学習教材:更新はありません" in message2:
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
-        jsonData = jsonLoad['pushForNotifyEnabledUser']
-        jsonData['messages'][0]['text'] = mail
+        jsonAllData = jsonLoad['pushForNotifyAllUser']
+        jsonAllData['messages'][0]['text'] = mail
         userId = useridSheet.col_values(1)
         userSetting = useridSheet.col_values(5)
         sendList = []
-        num = random.randrange(10)
-        if num == 0:
-            userNum = 0
-            for userEach in userId:
-                if "notify-all" in userSetting[userNum] or "notify-middle" in userSetting[userNum]:
-                    sendList.append(userEach)
-                userNum += 1
-        else:
-            userNum = 0
-            for userEach in userId:
-                if "notify-all" in userSetting[userNum]:
-                    sendList.append(userEach)
-                userNum += 1
-        finalSendList = list(set(sendList))
-        jsonData['to'] = finalSendList
-        requests.post(multicastEndPoint, json=jsonData, headers=headers)
+        # all
+        sendAllList = []
+        userNum = 0
+        for userEach in userId:
+            if "notify-all" in userSetting[userNum]:
+                sendAllList.append(userEach)
+            userNum += 1
+        finalAllSendList = list(set(sendAllList))
+        jsonAllData['to'] = finalAllSendList
+        requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
+        num = random.randrange(30)
         logMessage = "send message:" + \
             str(mail)+" send for:" + str(finalSendList) + \
             ". Random number is " + str(num)
+        if num == 0:
+            # middle
+            jsonMiddleData = jsonLoad['pushForNotifyMiddleUser']
+            sendMiddleList = []
+            userNum = 0
+            for userEach in userId:
+                if "notify-middle" in userSetting[userNum]:
+                    sendMiddleList.append(userEach)
+                userNum += 1
+            finalMiddleSendList = list(set(sendMiddleList))
+            jsonMiddleData['to'] = finalMiddleSendList
+            requests.post(multicastEndPoint,
+                          json=jsonMiddleData, headers=headers)
+            logMessage = "send message:" + \
+                str(mail)+"[all] send for:" + str(finalAllSendList) + ",[middle] send for:" + str(finalMiddleSendList) + \
+                ". Random number is " + str(num)
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))

@@ -17,7 +17,7 @@ import re
 import datetime
 
 import push
-import verify
+import owner
 
 app = Flask(__name__)
 
@@ -237,7 +237,7 @@ def handle_message(event):
         if "!get" in event.message.text:
             push.main()
         if "!left" in event.message.text:
-            verify.main()
+            owner.main()
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
     fixedEvent = str(event)
