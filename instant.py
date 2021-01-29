@@ -36,7 +36,7 @@ def main():
     print(jsonData)
     requests.post(broadcastEndPoint, json=jsonData, headers=headers)
     logMessage = "send message:" + \
-        str(mail)+" send for all followed user."
+        str(jsonData['messages'][0]['text'])+" send for all followed user."
     print(logMessage)
     reportSheet.update_cell(reportSheetLow+1, 1,
                             logMessage.replace("\n", ""))
