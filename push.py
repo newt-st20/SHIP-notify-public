@@ -132,13 +132,14 @@ def main():
         if connectionOldData != str(conAllDataList):
             connectionSheet.append_row(connectionData)
             for a in conAllDataList:
-                print(str(a))
+                print("135:"+a[3])
                 if str(a) in str(connectionOldData):
                     pass
                 else:
-                    message1 += "\n・連絡事項:" + a[0] + "-" + \
-                        a[1] + "-" + a[2].replace("\n", "") + \
-                        "(" + a[3].repalce("\n", "") + ")"
+                    message1 += "\n・連絡事項:" + \
+                        a[0] + "-" + a[1] + "-" + \
+                        a[2].replace("\n", "") + \
+                        "(" + a[3].replace("\n", "") + ")"
         else:
             connectionSheet.update_cell(connectionSheetLow, 4, getTime)
             message1 = "\n・連絡事項:更新はありません"
