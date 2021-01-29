@@ -67,21 +67,49 @@ def main():
     driver.find_element_by_name('login').click()
     time.sleep(getWaitSecs())
     driver.get("https://ship.sakae-higashi.jp/connection/connection_main.php")
-    connection = driver.page_source
+    con = driver.page_source
+
+
+conSoup = BeautifulSoup(con, 'html.parser')
+conTable = conSoup.find_all(class_='allc')[0]
+conLinks = conTable.find_all('a')
+conTrs = conTable.find_all("tr")
+conDataLists = []
+for conTr in conTrs:
+    conDataList = []
+    conTds = conTr.find_all("td")
+    for conTd in conTds:
+        conDataList.append(conTd.text)
+    conDataLists.append(conDataList)
+conDataLists.pop(0)
+conPageDescriptions = []
+for conLink in conLinks:
+    conOnclick = conLink.attrs['onclick']
+    conLeft = conOnclick.find("'")
+    conRight = conOnclick.find("'", conLeft+1)
+    conId = format(conOnclick[conLeft+1:conRight])
+    driver.get(
+        "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
+    conEachPage = driver.page_source
+    conEachPageSoup = BeautifulSoup(conEachPage, 'html.parser')
+    conPageMain = conEachPageSoup.find_all(class_='ac')[0].find_all("table")[1]
+    conPageDescription = conPageMain.find_all("table")[-2].text
+    conPageDescriptions.append(conPageDescription)
+    conAllDataCounter = 0
+    conAllDataList = []
+    for conData in range(len(conDataLists)):
+        conDatas = []
+        conDatas.append(conDataLists[conAllDataCounter][0])
+        conDatas.append(conDataLists[conAllDataCounter][1])
+        conDatas.append(conDataLists[conAllDataCounter][2])
+        conDatas.append(conPageDescriptions[conAllDataCounter])
+        conAllDataList.append(conDatas)
+        conAllDataCounter += 1
+    print(conAllDataList)
     driver.get("https://ship.sakae-higashi.jp/study/study_main.php")
     study = driver.page_source
     driver.quit()
 
-    connectionSoup = BeautifulSoup(connection, 'html.parser')
-    connectionText = connectionSoup.find_all('table')[7].find_all('tr')
-    connectionList = []
-    for i in range(len(connectionSoup.find_all('table')[7].find_all('tr'))):
-        for j in range(len(connectionSoup.find_all('table')[7].find_all('tr')[i].find_all('td')[0])):
-            connectionList.append([connectionSoup.find_all('table')[
-                7].find_all('tr')[i].find_all('td')[0].text, connectionSoup.find_all('table')[
-                7].find_all('tr')[i].find_all('td')[1].text, connectionSoup.find_all('table')[
-                7].find_all('tr')[i].find_all('td')[2].text])
-    connectionList.pop(0)
     studySoup = BeautifulSoup(study, 'html.parser')
     studyText = studySoup.find_all('table')[7].find_all('tr')
     studyList = []
@@ -95,19 +123,19 @@ def main():
 
     connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
     connectionSheetLow = len(connectionSheet.col_values(1))
-    connectionData = [str(connectionText), str(connectionList), getTime]
+    connectionData = [str(connectionText), str(conAllDataList), getTime]
     connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
     message1 = ""
     try:
-        if connectionOldData != str(connectionList):
+        if connectionOldData != str(conAllDataList):
             connectionSheet.append_row(connectionData)
-            for a in connectionList:
+            for a in conAllDataList:
                 print(str(a))
                 if str(a) in str(connectionOldData):
                     pass
                 else:
                     message1 += "\n連絡事項:" + a[0] + "-" + \
-                        a[1] + "-" + a[2].replace("\n", "")
+                        a[1] + "-" + a[2].replace("\n", "") + "(" + a[3] + ")"
         else:
             connectionSheet.update_cell(connectionSheetLow, 4, getTime)
             message1 = "\n連絡事項:更新はありません"
