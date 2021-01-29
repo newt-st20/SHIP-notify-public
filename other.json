@@ -6,6 +6,22 @@
     },
     "instantNormal": {
         "messages": [{
+            "type": "text",
+            "quickReply": {
+                "items": [{
+                    "type": "action",
+                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-middle.few",
+                    "action": {
+                        "type": "message",
+                        "label": "更新についての通知をなくす",
+                        "text": "!notify-few"
+                    }
+                }]
+            }
+        }]
+    },
+    "instantWithFewMenu": {
+        "messages": [{
             "type": "text"
         }]
     },
