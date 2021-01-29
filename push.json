@@ -4,9 +4,26 @@
             "type": "text"
         }]
     },
-    "pushForNotifyEnabledUser": {
+    "pushForNotifyAllUser": {
         "messages": [{
             "type": "text",
+            "quickReply": {
+                "items": [{
+                    "type": "action",
+                    "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-middle.jpg",
+                    "action": {
+                        "type": "message",
+                        "label": "この通知を少なくする",
+                        "text": "!notify-middle"
+                    }
+                }]
+            }
+        }]
+    },
+    "pushForNotifyMiddleUser": {
+        "messages": [{
+            "type": "text",
+            "text": "【定期通知】:\nSHIP-notifyは正常に動作しています。",
             "quickReply": {
                 "items": [{
                     "type": "action",
