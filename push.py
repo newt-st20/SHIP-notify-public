@@ -158,7 +158,7 @@ def main():
     studyData = [str(studySource), str(studyList), getTime]
     studyOldData = studySheet.cell(studySheetLow, 2).value
     studyNewData = studyList
-    message2 = ""
+    message2 = "\n"
     try:
         if studyOldData != str(studyList):
             studySheet.append_row(studyData)
