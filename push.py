@@ -112,6 +112,7 @@ def main():
     driver.quit()
 
     studySoup = BeautifulSoup(study, 'html.parser')
+    studySource = studySoup.find("body")
     studyText = studySoup.find_all('table')[7].find_all('tr')
     studyList = []
     for i in range(len(studySoup.find_all('table')[7].find_all('tr'))):
@@ -135,17 +136,18 @@ def main():
                 if str(a) in str(connectionOldData):
                     pass
                 else:
-                    message1 += "\n連絡事項:" + a[0] + "-" + \
-                        a[1] + "-" + a[2].replace("\n", "") + "(" + a[3] + ")"
+                    message1 += "\n・連絡事項:" + a[0] + "-" + \
+                        a[1] + "-" + a[2].replace("\n", "") + \
+                        "(" + a[3].repalce("\n", "") + ")"
         else:
             connectionSheet.update_cell(connectionSheetLow, 4, getTime)
-            message1 = "\n連絡事項:更新はありません"
+            message1 = "\n・連絡事項:更新はありません"
     except:
-        message1 = "\n連絡事項取得エラー:更新の有無を取得できませんでした"
+        message1 = "\n・連絡事項取得エラー:更新の有無を取得できませんでした"
 
     studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
     studySheetLow = len(studySheet.col_values(1))
-    studyData = [str(studyText), str(studyList), getTime]
+    studyData = [str(studySource), str(studyList), getTime]
     studyOldData = studySheet.cell(studySheetLow, 2).value
     studyNewData = studyList
     message2 = ""
@@ -157,13 +159,13 @@ def main():
                 if str(b) in str(studyOldData):
                     pass
                 else:
-                    message2 += "\n学習教材:" + b[0] + "-" + \
-                        b[1] + "-" + b[2].replace("\n", "")
+                    message2 += "\n・学習教材:" + b[0] + "-" + \
+                        b[1] + "-" + b[2].replace("\n", " ")
         else:
             studySheet.update_cell(studySheetLow, 4, getTime)
-            message2 = "\n学習教材:更新はありません"
+            message2 = "\n・学習教材:更新はありません"
     except:
-        message2 = "\n学習教材取得エラー:更新の有無を取得できませんでした"
+        message2 = "\n・学習教材取得エラー:更新の有無を取得できませんでした"
 
     if os.environ['CHANNEL_TYPE'] == "public":
         YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
