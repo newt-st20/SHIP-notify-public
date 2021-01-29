@@ -168,7 +168,9 @@ def main():
                     pass
                 else:
                     message2 += "\n・学習教材:" + b[0] + "-" + \
-                        b[1] + "-" + b[2].replace("\n", " ")
+                        b[1] + "-"
+                    if b[2].replace("\n", " ") != "":
+                        message2 += b[2].replace("\n", " ")
                     studyFlex0 = studyFlex1 = studyFlex2 = []
                     studyFlex0.append(a[0])
                     studyFlex1.append(a[1])
@@ -253,7 +255,13 @@ def main():
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
         jsonData = jsonLoad['pushForAll']
-        jsonData['messages'][0]['body']['contents'][1]['text'] = mail
+        counter = 0
+        text = ""
+        for conFlex in range(len(conFlex0)):
+            text += "\n日付:" + conFlex0[counter] + "\nフォルダ:" + conFlex1[counter] + \
+                "\nタイトル:" + conFlex2[counter] + "\n説明:" + conFlex3[counter]
+            counter += 1
+        jsonData['messages'][0]['body']['contents'][1]['text'] = text
         requests.post(broadcastEndPoint, json=jsonData, headers=headers)
 
 
