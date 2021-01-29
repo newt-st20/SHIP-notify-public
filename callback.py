@@ -226,17 +226,12 @@ def handle_message(event):
             messageCount += 1
             if event.message.text in messageEach:
                 sendMessage = messageSheetTextList[messageCount-1]
-                break
-            else:
-                pass
         if sendMessage == "":
             sendMessage == "It isn't a command, couldn't understand: " + event.message.text
         jsonData = jsonLoad['default']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = sendMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
-    else:
-        pass
     if event.source.user_id == os.environ['OWNER_USER_ID']:
         if "!get" in event.message.text:
             push.main()
