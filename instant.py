@@ -38,8 +38,6 @@ def main():
     logMessage = "send message:" + \
         str(jsonData['messages'][0]['text'])+" send for all followed user."
     print(logMessage)
-    reportSheet.update_cell(reportSheetLow+1, 1,
-                            logMessage.replace("\n", ""))
 
 
 if __name__ == "__main__":
