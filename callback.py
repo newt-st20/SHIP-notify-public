@@ -138,8 +138,12 @@ def handle_message(event):
         newestConnectionBaseMessage = ""
         print(newestConnectionList)
         for connectionEach in newestConnectionList:
-            newestConnectionBaseMessage += "\n" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
-                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ") + "\n《" + re.findall("\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
+            newestConnectionBaseMessage += "\n・" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ")
+            if re.findall("\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") != "":
+                newestConnectionBaseMessage += "\n《" + \
+                    re.findall(
+                        "\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
         print(newestConnectionBaseMessage)
         newestConnectionTime = connectionSheet.cell(
             connectionSheetLow, 3).value
@@ -165,7 +169,7 @@ def handle_message(event):
         newestStudyBaseMessage = ""
         print(newestStudyList)
         for studyEach in newestStudyList:
-            newestStudyBaseMessage += "\n" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+            newestStudyBaseMessage += "\n・" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
                 "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
         print(newestStudyBaseMessage)
         newestStudyTime = studySheet.cell(
@@ -238,6 +242,10 @@ def handle_message(event):
             push.main()
         if "!left" in event.message.text:
             owner.main()
+        if "!test" in event.message.text:
+            jsonData = jsonLoad['push']
+            jsonData['pushForAll'] = event.reply_token
+            requests.post(replyEndPoint, json=jsonData, headers=headers)
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
     fixedEvent = str(event)
