@@ -4,6 +4,11 @@
             "type": "text"
         }]
     },
+    "instantNormal": {
+        "messages": [{
+            "type": "text"
+        }]
+    },
     "test": {
         "messages": [{
             "type": "template",

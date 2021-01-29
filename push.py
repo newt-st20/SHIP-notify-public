@@ -206,7 +206,7 @@ def main():
         requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
         num = random.randrange(30)
         logMessage = "send message:" + \
-            str(mail)+" send for:" + str(finalSendList) + \
+            str(mail)+" send for:" + str(finalAllSendList) + \
             ". Random number is " + str(num)
         if num == 0:
             # middle
