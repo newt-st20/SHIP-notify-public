@@ -140,6 +140,7 @@ def main():
                         a[0] + "-" + a[1] + "-" + \
                         a[2].replace("\n", "") + \
                         "\n《" + a[3].replace("\n", "") + "》"
+                    conFlex0 = conFlex1 = conFlex2 = conFlex3 = []
                     conFlex0.append(a[0])
                     conFlex1.append(a[1])
                     conFlex2.append(a[2])
@@ -149,6 +150,8 @@ def main():
             message1 = "\n・連絡事項:更新はありません"
     except:
         message1 = "\n・連絡事項取得エラー:更新の有無を取得できませんでした"
+        import traceback
+        traceback.print_exc()
 
     studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
     studySheetLow = len(studySheet.col_values(1))
@@ -166,6 +169,7 @@ def main():
                 else:
                     message2 += "\n・学習教材:" + b[0] + "-" + \
                         b[1] + "-" + b[2].replace("\n", " ")
+                    studyFlex0 = studyFlex1 = studyFlex2 = []
                     studyFlex0.append(a[0])
                     studyFlex1.append(a[1])
                     studyFlex2.append(a[2])
@@ -174,6 +178,8 @@ def main():
             message2 = "\n・学習教材:更新はありません"
     except:
         message2 = "\n・学習教材取得エラー:更新の有無を取得できませんでした"
+        import traceback
+        traceback.print_exc()
 
     if os.environ['CHANNEL_TYPE'] == "public":
         YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
@@ -247,6 +253,7 @@ def main():
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
         jsonData = jsonLoad['pushForAll']
+        jsonData['messages'][0]['body']['contents'][1]['text'] = mail
         requests.post(broadcastEndPoint, json=jsonData, headers=headers)
 
 

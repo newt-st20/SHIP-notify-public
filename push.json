@@ -60,7 +60,8 @@
                     },
                     {
                         "type": "text",
-                        "text": "hello, world",
+                        "text": "hello, world\naa",
+                        "wrap": true,
                         "contents": []
                     }
                 ]
