@@ -129,6 +129,7 @@ def main():
     connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
     message1 = ""
     try:
+        conFlex0 = conFlex1 = conFlex2 = conFlex3 = []
         if connectionOldData != str(conAllDataList):
             connectionSheet.append_row(connectionData)
             for a in conAllDataList:
@@ -140,7 +141,6 @@ def main():
                         a[0] + "-" + a[1] + "-" + \
                         a[2].replace("\n", "") + \
                         "\n《" + a[3].replace("\n", "") + "》"
-                    conFlex0 = conFlex1 = conFlex2 = conFlex3 = []
                     conFlex0.append(a[0])
                     conFlex1.append(a[1])
                     conFlex2.append(a[2])
@@ -172,9 +172,9 @@ def main():
                     if b[2].replace("\n", " ") != "":
                         message2 += b[2].replace("\n", " ")
                     studyFlex0 = studyFlex1 = studyFlex2 = []
-                    studyFlex0.append(a[0])
-                    studyFlex1.append(a[1])
-                    studyFlex2.append(a[2])
+                    studyFlex0.append(b[0])
+                    studyFlex1.append(b[1])
+                    studyFlex2.append(b[2])
         else:
             studySheet.update_cell(studySheetLow, 4, getTime)
             message2 = "\n・学習教材:更新はありません"
