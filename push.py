@@ -66,7 +66,7 @@ def main():
     password.send_keys(os.environ['SHIP_PASS'])
     driver.find_element_by_name('login').click()
     time.sleep(getWaitSecs())
-    driver.get("https://ship.sakae-higashi.jp/connection/connection_main.php")
+    driver.get("https://ship.sakae-higashi.jp/connection/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
     con = driver.page_source
     conSoup = BeautifulSoup(con, 'html.parser')
     conSource = conSoup.find("body")
@@ -113,14 +113,12 @@ def main():
 
     studySoup = BeautifulSoup(study, 'html.parser')
     studySource = studySoup.find("body")
-    studyText = studySoup.find_all('table')[7].find_all('tr')
+    studyText = studySoup.find_all(class_='allc')[0].find_all('tr')
     studyList = []
-    for i in range(len(studySoup.find_all('table')[7].find_all('tr'))):
-        for j in range(len(studySoup.find_all('table')[7].find_all('tr')[i].find_all('td')[0])):
-            studyList.append([studySoup.find_all('table')[
-                7].find_all('tr')[i].find_all('td')[0].text, studySoup.find_all('table')[
-                7].find_all('tr')[i].find_all('td')[1].text, studySoup.find_all('table')[
-                7].find_all('tr')[i].find_all('td')[2].text])
+    for i in range(len(studySoup.find_all(class_='allc')[0].find_all('tr'))):
+        for j in range(len(studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[0])):
+            studyList.append([studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[0].text, studySoup.find_all(class_='allc')[
+                             0].find_all('tr')[i].find_all('td')[1].text, studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[2].text])
     studyList.pop(0)
 
     connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
@@ -203,7 +201,7 @@ def main():
     useridSheetLow = len(useridSheet.col_values(1))
     reportSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('report')
     reportSheetLow = len(reportSheet.col_values(1))
-    mail = "【" + getTime + "】\n" + message1 + message2
+    mail = "【" + getTime.replace("-", "/") + "】\n" + message1 + message2
     if "連絡事項:更新はありません" in message1 and "学習教材:更新はありません" in message2:
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonAllData = jsonLoad['pushForNotifyAllUser']
