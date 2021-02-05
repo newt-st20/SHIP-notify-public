@@ -186,6 +186,17 @@ def handle_message(event):
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestStudyMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!notify-setting" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        changeMessage = "notify-all"
+        for f in cell:
+            nowSet = useridSheet.cell(f.row, 5).value
+        jsonData = jsonLoad['notify-setting']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "現在の設定:"+nowSet
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!notify-all" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))

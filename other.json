@@ -27,50 +27,79 @@
     },
     "test": {
         "messages": [{
-            "type": "template",
-            "altText": "this is a confirm template",
-            "template": {
-                "type": "confirm",
-                "text": "Are you sure?",
-                "actions": [{
-                        "type": "message",
-                        "label": "Yes",
-                        "text": "yes"
-                    },
-                    {
-                        "type": "message",
-                        "label": "No",
-                        "text": "no"
-                    }
-                ]
-            },
-            "quickReply": {
-                "items": [{
-                        "type": "action",
-                        "imageUrl": "https://example.com/sushi.png",
-                        "action": {
-                            "type": "message",
-                            "label": "Sushi",
-                            "text": "Sushi"
+            "type": "flex",
+            "altText": "flexMessageです",
+            "contents": {
+                "type": "bubble",
+                "direction": "ltr",
+                "header": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [{
+                        "type": "text",
+                        "text": "通知設定",
+                        "weight": "bold",
+                        "size": "xl",
+                        "color": "#000000FF",
+                        "align": "start",
+                        "contents": []
+                    }]
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [{
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "全て",
+                                "text": "!notify-all"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "separator",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "中間",
+                                "text": "!notify-middle"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "separator",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "最低限",
+                                "text": "!notify-few"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
                         }
-                    },
-                    {
-                        "type": "action",
-                        "imageUrl": "https://example.com/tempura.png",
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [{
+                        "type": "button",
                         "action": {
-                            "type": "message",
-                            "label": "Tempura",
-                            "text": "Tempura"
+                            "type": "uri",
+                            "label": "詳しくはこちら",
+                            "uri": "https://newt-house.web.app/ship-notify/"
                         }
-                    },
-                    {
-                        "type": "action",
-                        "action": {
-                            "type": "location",
-                            "label": "Send location"
-                        }
-                    }
-                ]
+                    }]
+                }
             }
         }]
     }
