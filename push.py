@@ -139,8 +139,9 @@ def main():
                 else:
                     message1 += "\n・連絡事項:" + \
                         a[0] + "-" + a[1] + "-" + \
-                        a[2].replace("\n", "") + \
-                        "\n《" + a[3].replace("\n", "") + "》"
+                        a[2].replace("\n", "")
+                    if a[3].replace("\n", "") != "":
+                        message1 += "\n《" + a[3].replace("\n", "") + "》"
                     conFlex0.append(a[0])
                     conFlex1.append(a[1])
                     conFlex2.append(a[2])
