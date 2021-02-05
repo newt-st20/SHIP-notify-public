@@ -28,20 +28,11 @@
                     },
                     {
                         "type": "action",
-                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-all.jpg",
+                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-setting.jpg",
                         "action": {
                             "type": "message",
-                            "label": "すべての通知をオンにする",
+                            "label": "通知設定",
                             "text": "!notify-all"
-                        }
-                    },
-                    {
-                        "type": "action",
-                        "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-few.jpg",
-                        "action": {
-                            "type": "message",
-                            "label": "通知を最低限にする",
-                            "text": "!notify-few"
                         }
                     },
                     {
