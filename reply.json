@@ -256,5 +256,82 @@
                 }]
             }
         }]
+    },
+    "both": {
+        "messages": [{
+            "altText": "連絡事項・学習教材",
+            "type": "carousel",
+            "contents": [{
+                    "type": "bubble",
+                    "header": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "flex": 0,
+                        "contents": [{
+                            "type": "text",
+                            "text": "連絡事項",
+                            "weight": "bold",
+                            "size": "xxl",
+                            "contents": []
+                        }]
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "sm",
+                        "contents": [{
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [{
+                                    "type": "text",
+                                    "text": "hello, world",
+                                    "contents": []
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "hello, world",
+                                    "contents": []
+                                }
+                            ]
+                        }]
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "header": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "flex": 0,
+                        "contents": [{
+                            "type": "text",
+                            "text": "学習教材",
+                            "weight": "bold",
+                            "size": "xxl",
+                            "contents": []
+                        }]
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "sm",
+                        "contents": [{
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [{
+                                    "type": "text",
+                                    "text": "hello, world",
+                                    "contents": []
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "hello, world",
+                                    "contents": []
+                                }
+                            ]
+                        }]
+                    }
+                }
+            ]
+        }]
     }
 }
