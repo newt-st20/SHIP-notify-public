@@ -152,8 +152,8 @@ def handle_message(event):
         if lastUpdateConnectionTime == "":
             lastUpdateConnectionTime = newestConnectionTime
         newestConnectionMessage = "連絡事項最終更新:" + \
-            newestConnectionTime + "\n連絡事項最終取得:" + \
-            lastUpdateConnectionTime+"\n" + \
+            newestConnectionTime.replace("-", "/") + "\n連絡事項最終取得:" + \
+            lastUpdateConnectionTime.replace("-", "/") + "\n" + \
             str(newestConnectionBaseMessage)
         jsonData = jsonLoad['connection']
         jsonData['replyToken'] = event.reply_token
@@ -179,12 +179,17 @@ def handle_message(event):
         if lastUpdateStudyTime == "":
             lastUpdateStudyTime = newestStudyTime
         newestStudyMessage = "学習教材最終更新:" + \
-            newestStudyTime + "\n学習教材最終取得:" + \
-            lastUpdateStudyTime+"\n" + \
+            newestStudyTime.replace("-", "/") + "\n学習教材最終取得:" + \
+            lastUpdateStudyTime.replace("-", "/") + "\n" + \
             str(newestStudyBaseMessage)
         jsonData = jsonLoad['study']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = newestStudyMessage
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!both" in event.message.text:
+        jsonData = jsonLoad['both']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['text'] = "テスト中"
         requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!notify-setting" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
