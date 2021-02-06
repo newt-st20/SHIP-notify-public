@@ -88,27 +88,6 @@ def handle_message(event):
         jsonData['messages'][0]['text'] = messageData
         print(jsonData)
         requests.post(replyEndPoint, json=jsonData, headers=headers)
-    elif event.message.text == "!command":
-        messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
-        messageData = messageSheet.cell(2, 2).value
-        jsonData = jsonLoad['default']
-        jsonData['replyToken'] = event.reply_token
-        jsonData['messages'][0]['text'] = messageData
-        requests.post(replyEndPoint, json=jsonData, headers=headers)
-    elif event.message.text == "!settings":
-        messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
-        messageData = messageSheet.cell(3, 2).value
-        jsonData = jsonLoad['default']
-        jsonData['replyToken'] = event.reply_token
-        jsonData['messages'][0]['text'] = messageData
-        requests.post(replyEndPoint, json=jsonData, headers=headers)
-    elif event.message.text == "!when":
-        messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
-        messageData = messageSheet.cell(4, 2).value
-        jsonData = jsonLoad['default']
-        jsonData['replyToken'] = event.reply_token
-        jsonData['messages'][0]['text'] = messageData
-        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!issue" in event.message.text:
         if event.message.text == "!issue":
             jsonData = jsonLoad['issueReject']
@@ -117,13 +96,12 @@ def handle_message(event):
         else:
             useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('issue')
             useridSheetLow = len(useridSheet.col_values(1))
-            profile = line_bot_api.get_profile(event.source.user_id)
             useridSheet.update_cell(useridSheetLow + 1, 1,
                                     str(event.source.user_id))
             useridSheet.update_cell(
                 useridSheetLow + 1, 2, str(event.message.text))
             time = datetime.datetime.fromtimestamp(
-                int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
+                int(event.timestamp) / 1000).strftime('%Y/%m/%d %H:%M:%S.%f')
             useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
             jsonData = jsonLoad['issueComplete']
             jsonData['replyToken'] = event.reply_token
@@ -179,8 +157,8 @@ def handle_message(event):
         if lastUpdateStudyTime == "":
             lastUpdateStudyTime = newestStudyTime
         newestStudyMessage = "学習教材最終更新:" + \
-            newestStudyTime.replace("-", "/") + "\n学習教材最終取得:" + \
-            lastUpdateStudyTime.replace("-", "/") + "\n" + \
+            newestStudyTime + "\n学習教材最終取得:" + \
+            lastUpdateStudyTime + "\n" + \
             str(newestStudyBaseMessage)
         jsonData = jsonLoad['study']
         jsonData['replyToken'] = event.reply_token
@@ -263,7 +241,7 @@ def handle_message(event):
     getlogsSheet.update_cell(getlogsSheetLow + 1, 1,
                              fixedEvent.encode().decode())
     time = datetime.datetime.fromtimestamp(
-        int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
+        int(event.timestamp) / 1000).strftime('%Y/%m/%d %H:%M:%S.%f')
     getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(time))
 
 
@@ -285,7 +263,7 @@ def handle_follow(event):
     useridSheet.update_cell(useridSheetLow + 1, 1, userid)
     useridSheet.update_cell(useridSheetLow + 1, 2, str(userData))
     time = datetime.datetime.fromtimestamp(
-        int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
+        int(event.timestamp) / 1000).strftime('%Y/%m/%d %H:%M:%S.%f')
     useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
     useridSheet.update_cell(useridSheetLow + 1, 4, "")
     useridSheet.update_cell(useridSheetLow + 1, 5, "notify-middle")
@@ -311,7 +289,7 @@ def handle_unfollow(event):
     useridSheetLow = len(useridSheet.col_values(1))
     cell = useridSheet.findall(str(event.source.user_id))
     time = datetime.datetime.fromtimestamp(
-        int(event.timestamp) / 1000).strftime('%Y-%m-%d %H:%M:%S.%f')
+        int(event.timestamp) / 1000).strftime('%Y/%m/%d %H:%M:%S.%f')
     blockMessage = "blocked:" + str(time)
     for f in cell:
         useridSheet.update_cell(f.row, 5, "notify-few")
