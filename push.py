@@ -25,7 +25,7 @@ def getWaitSecs():
 
 def main():
     now = datetime.datetime.now()
-    getTime = now.strftime('%Y-%m-%d %H:%M:%S')
+    getTime = now.strftime('%Y/%m/%d %H:%M:%S')
 
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
@@ -107,7 +107,7 @@ def main():
         conAllDataList.append(conDatas)
         conAllDataCounter += 1
     print(conAllDataList)
-    driver.get("https://ship.sakae-higashi.jp/study/study_main.php")
+    driver.get("https://ship.sakae-higashi.jp/study/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
     study = driver.page_source
     driver.quit()
 
@@ -201,7 +201,7 @@ def main():
     useridSheetLow = len(useridSheet.col_values(1))
     reportSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('report')
     reportSheetLow = len(reportSheet.col_values(1))
-    mail = "【" + getTime.replace("-", "/") + "】\n" + message1 + message2
+    mail = "【" + getTime + "】\n" + message1 + message2
     if "連絡事項:更新はありません" in message1 and "学習教材:更新はありません" in message2:
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonAllData = jsonLoad['pushForNotifyAllUser']
@@ -253,15 +253,6 @@ def main():
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
-        jsonData = jsonLoad['pushForAll']
-        counter = 0
-        text = ""
-        for conFlex in range(len(conFlex0)):
-            text += "\n日付:" + conFlex0[counter] + "\nフォルダ:" + conFlex1[counter] + \
-                "\nタイトル:" + conFlex2[counter] + "\n説明:" + conFlex3[counter]
-            counter += 1
-        jsonData['messages'][0]['body']['contents'][1]['text'] = text
-        requests.post(broadcastEndPoint, json=jsonData, headers=headers)
 
 
 if __name__ == "__main__":
