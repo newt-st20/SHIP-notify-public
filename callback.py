@@ -157,8 +157,8 @@ def handle_message(event):
         if lastUpdateStudyTime == "":
             lastUpdateStudyTime = newestStudyTime
         newestStudyMessage = "学習教材最終更新:" + \
-            newestStudyTime + "\n学習教材最終取得:" + \
-            lastUpdateStudyTime + "\n" + \
+            newestStudyTime.replace("-", "/") + "\n学習教材最終取得:" + \
+            lastUpdateStudyTime.replace("-", "/") + "\n" + \
             str(newestStudyBaseMessage)
         jsonData = jsonLoad['study']
         jsonData['replyToken'] = event.reply_token
@@ -215,13 +215,11 @@ def handle_message(event):
         messageSheetList = messageSheet.col_values(1)
         messageSheetTextList = messageSheet.col_values(2)
         messageCount = 0
-        sendMessage = ""
+        sendMessage = "It isn't a command, couldn't understand: " + event.message.text
         for messageEach in messageSheetList:
             messageCount += 1
             if event.message.text in messageEach:
                 sendMessage = messageSheetTextList[messageCount-1]
-        if sendMessage == "":
-            sendMessage == "It isn't a command, couldn't understand: " + event.message.text
         jsonData = jsonLoad['default']
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = sendMessage
