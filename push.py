@@ -201,7 +201,7 @@ def main():
     useridSheetLow = len(useridSheet.col_values(1))
     reportSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('report')
     reportSheetLow = len(reportSheet.col_values(1))
-    mail = "【" + getTime + "】\n" + message1 + message2
+    mail = "【" + getTime.replace("-", "/") + "】\n" + message1 + message2
     if "連絡事項:更新はありません" in message1 and "学習教材:更新はありません" in message2:
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonAllData = jsonLoad['pushForNotifyAllUser']
