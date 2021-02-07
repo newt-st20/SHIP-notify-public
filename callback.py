@@ -184,7 +184,7 @@ def handle_message(event):
                             "\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
                 counter += 1
             else:
-                pass:
+                continue
         newestConnectionTime = connectionSheet.cell(
             connectionSheetLow, 3).value
         lastUpdateConnectionTime = connectionSheet.cell(
@@ -210,7 +210,7 @@ def handle_message(event):
                     "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
                 counter += 1
             else:
-                pass:
+                continue
         newestStudyTime = studySheet.cell(
             studySheetLow, 3).value
         lastUpdateStudyTime = studySheet.cell(
