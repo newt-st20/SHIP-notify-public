@@ -173,22 +173,26 @@ def handle_message(event):
         newestConnectionList = re.findall('\[(.*?)\]', newestConnection)
         newestConnectionBaseMessage = ""
         print(newestConnectionList)
+        counter = 0
         for connectionEach in newestConnectionList:
-            newestConnectionBaseMessage += "\n・" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
-                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ")
-            if re.findall("\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") != "":
-                newestConnectionBaseMessage += "\n《" + \
-                    re.findall(
-                        "\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
-        print(newestConnectionBaseMessage)
+            if counter < 5:
+                newestConnectionBaseMessage += "\n・" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                    "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ")
+                if re.findall("\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") != "":
+                    newestConnectionBaseMessage += "\n《" + \
+                        re.findall(
+                            "\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
+                counter += 1
+            else:
+                pass:
         newestConnectionTime = connectionSheet.cell(
             connectionSheetLow, 3).value
         lastUpdateConnectionTime = connectionSheet.cell(
             connectionSheetLow, 4).value
         if lastUpdateConnectionTime == "":
             lastUpdateConnectionTime = newestConnectionTime
-        newestConnectionMessage = "連絡事項最終更新:" + \
-            newestConnectionTime.replace("-", "/") + "\n連絡事項最終取得:" + \
+        newestConnectionMessage = "最終更新:" + \
+            newestConnectionTime.replace("-", "/") + "\n最終取得:" + \
             lastUpdateConnectionTime.replace("-", "/") + "\n" + \
             str(newestConnectionBaseMessage)
 
@@ -199,11 +203,14 @@ def handle_message(event):
             studySheetLow, 2).value[1:-1]
         newestStudyList = re.findall('\[(.*?)\]', newestStudy)
         newestStudyBaseMessage = ""
-        print(newestStudyList)
+        counter = 0
         for studyEach in newestStudyList:
-            newestStudyBaseMessage += "\n・" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
-                "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
-        print(newestStudyBaseMessage)
+            if counter < 10:
+                newestStudyBaseMessage += "\n・" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                    "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
+                counter += 1
+            else:
+                pass:
         newestStudyTime = studySheet.cell(
             studySheetLow, 3).value
         lastUpdateStudyTime = studySheet.cell(
