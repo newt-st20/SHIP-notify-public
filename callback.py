@@ -15,7 +15,6 @@ import gspread
 import requests
 import re
 import datetime
-import discord
 
 import push
 import owner
@@ -166,9 +165,59 @@ def handle_message(event):
         jsonData['messages'][0]['text'] = newestStudyMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!both" in event.message.text:
+        connectionSheet = gc.open_by_key(
+            SPREADSHEET_KEY).worksheet('connection')
+        connectionSheetLow = len(connectionSheet.col_values(1))
+        newestConnection = connectionSheet.cell(
+            connectionSheetLow, 2).value[1:-1]
+        newestConnectionList = re.findall('\[(.*?)\]', newestConnection)
+        newestConnectionBaseMessage = ""
+        print(newestConnectionList)
+        for connectionEach in newestConnectionList:
+            newestConnectionBaseMessage += "\n・" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ")
+            if re.findall("\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") != "":
+                newestConnectionBaseMessage += "\n《" + \
+                    re.findall(
+                        "\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
+        print(newestConnectionBaseMessage)
+        newestConnectionTime = connectionSheet.cell(
+            connectionSheetLow, 3).value
+        lastUpdateConnectionTime = connectionSheet.cell(
+            connectionSheetLow, 4).value
+        if lastUpdateConnectionTime == "":
+            lastUpdateConnectionTime = newestConnectionTime
+        newestConnectionMessage = "連絡事項最終更新:" + \
+            newestConnectionTime.replace("-", "/") + "\n連絡事項最終取得:" + \
+            lastUpdateConnectionTime.replace("-", "/") + "\n" + \
+            str(newestConnectionBaseMessage)
+
+        studySheet = gc.open_by_key(
+            SPREADSHEET_KEY).worksheet('study')
+        studySheetLow = len(studySheet.col_values(1))
+        newestStudy = studySheet.cell(
+            studySheetLow, 2).value[1:-1]
+        newestStudyList = re.findall('\[(.*?)\]', newestStudy)
+        newestStudyBaseMessage = ""
+        print(newestStudyList)
+        for studyEach in newestStudyList:
+            newestStudyBaseMessage += "\n・" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
+        print(newestStudyBaseMessage)
+        newestStudyTime = studySheet.cell(
+            studySheetLow, 3).value
+        lastUpdateStudyTime = studySheet.cell(
+            studySheetLow, 4).value
+        if lastUpdateStudyTime == "":
+            lastUpdateStudyTime = newestStudyTime
+        newestStudyMessage = "学習教材最終更新:" + \
+            newestStudyTime.replace("-", "/") + "\n学習教材最終取得:" + \
+            lastUpdateStudyTime.replace("-", "/") + "\n" + \
+            str(newestStudyBaseMessage)
         jsonData = jsonLoad['both']
         jsonData['replyToken'] = event.reply_token
-        jsonData['messages'][0]['text'] = "テスト中"
+        jsonData['messages'][0]['contents']['contents'][0]['body']['contents'][0]['contents'][0]['text'] = newestConnectionMessage
+        jsonData['messages'][0]['contents']['contents'][1]['body']['contents'][0]['contents'][0]['text'] = newestStudyMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!notify-setting" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
@@ -216,7 +265,7 @@ def handle_message(event):
         messageSheetList = messageSheet.col_values(1)
         messageSheetTextList = messageSheet.col_values(2)
         messageCount = 0
-        sendMessage = "It isn't a command, couldn't understand: " + event.message.text
+        sendMessage = "It isn't a command, so couldn't understand: " + event.message.text
         for messageEach in messageSheetList:
             messageCount += 1
             if event.message.text in messageEach:
