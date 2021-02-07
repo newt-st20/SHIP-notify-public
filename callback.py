@@ -295,6 +295,83 @@ def handle_unfollow(event):
             useridSheet.update_cell(f.row, 4, blockMessage)
 
 
+# Discord bot
+
+TOKEN = os.environ['DISCORD_TOKEN']
+client = discord.Client()
+
+
+@client.event
+async def on_ready():
+    print('Discordにログインしました')
+
+
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    if message.content == '/neko':
+        await message.channel.send('にゃーん')
+    if message.content == '/about':
+        messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
+        messageData = messageSheet.cell(1, 2).value
+        await message.channel.send(messageData)
+    if message.content == '/connection':
+        connectionSheet = gc.open_by_key(
+            SPREADSHEET_KEY).worksheet('connection')
+        connectionSheetLow = len(connectionSheet.col_values(1))
+        newestConnection = connectionSheet.cell(
+            connectionSheetLow, 2).value[1:-1]
+        newestConnectionList = re.findall('\[(.*?)\]', newestConnection)
+        newestConnectionBaseMessage = ""
+        print(newestConnectionList)
+        for connectionEach in newestConnectionList:
+            newestConnectionBaseMessage += "\n・" + re.findall("\'(.*?)\'", connectionEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                "\'(.*?)\'", connectionEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", connectionEach)[2].replace("\\n", "").replace("\\u3000", " ")
+            if re.findall("\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") != "":
+                newestConnectionBaseMessage += "\n《" + \
+                    re.findall(
+                        "\'(.*?)\'", connectionEach)[3].replace("\\n", "").replace("\\u3000", " ") + "》"
+        print(newestConnectionBaseMessage)
+        newestConnectionTime = connectionSheet.cell(
+            connectionSheetLow, 3).value
+        lastUpdateConnectionTime = connectionSheet.cell(
+            connectionSheetLow, 4).value
+        if lastUpdateConnectionTime == "":
+            lastUpdateConnectionTime = newestConnectionTime
+        newestConnectionMessage = "連絡事項最終更新:" + \
+            newestConnectionTime.replace("-", "/") + "\n連絡事項最終取得:" + \
+            lastUpdateConnectionTime.replace("-", "/") + "\n" + \
+            str(newestConnectionBaseMessage)
+        await message.channel.send(newestConnectionMessage)
+    if message.content == '/study':
+        studySheet = gc.open_by_key(
+            SPREADSHEET_KEY).worksheet('study')
+        studySheetLow = len(studySheet.col_values(1))
+        newestStudy = studySheet.cell(
+            studySheetLow, 2).value[1:-1]
+        newestStudyList = re.findall('\[(.*?)\]', newestStudy)
+        newestStudyBaseMessage = ""
+        print(newestStudyList)
+        for studyEach in newestStudyList:
+            newestStudyBaseMessage += "\n・" + re.findall("\'(.*?)\'", studyEach)[0].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall(
+                "\'(.*?)\'", studyEach)[1].replace("\\n", "").replace("\\u3000", " ") + "-" + re.findall("\'(.*?)\'", studyEach)[2].replace("\\n", "").replace("\\u3000", " ")
+        print(newestStudyBaseMessage)
+        newestStudyTime = studySheet.cell(
+            studySheetLow, 3).value
+        lastUpdateStudyTime = studySheet.cell(
+            studySheetLow, 4).value
+        if lastUpdateStudyTime == "":
+            lastUpdateStudyTime = newestStudyTime
+        newestStudyMessage = "学習教材最終更新:" + \
+            newestStudyTime.replace("-", "/") + "\n学習教材最終取得:" + \
+            lastUpdateStudyTime.replace("-", "/") + "\n" + \
+            str(newestStudyBaseMessage)
+        await message.channel.send(newestStudyMessage)
+
+client.run(TOKEN)
+
+
 if __name__ == "__main__":
     #    app.run()
     port = int(os.getenv("PORT", 5000))
