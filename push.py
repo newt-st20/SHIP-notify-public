@@ -13,42 +13,41 @@ import time
 import re
 import random
 
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+credential_list = {
+    "type": "service_account",
+    "project_id": os.environ['SHEET_PROJECT_ID'],
+    "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
+    "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
+    "client_email": os.environ['SHEET_CLIENT_EMAIL'],
+    "client_id": os.environ['SHEET_CLIENT_ID'],
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
+}
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+    credential_list, scope)
+gc = gspread.authorize(credentials)
+if os.environ['CHANNEL_TYPE'] == "public":
+    SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
+else:
+    SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
 
-def getWaitSecs():
-    # 画面の待機秒数の取得
-    max_wait = 7.0  # 最大待機秒
-    min_wait = 3.0  # 最小待機秒
-    mean_wait = 5.0  # 平均待機秒
-    sigma_wait = 1.0  # 標準偏差（ブレ幅）
-    return min([max_wait, max([min_wait, round(random.normalvariate(mean_wait, sigma_wait))])])
+if os.environ['CHANNEL_TYPE'] == "public":
+    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
+    YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
+else:
+    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
+    YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
+
+line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 
 
 def main():
     now = datetime.datetime.now()
     getTime = now.strftime('%Y/%m/%d %H:%M:%S')
-
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    credential_list = {
-        "type": "service_account",
-        "project_id": os.environ['SHEET_PROJECT_ID'],
-        "private_key_id": os.environ['SHEET_PRIVATE_KEY_ID'],
-        "private_key": os.environ['SHEET_PRIVATE_KEY'].replace('\\n', '\n'),
-        "client_email": os.environ['SHEET_CLIENT_EMAIL'],
-        "client_id": os.environ['SHEET_CLIENT_ID'],
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                    "client_x509_cert_url":  os.environ['SHEET_CLIENT_X509_CERT_URL']
-    }
-    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-        credential_list, scope)
-    gc = gspread.authorize(credentials)
-    if os.environ['CHANNEL_TYPE'] == "public":
-        SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
-    else:
-        SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
-
     driver_path = '/app/.chromedriver/bin/chromedriver'
     options = Options()
     options.add_argument('--disable-gpu')
@@ -181,15 +180,6 @@ def main():
         import traceback
         traceback.print_exc()
 
-    if os.environ['CHANNEL_TYPE'] == "public":
-        YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
-        YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
-    else:
-        YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
-        YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
-
-    line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
-
     headers = {
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
@@ -205,17 +195,7 @@ def main():
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonAllData = jsonLoad['pushForNotifyAllUser']
         jsonAllData['messages'][0]['text'] = mail
-        userId = useridSheet.col_values(1)
-        userSetting = useridSheet.col_values(5)
-        sendList = []
-        # all
-        sendAllList = []
-        userNum = 0
-        for userEach in userId:
-            if "notify-all" in userSetting[userNum]:
-                sendAllList.append(userEach)
-            userNum += 1
-        finalAllSendList = list(set(sendAllList))
+        finalAllSendList = findUser(5,"notify-all")
         jsonAllData['to'] = finalAllSendList
         requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
         num = random.randrange(10)
@@ -252,11 +232,48 @@ def main():
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
-        jsonData = jsonLoad['pushForAll']
-        jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1
-        jsonData['messages'][0]['contents']['body']['contents'][4]['text'] = message2
-        print(jsonData)
-        requests.post(broadcastEndPoint, json=jsonData, headers=headers)
+        if os.environ['CHANNEL_TYPE'] == "staging":
+            sendMiddleList = []
+            userNum = 0
+            for userEach in userId:
+                if "notify-middle" in userSetting[userNum]:
+                    sendMiddleList.append(userEach)
+                userNum += 1
+            finalMiddleSendList = list(set(sendMiddleList))
+            jsonMiddleData['to'] = finalMiddleSendList
+            jsonData = jsonLoad['pushForAll']
+            jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "取得: " + \
+                getTime.replace("-", "/")
+            jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1.replace(
+                "連絡事項:", "")
+            jsonData['messages'][0]['contents']['body']['contents'][4]['text'] = message2.replace(
+                "学習教材:", "")
+            print(jsonData)
+            requests.post(broadcastEndPoint, json=jsonData, headers=headers)
+
+
+def getWaitSecs():
+    # 画面の待機秒数の取得
+    max_wait = 7.0  # 最大待機秒
+    min_wait = 3.0  # 最小待機秒
+    mean_wait = 5.0  # 平均待機秒
+    sigma_wait = 1.0  # 標準偏差（ブレ幅）
+    return min([max_wait, max([min_wait, round(random.normalvariate(mean_wait, sigma_wait))])])
+
+
+def findUser(row, text):
+    useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+    useridSheetLow = len(useridSheet.col_values(1))
+    userId = useridSheet.col_values(1)
+    userSetting = useridSheet.col_values(row)
+    sendList = []
+    sendAllList = []
+    userNum = 0
+    for userEach in userId:
+        if text in userSetting[userNum]:
+            sendAllList.append(userEach)
+        userNum += 1
+    return list(set(sendAllList))
 
 
 if __name__ == "__main__":
