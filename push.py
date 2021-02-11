@@ -30,15 +30,13 @@ credential_list = {
 credentials = ServiceAccountCredentials.from_json_keyfile_dict(
     credential_list, scope)
 gc = gspread.authorize(credentials)
-if os.environ['CHANNEL_TYPE'] == "public":
-    SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
-else:
-    SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
 
 if os.environ['CHANNEL_TYPE'] == "public":
+    SPREADSHEET_KEY = '1XylqIA4R8rlIcvA113nEJ_PTYMQTGEBsrsT315glFYM'
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
 else:
+    SPREADSHEET_KEY = '1OwuiunNnZcZ3l2QbnGsricHwSfyWliTpRX68-6W5ji0'
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
 
@@ -228,7 +226,7 @@ def main():
                                 logMessage.replace("\n", ""))
         # beta-user
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
-        BetaSendList = findUser(6, "beta")
+        BetaSendList = findUser(6, "beta-on")
         jsonData['to'] = BetaSendList
         jsonData = jsonLoad['pushForAll']
         jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "最終取得: " + \
