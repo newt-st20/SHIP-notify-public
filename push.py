@@ -131,7 +131,6 @@ def main():
         if connectionOldData != str(conAllDataList):
             connectionSheet.append_row(connectionData)
             for a in conAllDataList:
-                print("135:"+a[3])
                 if str(a) in str(connectionOldData):
                     pass
                 else:
@@ -195,7 +194,7 @@ def main():
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
-    jsonOpen = open('push.json', 'r', encoding="utf-8_sig")
+    jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
@@ -219,7 +218,7 @@ def main():
         finalAllSendList = list(set(sendAllList))
         jsonAllData['to'] = finalAllSendList
         requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
-        num = random.randrange(30)
+        num = random.randrange(10)
         logMessage = "send message:" + \
             str(mail)+" send for:" + str(finalAllSendList) + \
             ". Random number is " + str(num)
