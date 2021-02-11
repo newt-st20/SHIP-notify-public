@@ -1,13 +1,14 @@
 {
     "default": {
         "messages": [{
-            "type": "text"
+            "type": "text",
+            "text": "Textfield is empty"
         }]
     },
     "pushForAll": {
         "messages": [{
             "type": "flex",
-            "altText": "通知設定",
+            "altText": "SHIPに更新がありました",
             "contents": {
                 "type": "bubble",
                 "direction": "ltr",
@@ -15,18 +16,13 @@
                     "type": "box",
                     "layout": "vertical",
                     "contents": [{
-                            "type": "text",
-                            "text": "test",
-                            "weight": "bold",
-                            "size": "xxl",
-                            "color": "#000000FF",
-                            "align": "start",
-                            "contents": []
-                        },
-                        {
-                            "type": "separator"
-                        }
-                    ]
+                        "type": "text",
+                        "text": "SHIPに更新がありました",
+                        "weight": "bold",
+                        "size": "xl",
+                        "align": "start",
+                        "contents": []
+                    }]
                 },
                 "body": {
                     "type": "box",
@@ -35,11 +31,9 @@
                             "type": "text",
                             "text": "連絡事項",
                             "weight": "bold",
-                            "size": "xl",
-                            "contents": [{
-                                "type": "span",
-                                "text": "連絡事項"
-                            }]
+                            "size": "lg",
+                            "align": "start",
+                            "contents": []
                         },
                         {
                             "type": "text",
@@ -48,23 +42,19 @@
                         },
                         {
                             "type": "separator",
-                            "margin": "xl",
-                            "color": "#FFFFFFFF"
+                            "margin": "lg",
+                            "color": "#000000FF"
                         },
                         {
                             "type": "text",
                             "text": "学習教材",
                             "weight": "bold",
-                            "size": "xl",
-                            "contents": [{
-                                "type": "span",
-                                "text": "学習教材"
-                            }]
+                            "size": "lg",
+                            "contents": []
                         },
                         {
                             "type": "text",
-                            "text": "hello, world\naa",
-                            "wrap": true,
+                            "text": "hello, world",
                             "contents": []
                         }
                     ]
