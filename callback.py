@@ -267,6 +267,66 @@ def handle_message(event):
         jsonData = jsonLoad['notify-few']
         jsonData['replyToken'] = event.reply_token
         requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!beta-setting" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        for f in cell:
+            nowSet = useridSheet.cell(f.row, 6).value
+        jsonData = jsonLoad['beta-setting']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "現在の設定: "+nowSet
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!beta-join" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        changeMessage = "beta"
+        for f in cell:
+            useridSheet.update_cell(f.row, 6, changeMessage)
+        jsonData = jsonLoad['beta-join']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!beta-leave" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        changeMessage = ""
+        for f in cell:
+            useridSheet.update_cell(f.row, 6, changeMessage)
+        jsonData = jsonLoad['beta-leave']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!school-high" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        changeMessage = "high"
+        for f in cell:
+            useridSheet.update_cell(f.row, 7, changeMessage)
+        jsonData = jsonLoad['school-high']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!school-junior" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        changeMessage = "junior"
+        for f in cell:
+            useridSheet.update_cell(f.row, 7, changeMessage)
+        jsonData = jsonLoad['school-junior']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!school-both" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        changeMessage = "both"
+        for f in cell:
+            useridSheet.update_cell(f.row, 7, changeMessage)
+        jsonData = jsonLoad['school-both']
+        jsonData['replyToken'] = event.reply_token
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!" in event.message.text:
         messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
         messageSheetList = messageSheet.col_values(1)

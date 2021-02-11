@@ -225,6 +225,201 @@
             }
         }]
     },
+    "beta-setting": {
+        "messages": [{
+            "type": "flex",
+            "altText": "通知設定",
+            "contents": {
+                "type": "bubble",
+                "direction": "ltr",
+                "header": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [{
+                            "type": "text",
+                            "text": "ベータ版への参加設定",
+                            "weight": "bold",
+                            "size": "xl",
+                            "color": "#000000FF",
+                            "align": "start",
+                            "contents": []
+                        },
+                        {
+                            "type": "text",
+                            "text": "empty",
+                            "contents": []
+                        }
+                    ]
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [{
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "参加する",
+                                "text": "!beta-join"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "separator",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "やめる",
+                                "text": "!beta-leave"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
+                        }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [{
+                        "type": "button",
+                        "action": {
+                            "type": "uri",
+                            "label": "詳しくはこちら",
+                            "uri": "https://newt-house.web.app/ship-notify/"
+                        }
+                    }]
+                }
+            }
+        }]
+    },
+    "beta-join": {
+        "messages": [{
+            "type": "text",
+            "text": "ベータ版に参加しました。「!beta-leave」から中止することができます。",
+            "quickReply": {
+                "items": [{
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "ベータ版への参加を取りやめる",
+                            "text": "!beta-leave"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "ベータ版参加設定",
+                            "text": "!beta-setting"
+                        }
+                    }
+                ]
+            }
+        }]
+    },
+    "beta-leave": {
+        "messages": [{
+            "type": "text",
+            "text": "ベータ版への参加を取りやめました。「!beta-join」から再度参加することができます。",
+            "quickReply": {
+                "items": [{
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "ベータ版へ参加する",
+                            "text": "!beta-join"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "ベータ版参加設定",
+                            "text": "!beta-setting"
+                        }
+                    }
+                ]
+            }
+        }]
+    },
+    "school-high": {
+        "messages": [{
+            "type": "text",
+            "text": "高校のページの更新のみ通知します。",
+            "quickReply": {
+                "items": [{
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "中学",
+                            "text": "!school-junior"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "両方",
+                            "text": "!school-both"
+                        }
+                    }
+                ]
+            }
+        }]
+    },
+    "school-junior": {
+        "messages": [{
+            "type": "text",
+            "text": "中学のページの更新のみ通知します。",
+            "quickReply": {
+                "items": [{
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "高校",
+                            "text": "!school-high"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "両方",
+                            "text": "!school-both"
+                        }
+                    }
+                ]
+            }
+        }]
+    },
+    "school-both": {
+        "messages": [{
+            "type": "text",
+            "text": "中学、高校両方のページの更新を通知します。",
+            "quickReply": {
+                "items": [{
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "中学",
+                            "text": "!school-junior"
+                        }
+                    },
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "高校",
+                            "text": "!school-high"
+                        }
+                    }
+                ]
+            }
+        }]
+    },
     "connection": {
         "messages": [{
             "type": "text",

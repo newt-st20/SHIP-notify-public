@@ -195,7 +195,7 @@ def main():
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonAllData = jsonLoad['pushForNotifyAllUser']
         jsonAllData['messages'][0]['text'] = mail
-        finalAllSendList = findUser(5,"notify-all")
+        finalAllSendList = findUser(5, "notify-all")
         jsonAllData['to'] = finalAllSendList
         requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
         num = random.randrange(10)
@@ -205,13 +205,7 @@ def main():
         if num == 0:
             # middle
             jsonMiddleData = jsonLoad['pushForNotifyMiddleUser']
-            sendMiddleList = []
-            userNum = 0
-            for userEach in userId:
-                if "notify-middle" in userSetting[userNum]:
-                    sendMiddleList.append(userEach)
-                userNum += 1
-            finalMiddleSendList = list(set(sendMiddleList))
+            finalMiddleSendList = findUser(5, "notify-middle")
             jsonMiddleData['to'] = finalMiddleSendList
             requests.post(multicastEndPoint,
                           json=jsonMiddleData, headers=headers)
@@ -232,24 +226,19 @@ def main():
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
-        if os.environ['CHANNEL_TYPE'] == "staging":
-            sendMiddleList = []
-            userNum = 0
-            for userEach in userId:
-                if "notify-middle" in userSetting[userNum]:
-                    sendMiddleList.append(userEach)
-                userNum += 1
-            finalMiddleSendList = list(set(sendMiddleList))
-            jsonMiddleData['to'] = finalMiddleSendList
-            jsonData = jsonLoad['pushForAll']
-            jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "取得: " + \
-                getTime.replace("-", "/")
-            jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1.replace(
-                "連絡事項:", "")
-            jsonData['messages'][0]['contents']['body']['contents'][4]['text'] = message2.replace(
-                "学習教材:", "")
-            print(jsonData)
-            requests.post(broadcastEndPoint, json=jsonData, headers=headers)
+        # betauser
+        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
+        BetaSendList = findUser(6, "beta")
+        jsonData['to'] = BetaSendList
+        jsonData = jsonLoad['pushForAll']
+        jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "取得: " + \
+            getTime.replace("-", "/")
+        jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1.replace(
+            "連絡事項:", "")
+        jsonData['messages'][0]['contents']['body']['contents'][4]['text'] = message2.replace(
+            "学習教材:", "")
+        print(jsonData)
+        requests.post(multicastEndPoint, json=jsonData, headers=headers)
 
 
 def getWaitSecs():
