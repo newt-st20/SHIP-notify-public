@@ -297,6 +297,16 @@ def handle_message(event):
         jsonData = jsonLoad['beta-leave']
         jsonData['replyToken'] = event.reply_token
         requests.post(replyEndPoint, json=jsonData, headers=headers)
+    elif "!school-setting" in event.message.text:
+        useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
+        useridSheetLow = len(useridSheet.col_values(1))
+        cell = useridSheet.findall(str(event.source.user_id))
+        for f in cell:
+            nowSet = useridSheet.cell(f.row, 7).value
+        jsonData = jsonLoad['school-setting']
+        jsonData['replyToken'] = event.reply_token
+        jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "現在の設定: "+nowSet
+        requests.post(replyEndPoint, json=jsonData, headers=headers)
     elif "!school-high" in event.message.text:
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
@@ -332,7 +342,8 @@ def handle_message(event):
         messageSheetList = messageSheet.col_values(1)
         messageSheetTextList = messageSheet.col_values(2)
         messageCount = 0
-        sendMessage = "I recognize messages with '!' is recognized as a command. But I couldn't understand this command: " + event.message.text
+        sendMessage = "I recognize messages with '!' is recognized as a command. But I couldn't understand this command '" + \
+            event.message.text + "'."
         for messageEach in messageSheetList:
             messageCount += 1
             if event.message.text in messageEach:
