@@ -77,7 +77,7 @@ def handle_message(event):
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
-    jsonOpen = open('reply.json', 'r', encoding="utf-8_sig")
+    jsonOpen = open('json/reply.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     replyEndPoint = "https://api.line.me/v2/bot/message/reply"
     if event.message.text == "!about":
