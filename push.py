@@ -252,6 +252,11 @@ def main():
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
+        jsonData = jsonLoad['pushForAll']
+        jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1
+        jsonData['messages'][0]['contents']['body']['contents'][4]['text'] = message2
+        print(jsonData)
+        requests.post(broadcastEndPoint, json=jsonData, headers=headers)
 
 
 if __name__ == "__main__":

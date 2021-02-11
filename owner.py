@@ -41,7 +41,7 @@ def main():
     sendText = deviveryDay + str(deliveryData.json()) + \
         "\n" + followersDay + str(followersData.json()) + \
         "\n" + str(leftData.json())
-    jsonOpen = open('other.json', 'r', encoding="utf-8_sig")
+    jsonOpen = open('json/other.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     jsonData = jsonLoad['ownerVerify']
     jsonData['to'] = os.environ["OWNER_USER_ID"]
