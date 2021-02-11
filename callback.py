@@ -281,7 +281,7 @@ def handle_message(event):
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
         cell = useridSheet.findall(str(event.source.user_id))
-        changeMessage = "beta"
+        changeMessage = "beta-on"
         for f in cell:
             useridSheet.update_cell(f.row, 6, changeMessage)
         jsonData = jsonLoad['beta-join']
@@ -291,7 +291,7 @@ def handle_message(event):
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
         cell = useridSheet.findall(str(event.source.user_id))
-        changeMessage = ""
+        changeMessage = "beta-off"
         for f in cell:
             useridSheet.update_cell(f.row, 6, changeMessage)
         jsonData = jsonLoad['beta-leave']
@@ -332,7 +332,7 @@ def handle_message(event):
         messageSheetList = messageSheet.col_values(1)
         messageSheetTextList = messageSheet.col_values(2)
         messageCount = 0
-        sendMessage = "It isn't a command, so couldn't understand: " + event.message.text
+        sendMessage = "I recognize messages with '!' is recognized as a command. But I couldn't understand this command: " + event.message.text
         for messageEach in messageSheetList:
             messageCount += 1
             if event.message.text in messageEach:

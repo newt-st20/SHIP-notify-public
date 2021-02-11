@@ -51,7 +51,7 @@
     "issueReject": {
         "messages": [{
             "type": "text",
-            "text": "不具合報告・機能改善要望コマンドは「!issue 内容」の形で送ってください"
+            "text": "不具合報告・機能改善要望コマンドは「!issue 内容」の形で送ってください。こちらのフォームからでも送信可能です。https://forms.gle/Ej61whsUhTWLp7G49"
         }]
     },
     "issueComplete": {
