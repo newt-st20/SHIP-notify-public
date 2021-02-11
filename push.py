@@ -226,9 +226,9 @@ def main():
                                 logMessage.replace("\n", ""))
         # beta-user
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
+        jsonData = jsonLoad['pushForAll']
         BetaSendList = findUser(6, "beta-on")
         jsonData['to'] = BetaSendList
-        jsonData = jsonLoad['pushForAll']
         jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "最終取得: " + \
             getTime.replace("-", "/")
         jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1.replace(

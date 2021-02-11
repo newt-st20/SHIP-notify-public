@@ -345,6 +345,90 @@
             }
         }]
     },
+    "school-setting": {
+        "messages": [{
+            "type": "flex",
+            "altText": "中学・高校設定",
+            "contents": {
+                "type": "bubble",
+                "direction": "ltr",
+                "header": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [{
+                            "type": "text",
+                            "text": "中学・高校設定",
+                            "weight": "bold",
+                            "size": "xl",
+                            "color": "#000000FF",
+                            "align": "start",
+                            "contents": []
+                        },
+                        {
+                            "type": "text",
+                            "text": "現在の設定:",
+                            "contents": []
+                        }
+                    ]
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [{
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "中学のみ通知",
+                                "text": "!school-junior"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "separator",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "高校のみ通知",
+                                "text": "!school-high"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "separator",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                                "type": "message",
+                                "label": "両方通知",
+                                "text": "!school-both"
+                            },
+                            "color": "#0BB9FFFF",
+                            "style": "primary"
+                        }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [{
+                        "type": "button",
+                        "action": {
+                            "type": "uri",
+                            "label": "詳しくはこちら",
+                            "uri": "https://newt-house.web.app/ship-notify/"
+                        }
+                    }]
+                }
+            }
+        }]
+    },
     "school-high": {
         "messages": [{
             "type": "text",
