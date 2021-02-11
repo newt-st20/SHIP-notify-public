@@ -25,7 +25,7 @@
                         },
                         {
                             "type": "text",
-                            "text": "取得:",
+                            "text": "最終取得:",
                             "contents": []
                         }
                     ]
@@ -43,7 +43,7 @@
                         },
                         {
                             "type": "text",
-                            "text": "hello, world",
+                            "text": "連絡事項",
                             "wrap": true,
                             "contents": []
                         },
@@ -61,7 +61,7 @@
                         },
                         {
                             "type": "text",
-                            "text": "hello, world",
+                            "text": "学習教材",
                             "wrap": true,
                             "contents": []
                         }

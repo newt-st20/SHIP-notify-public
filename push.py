@@ -226,12 +226,12 @@ def main():
         print(logMessage)
         reportSheet.update_cell(reportSheetLow+1, 1,
                                 logMessage.replace("\n", ""))
-        # betauser
+        # beta-user
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         BetaSendList = findUser(6, "beta")
         jsonData['to'] = BetaSendList
         jsonData = jsonLoad['pushForAll']
-        jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "取得: " + \
+        jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "最終取得: " + \
             getTime.replace("-", "/")
         jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1.replace(
             "連絡事項:", "")

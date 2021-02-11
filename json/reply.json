@@ -228,7 +228,7 @@
     "beta-setting": {
         "messages": [{
             "type": "flex",
-            "altText": "通知設定",
+            "altText": "ベータ版参加設定",
             "contents": {
                 "type": "bubble",
                 "direction": "ltr",
@@ -246,7 +246,7 @@
                         },
                         {
                             "type": "text",
-                            "text": "empty",
+                            "text": "現在の設定:",
                             "contents": []
                         }
                     ]
