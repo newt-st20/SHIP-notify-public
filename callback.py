@@ -94,15 +94,15 @@ def handle_message(event):
             jsonData['replyToken'] = event.reply_token
             requests.post(replyEndPoint, json=jsonData, headers=headers)
         else:
-            useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('issue')
-            useridSheetLow = len(useridSheet.col_values(1))
-            useridSheet.update_cell(useridSheetLow + 1, 1,
-                                    str(event.source.user_id))
-            useridSheet.update_cell(
-                useridSheetLow + 1, 2, str(event.message.text))
+            issueSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('issue')
+            issueSheetLow = len(issueSheet.col_values(1))
+            issueSheet.update_cell(issueSheetLow + 1, 1,
+                                   str(event.source.user_id))
+            issueSheet.update_cell(
+                issueSheetLow + 1, 2, str(event.message.text))
             time = datetime.datetime.fromtimestamp(
                 int(event.timestamp) / 1000).strftime('%Y/%m/%d %H:%M:%S.%f')
-            useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
+            issueSheet.update_cell(issueSheetLow + 1, 3, str(time))
             jsonData = jsonLoad['issueComplete']
             jsonData['replyToken'] = event.reply_token
             requests.post(replyEndPoint, json=jsonData, headers=headers)
@@ -195,7 +195,6 @@ def handle_message(event):
             newestConnectionTime.replace("-", "/") + "\n最終取得:" + \
             lastUpdateConnectionTime.replace("-", "/") + "\n" + \
             str(newestConnectionBaseMessage)
-
         studySheet = gc.open_by_key(
             SPREADSHEET_KEY).worksheet('study')
         studySheetLow = len(studySheet.col_values(1))
@@ -311,7 +310,7 @@ def handle_message(event):
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
         cell = useridSheet.findall(str(event.source.user_id))
-        changeMessage = "high"
+        changeMessage = "school-high"
         for f in cell:
             useridSheet.update_cell(f.row, 7, changeMessage)
         jsonData = jsonLoad['school-high']
@@ -321,7 +320,7 @@ def handle_message(event):
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
         cell = useridSheet.findall(str(event.source.user_id))
-        changeMessage = "junior"
+        changeMessage = "school-junior"
         for f in cell:
             useridSheet.update_cell(f.row, 7, changeMessage)
         jsonData = jsonLoad['school-junior']
@@ -331,7 +330,7 @@ def handle_message(event):
         useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
         useridSheetLow = len(useridSheet.col_values(1))
         cell = useridSheet.findall(str(event.source.user_id))
-        changeMessage = "both"
+        changeMessage = "school-both"
         for f in cell:
             useridSheet.update_cell(f.row, 7, changeMessage)
         jsonData = jsonLoad['school-both']
@@ -363,9 +362,8 @@ def handle_message(event):
             requests.post(replyEndPoint, json=jsonData, headers=headers)
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
-    fixedEvent = str(event)
     getlogsSheet.update_cell(getlogsSheetLow + 1, 1,
-                             fixedEvent.encode().decode())
+                             str(event).encode().decode())
     time = datetime.datetime.fromtimestamp(
         int(event.timestamp) / 1000).strftime('%Y/%m/%d %H:%M:%S.%f')
     getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(time))
@@ -393,6 +391,8 @@ def handle_follow(event):
     useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
     useridSheet.update_cell(useridSheetLow + 1, 4, "")
     useridSheet.update_cell(useridSheetLow + 1, 5, "notify-middle")
+    useridSheet.update_cell(useridSheetLow + 1, 5, "beta-off")
+    useridSheet.update_cell(useridSheetLow + 1, 5, "school-both")
     messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
     messageData = messageSheet.cell(1, 2).value
     jsonData = jsonLoad['about']
@@ -419,6 +419,8 @@ def handle_unfollow(event):
     blockMessage = "blocked:" + str(time)
     for f in cell:
         useridSheet.update_cell(f.row, 5, "notify-none")
+        useridSheet.update_cell(f.row, 6, "beta-none")
+        useridSheet.update_cell(f.row, 7, "school-none")
         if useridSheet.cell(f.row, 4).value == "":
             useridSheet.update_cell(f.row, 4, blockMessage)
 
