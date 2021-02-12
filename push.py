@@ -114,16 +114,18 @@ def main():
     studyList = []
     for i in range(len(studySoup.find_all(class_='allc')[0].find_all('tr'))):
         for j in range(len(studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[0])):
-            studyList.append(studySoup.find_all(class_='allc')[
-                             0].find_all('tr')[i].find_all('td')[0].text)
+            eachStudyList = []
+            eachStudyList.append(studySoup.find_all(class_='allc')[
+                0].find_all('tr')[i].find_all('td')[0].text)
             try:
-                studyList.append(studySoup.find_all(class_='allc')[0].find_all('tr')[
-                                 i].find_all('td')[1].find('span').get('title'))
+                eachStudyList.append(studySoup.find_all(class_='allc')[0].find_all('tr')[
+                    i].find_all('td')[1].find('span').get('title'))
             except:
-                studyList.append(studySoup.find_all(class_='allc')[
-                                 0].find_all('tr')[i].find_all('td')[1].text)
-            studyList.append(studySoup.find_all(class_='allc')[
-                             0].find_all('tr')[i].find_all('td')[2].text)
+                eachStudyList.append(studySoup.find_all(class_='allc')[
+                    0].find_all('tr')[i].find_all('td')[1].text)
+            eachStudyList.append(studySoup.find_all(class_='allc')[
+                0].find_all('tr')[i].find_all('td')[2].text)
+            studyList.append(eachStudyList)
     studyList.pop(0)
     print(studyList)
 
