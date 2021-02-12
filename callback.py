@@ -10,6 +10,7 @@ from linebot.models import (
 )
 import os
 from oauth2client.service_account import ServiceAccountCredentials
+import psycopg2
 import json
 import gspread
 import requests
@@ -402,15 +403,18 @@ def handle_follow(event):
     jsonData['messages'][0]['text'] = messageData
     print(jsonData)
     requests.post(replyEndPoint, json=jsonData, headers=headers)
-    #sql
+    # sql
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute('INSERT INTO users (id) VALUES (%s)', (userid,))
-                cur.execute('INSERT INTO users (data) VALUES (%s)', (str(userData),))
-                cur.execute('INSERT INTO users (followdate) VALUES (%s)', (str(time),))
+                cur.execute('INSERT INTO users (data) VALUES (%s)',
+                            (str(userData)),)
+                cur.execute(
+                    'INSERT INTO users (followdate) VALUES (%s)', (str(time),))
             conn.commit()
     except:
+        import traceback
         traceback.print_exc()
 
 
@@ -433,9 +437,11 @@ def handle_unfollow(event):
         if useridSheet.cell(f.row, 4).value == "":
             useridSheet.update_cell(f.row, 4, blockMessage)
 
+
 @app.route('/')
 def get_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
+
 
 def get_response_message(mes_from):
     with get_connection() as conn:
@@ -445,11 +451,13 @@ def get_response_message(mes_from):
             rows = cur.fetchall()
             return rows
 
+
 def writeData():
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute('INSERT INTO users (id) VALUES (%s)', ('foo',))
         conn.commit()
+
 
 if __name__ == "__main__":
     #    app.run()
