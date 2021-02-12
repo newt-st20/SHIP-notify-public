@@ -408,7 +408,7 @@ def handle_follow(event):
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    'INSERT INTO users (id, data, followdate) VALUES (%s)', (userid, str(userData), str(time),))
+                    'INSERT INTO users (id, data, follow_date, follow_status) VALUES (%s, %s, %s, %s)', (userid, str(userData), str(time), ""))
             conn.commit()
     except:
         import traceback
