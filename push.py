@@ -115,7 +115,7 @@ def main():
     for i in range(len(studySoup.find_all(class_='allc')[0].find_all('tr'))):
         for j in range(len(studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[0])):
             studyList.append([studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[0].text, studySoup.find_all(class_='allc')[0].find_all(
-                'tr')[i].find_all('td')[1].find_all('span')[0]['title'], studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[2].text])
+                'tr')[i].find_all('td')[1].find('span')['title'], studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[2].text])
     studyList.pop(0)
 
     connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
