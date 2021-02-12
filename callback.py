@@ -403,12 +403,15 @@ def handle_follow(event):
     print(jsonData)
     requests.post(replyEndPoint, json=jsonData, headers=headers)
     #sql
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute('INSERT INTO users (id) VALUES (%s)', (userid,))
-            cur.execute('INSERT INTO users (data) VALUES (%s)', (str(userData),))
-            cur.execute('INSERT INTO users (followdate) VALUES (%s)', (str(time),))
-        conn.commit()
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('INSERT INTO users (id) VALUES (%s)', (userid,))
+                cur.execute('INSERT INTO users (data) VALUES (%s)', (str(userData),))
+                cur.execute('INSERT INTO users (followdate) VALUES (%s)', (str(time),))
+            conn.commit()
+    except:
+        traceback.print_exc()
 
 
 @ handler.add(UnfollowEvent)
