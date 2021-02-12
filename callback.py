@@ -375,7 +375,7 @@ def handle_follow(event):
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
-    jsonOpen = open('reply.json', 'r', encoding="utf-8_sig")
+    jsonOpen = open('json/reply.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     replyEndPoint = "https://api.line.me/v2/bot/message/reply"
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
@@ -391,8 +391,8 @@ def handle_follow(event):
     useridSheet.update_cell(useridSheetLow + 1, 3, str(time))
     useridSheet.update_cell(useridSheetLow + 1, 4, "")
     useridSheet.update_cell(useridSheetLow + 1, 5, "notify-middle")
-    useridSheet.update_cell(useridSheetLow + 1, 5, "beta-off")
-    useridSheet.update_cell(useridSheetLow + 1, 5, "school-both")
+    useridSheet.update_cell(useridSheetLow + 1, 6, "beta-off")
+    useridSheet.update_cell(useridSheetLow + 1, 7, "school-both")
     messageSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('message')
     messageData = messageSheet.cell(1, 2).value
     jsonData = jsonLoad['about']
@@ -408,9 +408,6 @@ def handle_unfollow(event):
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
-    jsonOpen = open('reply.json', 'r', encoding="utf-8_sig")
-    jsonLoad = json.load(jsonOpen)
-    replyEndPoint = "https://api.line.me/v2/bot/message/reply"
     useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
     useridSheetLow = len(useridSheet.col_values(1))
     cell = useridSheet.findall(str(event.source.user_id))
