@@ -21,6 +21,8 @@ import owner
 
 app = Flask(__name__)
 
+DATABASE_URL = os.environ['DATABASE_URL']
+
 if os.environ['CHANNEL_TYPE'] == "public":
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
@@ -429,7 +431,6 @@ def handle_unfollow(event):
             useridSheet.update_cell(f.row, 4, blockMessage)
 
 @app.route('/')
-DATABASE_URL = os.environ.get('DATABASE_URL')
 def get_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 
