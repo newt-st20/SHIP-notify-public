@@ -416,8 +416,15 @@ def handle_follow(event):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(
-                    'INSERT INTO users (id, json_userdata, follow_time, follow_status, notify_status, beta_status, school_status) VALUES (%s, %s, %s, %s, %s, %s, %s)', [userid, userData, time, True, "all", True, "both"])
+                cur.execute('SELECT id = %s FROM users',
+                            [event.source.user_id])
+                rows = cur.fetchall()
+                if rows.length() != 0:
+                    cur.execute('UPDATE users SET follow_status = %s WHERE id = %s', [
+                                True, event.source.user_id])
+                else:
+                    cur.execute('INSERT INTO users (id, json_userdata, follow_time, follow_status, notify_status, beta_status, school_status) VALUES (%s, %s, %s, %s, %s, %s, %s)', [
+                                userid, userData, time, True, "all", True, "both"])
             conn.commit()
     except:
         import traceback
@@ -446,7 +453,7 @@ def handle_unfollow(event):
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    'UPDATE users SET follow_status = (%s) WHERE id ', [False])
+                    'UPDATE users SET follow_status = %s WHERE id = %s', [False, event.source.user_id])
             conn.commit()
     except:
         import traceback
