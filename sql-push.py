@@ -164,7 +164,7 @@ def main():
                         with get_connection() as conn:
                             with conn.cursor() as cur:
                                 cur.execute(
-                                    'INSERT INTO study_junior (date, folder, title) VALUES (%s, %s, %s)', ("2021/02/13", b[1], b[2]))
+                                    'INSERT INTO study_junior (date, folder, title) VALUES (%s, %s, %s)', ["2021/02/13", b[1], b[2]])
                             conn.commit()
                     except:
                         import traceback
