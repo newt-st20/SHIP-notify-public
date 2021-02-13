@@ -374,7 +374,7 @@ def handle_message(event):
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    'INSERT INTO message_log (json_data, time) VALUES (%s, %s)',(event, time))
+                    'INSERT INTO message_log (json_data, time) VALUES (%s, %s)', [str(event), time])
             conn.commit()
     except:
         import traceback
@@ -417,7 +417,7 @@ def handle_follow(event):
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    'INSERT INTO users (id, json_userdata, follow_date, follow_status, notify_status, beta_status, school_status) VALUES (%s, %s, %s, %s, %s, %s, %s)', (userid, userData, time, True, "all", True, "both"))
+                    'INSERT INTO users (id, json_userdata, follow_time, follow_status, notify_status, beta_status, school_status) VALUES (%s, %s, %s, %s, %s, %s, %s)', [userid, userData, time, True, "all", True, "both"])
             conn.commit()
     except:
         import traceback
@@ -446,7 +446,7 @@ def handle_unfollow(event):
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    'UPDATE users SET follow_status = (%s) WHERE id ', (False))
+                    'UPDATE users SET follow_status = (%s) WHERE id ', [False])
             conn.commit()
     except:
         import traceback
@@ -456,15 +456,6 @@ def handle_unfollow(event):
 @app.route('/')
 def get_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
-
-
-def get_response_message(mes_from):
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute(
-                "SELECT * FROM staff WHERE name='{}'".format(mes_from))
-            rows = cur.fetchall()
-            return rows
 
 
 if __name__ == "__main__":
