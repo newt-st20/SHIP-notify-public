@@ -370,6 +370,15 @@ def handle_message(event):
     time = datetime.datetime.fromtimestamp(
         int(event.timestamp) / 1000).strftime('%Y/%m/%d %H:%M:%S.%f')
     getlogsSheet.update_cell(getlogsSheetLow + 1, 2, str(time))
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'INSERT INTO message_log (json_data, time) VALUES (%s, %s)',(event, time))
+            conn.commit()
+    except:
+        import traceback
+        traceback.print_exc()
 
 
 @handler.add(FollowEvent)
@@ -408,7 +417,7 @@ def handle_follow(event):
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    'INSERT INTO users (id, data, follow_date, follow_status) VALUES (%s, %s, %s, %s)', (userid, str(userData), str(time), ""))
+                    'INSERT INTO users (id, json_userdata, follow_date, follow_status, notify_status, beta_status, school_status) VALUES (%s, %s, %s, %s, %s, %s, %s)', (userid, userData, time, True, "all", True, "both"))
             conn.commit()
     except:
         import traceback
@@ -433,6 +442,15 @@ def handle_unfollow(event):
         useridSheet.update_cell(f.row, 7, "school-none")
         if useridSheet.cell(f.row, 4).value == "":
             useridSheet.update_cell(f.row, 4, blockMessage)
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'UPDATE users SET follow_status = (%s) WHERE id ', (False))
+            conn.commit()
+    except:
+        import traceback
+        traceback.print_exc()
 
 
 @app.route('/')
@@ -447,13 +465,6 @@ def get_response_message(mes_from):
                 "SELECT * FROM staff WHERE name='{}'".format(mes_from))
             rows = cur.fetchall()
             return rows
-
-
-def writeData():
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute('INSERT INTO users (id) VALUES (%s)', ('foo',))
-        conn.commit()
 
 
 if __name__ == "__main__":
