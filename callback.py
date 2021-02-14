@@ -419,7 +419,7 @@ def handle_follow(event):
                 cur.execute('SELECT id = %s FROM users',
                             [event.source.user_id])
                 rows = cur.fetchall()
-                if rows.length() != 0:
+                if len(rows) != 0:
                     cur.execute('UPDATE users SET follow_status = %s WHERE id = %s', [
                                 True, event.source.user_id])
                 else:
