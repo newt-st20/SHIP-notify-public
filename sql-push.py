@@ -1,17 +1,15 @@
-from linebot.models import TextSendMessage
-from linebot import LineBotApi
-import datetime
-from oauth2client.service_account import ServiceAccountCredentials
+import os
+import psycopg2
+from psycopg2.extras import DictCursor
 import json
-import gspread
+import time
+import datetime
 import requests
+import re
+import random
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import os
-import time
-import re
-import random
 
 
 if os.environ['CHANNEL_TYPE'] == "public":
@@ -38,144 +36,155 @@ def main():
     time.sleep(getWaitSecs())
     ship_id = driver.find_element_by_name("ship_id")
     password = driver.find_element_by_name("pass")
-    ship_id.send_keys(os.environ['SHIP_ID'])
-    password.send_keys(os.environ['SHIP_PASS'])
+    ship_id.send_keys('shj181152')
+    password.send_keys('ry9k5btx')
     driver.find_element_by_name('login').click()
     time.sleep(getWaitSecs())
+
     driver.get("https://ship.sakae-higashi.jp/connection/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
     con = driver.page_source
     conSoup = BeautifulSoup(con, 'html.parser')
-    conSource = conSoup.find("body")
-    conTable = conSoup.find_all(class_='allc')[0]
-    conLinks = conTable.find_all('a')
-    conTrs = conTable.find_all("tr")
-    conDataLists = []
-    for conTr in conTrs:
-        conDataList = []
-        conTds = conTr.find_all("td")
-        for conTd in conTds:
-            conDataList.append(conTd.text)
-        conDataLists.append(conDataList)
-    conDataLists.pop(0)
-    conPageDescriptions = []
+    conLinks = conSoup.find_all(class_='allc')[0].find_all('a')
+    conEachPage = []
     for conLink in conLinks:
-        conOnclick = conLink.attrs['onclick']
-        conLeft = conOnclick.find("'")
-        conRight = conOnclick.find("'", conLeft+1)
-        conId = format(conOnclick[conLeft+1:conRight])
-        time.sleep(getWaitSecs())
+        conOnclick = conLink.get('onclick')
+        conId = re.findall("'([^']*)'", conOnclick)[0]
         driver.get(
             "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
-        conEachPage = driver.page_source
-        conEachPageSoup = BeautifulSoup(conEachPage, 'html.parser')
-        conPageMain = conEachPageSoup.find_all(
-            class_='ac')[0].find_all("table")[1]
-        conPageDescription = conPageMain.find_all("table")[-2].text
-        conPageDescriptions.append(conPageDescription)
-    conAllDataCounter = 0
-    conAllDataList = []
-    for conData in range(len(conDataLists)):
-        conDatas = []
-        conDatas.append(conDataLists[conAllDataCounter][0])
-        conDatas.append(conDataLists[conAllDataCounter][1])
-        conDatas.append(conDataLists[conAllDataCounter][2])
-        conDatas.append(conPageDescriptions[conAllDataCounter])
-        conAllDataList.append(conDatas)
-        conAllDataCounter += 1
-    print(conAllDataList)
+        conEachPage.append(driver.page_source)
+
     driver.get("https://ship.sakae-higashi.jp/study/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
     study = driver.page_source
+    studySoup = BeautifulSoup(study, 'html.parser')
     driver.quit()
 
-    studySoup = BeautifulSoup(study, 'html.parser')
-    studySource = studySoup.find("body")
-    studyText = studySoup.find_all(class_='allc')[0].find_all('tr')
+    conBody = conSoup.find("body")
+    conTrs = conSoup.find_all(class_='allc')[0].find_all('tr')
+    conTrs.pop(0)
+    conList = []
+    conc = 0
+    for conTr in conTrs:
+        eachconList = []
+        conTrTds = conTr.find_all('td')
+        try:
+            stage = conTrTds[2].find('a').get('onclick')
+            eachconList.append(re.findall("'([^']*)'", stage))
+        except:
+            eachconList.append([0, 0])
+        eachconList.append(conTrTds[0].text)
+        try:
+            eachconList.append(conTrTds[1].find('span').get('title'))
+        except:
+            eachconList.append(conTrTds[1].text)
+        eachconList.append(conTrTds[2].text.replace("\n", ""))
+        conEachPageSoup = BeautifulSoup(conEachPage[conc], 'html.parser')
+        conPageMain = conEachPageSoup.find_all(
+            class_='ac')[0].find_all("table")[1]
+        conPageDescription = conPageMain.find_all(
+            "table")[-2].text.replace("\n", "")
+        eachconList.append(conPageDescription)
+        conList.append(eachconList)
+        conc += 1
+    print(conList)
+
+    studyBody = studySoup.find("body")
+    studyTrs = studySoup.find_all(class_='allc')[0].find_all('tr')
+    studyTrs.pop(0)
     studyList = []
-    for i in range(len(studySoup.find_all(class_='allc')[0].find_all('tr'))):
-        for j in range(len(studySoup.find_all(class_='allc')[0].find_all('tr')[i].find_all('td')[0])):
-            eachStudyList = []
-            eachStudyList.append(studySoup.find_all(class_='allc')[
-                0].find_all('tr')[i].find_all('td')[0].text)
-            try:
-                eachStudyList.append(studySoup.find_all(class_='allc')[0].find_all('tr')[
-                    i].find_all('td')[1].find('span').get('title'))
-            except:
-                eachStudyList.append(studySoup.find_all(class_='allc')[
-                    0].find_all('tr')[i].find_all('td')[1].text)
-            eachStudyList.append(studySoup.find_all(class_='allc')[
-                0].find_all('tr')[i].find_all('td')[2].text)
-            studyList.append(eachStudyList)
-    studyList.pop(0)
+    studyc = 0
+    for studyTr in studyTrs:
+        eachstudyList = []
+        studyTrTds = studyTr.find_all('td')
+        try:
+            stage = studyTrTds[2].find('a').get('onclick')
+            eachstudyList.append(re.findall("'([^']*)'", stage))
+        except:
+            eachstudyList.append([0, 0])
+        eachstudyList.append(studyTrTds[0].text)
+        try:
+            eachstudyList.append(studyTrTds[1].find('span').get('title'))
+        except:
+            eachstudyList.append(studyTrTds[1].text)
+        eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
+        studyList.append(eachstudyList)
+        studyc += 1
     print(studyList)
 
-    connectionSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('connection')
-    connectionSheetLow = len(connectionSheet.col_values(1))
-    connectionData = [str(conSource), str(conAllDataList), getTime]
-    connectionOldData = connectionSheet.cell(connectionSheetLow, 2).value
-    message1 = ""
-    try:
-        conFlex0 = conFlex1 = conFlex2 = conFlex3 = []
-        if connectionOldData != str(conAllDataList):
-            connectionSheet.append_row(connectionData)
-            for a in conAllDataList:
-                if str(a) in str(connectionOldData):
-                    pass
-                else:
-                    message1 += "\n・連絡事項:" + \
-                        a[0] + "-" + a[1] + "-" + \
-                        a[2].replace("\n", "")
-                    if a[3].replace("\n", "") != "":
-                        message1 += "\n《" + a[3].replace("\n", "") + "》"
-                    conFlex0.append(a[0])
-                    conFlex1.append(a[1])
-                    conFlex2.append(a[2])
-                    conFlex3.append(a[3])
-        else:
-            connectionSheet.update_cell(connectionSheetLow, 4, getTime)
-            message1 = "\n・連絡事項:更新はありません"
-    except:
-        message1 = "\n・連絡事項取得エラー:更新の有無を取得できませんでした"
-        import traceback
-        traceback.print_exc()
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            conSendData = []
+            studySendData = []
+            for i in conList:
+                if i[0][0] != 0:
+                    cur.execute('SELECT EXISTS (SELECT * FROM con_junior WHERE id = %s)',
+                                [int(i[0][0])])
+                    (b,) = cur.fetchone()
+                    if b == False:
+                        date = i[1].replace(
+                            "年", "/").replace("月", "/").replace("日", "")
+                        cur.execute('INSERT INTO con_junior (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[2], i[3], i[4]])
+                        conSendData.append([date, i[2], i[3], i[4]])
+            for i in studyList:
+                if i[0][0] != 0:
+                    cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
+                                [int(i[0][0])])
+                    (b,) = cur.fetchone()
+                    if b == False:
+                        date = i[1].replace(
+                            "年", "/").replace("月", "/").replace("日", "")
+                        cur.execute('INSERT INTO study_junior (id, date, folder, title) VALUES (%s, %s, %s, %s)', [
+                                    i[0][0], date, i[2], i[3]])
+                        studySendData.append([date, i[2], i[3]])
+        conn.commit()
 
-    studySheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('study')
-    studySheetLow = len(studySheet.col_values(1))
-    studyData = [str(studySource), str(studyList), getTime]
-    studyOldData = studySheet.cell(studySheetLow, 2).value
-    studyNewData = studyList
-    message2 = "\n"
-    try:
-        if studyOldData != str(studyList):
-            studySheet.append_row(studyData)
-            for b in studyList:
-                print(str(b))
-                if str(b) in str(studyOldData):
-                    pass
-                else:
-                    message2 += "\n・学習教材:" + b[0] + "-" + \
-                        b[1] + "-"
-                    if b[2].replace("\n", " ") != "":
-                        message2 += b[2].replace("\n", " ")
-                    studyFlex0 = studyFlex1 = studyFlex2 = []
-                    studyFlex0.append(b[0])
-                    studyFlex1.append(b[1])
-                    studyFlex2.append(b[2])
-                    try:
-                        with get_connection() as conn:
-                            with conn.cursor() as cur:
-                                cur.execute(
-                                    'INSERT INTO study_junior (date, folder, title) VALUES (%s, %s, %s)', ["2021/02/13", b[1], b[2]])
-                            conn.commit()
-                    except:
-                        import traceback
-                        traceback.print_exc()
+    print(conSendData)
+    print(studySendData)
+
+    if len(conSendData) != 0 or len(studySendData) != 0:
+        mail = "【" + getTime + "】"
+        if len(conSendData) != 0:
+
+            for conEachSendData in conSendData:
+                mail += "\n・連絡事項:" + \
+                    conEachSendData[0] + "-" + \
+                        conEachSendData[1] + "-" + conEachSendData[2]
+                if conEachSendData[3] != "":
+                    mail += "《" + conEachSendData[3] + "》"
+                mail += "\n"
         else:
-            studySheet.update_cell(studySheetLow, 4, getTime)
-            message2 = "\n・学習教材:更新はありません"
-    except:
-        message2 = "\n・学習教材取得エラー:更新の有無を取得できませんでした"
-        import traceback
-        traceback.print_exc()
+            mail += "\n連絡事項:更新はありません"
+        if len(studySendData) != 0:
+            for studyEachSendData in studySendData:
+                mail += "\n・連絡事項:" + \
+                    studyEachSendData[0] + "-" + \
+                        studyEachSendData[1] + "-" + studyEachSendData[2]
+                mail += "\n"
+        else:
+            mail += "\n学習教材:更新はありません"
+    else:
+        mail = "更新はありません"
+
+    print(mail)
+
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
+            cur.execute(
+                'SELECT id FROM users WHERE notify_status LIKE %s', ["%all%"])
+            notifyAllUserList = []
+            for row in cur:
+                notifyAllUserList.append(row)
+            cur.execute(
+                'SELECT id FROM users WHERE notify_status LIKE %s', ["%middle%"])
+            notifyMiddleUserList = []
+            for row in cur:
+                notifyMiddleUserList.append(row)
+            cur.execute(
+                'SELECT id FROM users WHERE notify_status LIKE %s', ["%few%"])
+            notifyFewUserList = []
+            for row in cur:
+                notifyFewUserList.append(row)
+        conn.commit()
 
     headers = {
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
@@ -183,59 +192,41 @@ def main():
     }
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
-    useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
-    useridSheetLow = len(useridSheet.col_values(1))
-    reportSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('report')
-    reportSheetLow = len(reportSheet.col_values(1))
-    mail = "【" + getTime.replace("-", "/") + "】\n" + message1 + message2
-    if "連絡事項:更新はありません" in message1 and "学習教材:更新はありません" in message2:
-        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
-        jsonAllData = jsonLoad['pushForNotifyAllUser']
-        jsonAllData['messages'][0]['text'] = mail
-        finalAllSendList = findUser(5, "notify-all")
-        jsonAllData['to'] = finalAllSendList
-        requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
-        num = random.randrange(10)
-        logMessage = "send message:" + \
-            str(mail)+" send for:" + str(finalAllSendList) + \
-            ". Random number is " + str(num)
-        if num == 0:
-            # middle
-            jsonMiddleData = jsonLoad['pushForNotifyMiddleUser']
-            finalMiddleSendList = findUser(5, "notify-middle")
-            jsonMiddleData['to'] = finalMiddleSendList
-            requests.post(multicastEndPoint,
-                          json=jsonMiddleData, headers=headers)
-            logMessage = "send message:" + \
-                str(mail)+"[all] send for:" + str(finalAllSendList) + ",[middle] send for:" + str(finalMiddleSendList) + \
-                ". Random number is " + str(num)
-        print(logMessage)
-        reportSheet.update_cell(reportSheetLow+1, 1,
-                                logMessage.replace("\n", ""))
-    else:
+
+    if len(conSendData) != 0 or len(studySendData) != 0:
         broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
         jsonData = jsonLoad['default']
         jsonData['messages'][0]['text'] = mail
         print(jsonData)
         requests.post(broadcastEndPoint, json=jsonData, headers=headers)
-        logMessage = "send message:" + \
-            str(mail)+" send for all followed user."
-        print(logMessage)
-        reportSheet.update_cell(reportSheetLow+1, 1,
-                                logMessage.replace("\n", ""))
-        # beta-user
+        log = "[For]all following user\n[Message]" + mail.replace("\n", "")
+    else:
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
-        jsonData = jsonLoad['pushForAll']
-        BetaSendList = findUser(6, "beta-on")
-        jsonData['to'] = BetaSendList
-        jsonData['messages'][0]['contents']['header']['contents'][1]['text'] = "最終取得: " + \
-            getTime.replace("-", "/")
-        jsonData['messages'][0]['contents']['body']['contents'][1]['text'] = message1.replace(
-            "連絡事項:", "")
-        jsonData['messages'][0]['contents']['body']['contents'][4]['text'] = message2.replace(
-            "学習教材:", "")
-        print(jsonData)
-        requests.post(multicastEndPoint, json=jsonData, headers=headers)
+        jsonAllData = jsonLoad['pushForNotifyAllUser']
+        jsonAllData['messages'][0]['text'] = mail
+        jsonData['to'] = notifyAllUserList
+        requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
+        num = random.randrange(10)
+        if num == 0:
+            multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
+            jsonAllData = jsonLoad['pushForNotifyMiddleUser']
+            jsonAllData['messages'][0]['text'] = "【定期通知】SHIP-notifyは正常に動作しています。"
+            jsonData['to'] = notifyMiddleUserList
+            requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
+            log = "[For]setting notify-all user and notify-middle user\n[Random-num]" + \
+                num + "\n[Message]" + mail.replace("\n", "")
+        else:
+            log = "[For]setting notify-all user\n[Random-num]" + \
+                num + "\n[Message]" + mail.replace("\n", "")
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'INSERT INTO push_log (time, log) VALUES (%s, %s)', [getTime, log])
+            conn.commit()
+    except:
+        import traceback
+        traceback.print_exc()
 
 
 def getWaitSecs():
@@ -245,34 +236,6 @@ def getWaitSecs():
     mean_wait = 5.0  # 平均待機秒
     sigma_wait = 1.0  # 標準偏差（ブレ幅）
     return min([max_wait, max([min_wait, round(random.normalvariate(mean_wait, sigma_wait))])])
-
-
-def findUser(row, text):
-    useridSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('userid')
-    useridSheetLow = len(useridSheet.col_values(1))
-    userId = useridSheet.col_values(1)
-    userSetting = useridSheet.col_values(row)
-    sendList = []
-    sendAllList = []
-    userNum = 0
-    for userEach in userId:
-        if text in userSetting[userNum]:
-            sendAllList.append(userEach)
-        userNum += 1
-    return list(set(sendAllList))
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL, sslmode='require')
-
-
-def get_response_message(mes_from):
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute(
-                "SELECT * FROM staff WHERE name='{}'".format(mes_from))
-            rows = cur.fetchall()
-            return rows
 
 
 if __name__ == "__main__":
