@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.options import Options
 import get
 
 DATABASE_URL = os.environ['DATABASE_URL']
-
+getTime = now.strftime('%Y/%m/%d %H:%M:%S')
 if os.environ['CHANNEL_TYPE'] == "public":
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]

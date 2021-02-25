@@ -42,6 +42,7 @@ def main():
     for conLink in conLinks:
         conOnclick = conLink.get('onclick')
         conId = re.findall("'([^']*)'", conOnclick)[0]
+        time.sleep(getWaitSecs())
         driver.get(
             "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
         conEachPage.append(driver.page_source)
