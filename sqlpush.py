@@ -118,7 +118,7 @@ def main():
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
 
-    if len(conSendData) != 0 or len(studySendData) != 0:
+"""     if len(conSendData) != 0 or len(studySendData) != 0:
         broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
         jsonData = jsonLoad['default']
         jsonData['messages'][0]['text'] = mail
@@ -143,8 +143,7 @@ def main():
                 num + "\n[Message]" + mail.replace("\n", "")
         else:
             log = "[For]setting notify-all user\n[Random-num]" + \
-                num + "\n[Message]" + mail.replace("\n", "")
-        return mail
+                num + "\n[Message]" + mail.replace("\n", "") """
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
@@ -154,6 +153,7 @@ def main():
     except:
         import traceback
         traceback.print_exc()
+    return mail
 
 
 def get_connection():

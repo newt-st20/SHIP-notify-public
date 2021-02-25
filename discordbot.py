@@ -31,7 +31,7 @@ async def on_message(message):
         await message.channel.send('にゃーん')
     if message.content == '/run':
         result = sqlpush.main()
-        await channel.send(mail)
+        await channel.send(result)
 
 
 @tasks.loop(seconds=3000)
@@ -43,7 +43,7 @@ async def loop():
     print(date)
     if date == "21":
         result = sqlpush.main()
-        await channel.send(mail)
+        await channel.send(result)
 
 loop.start()
 
