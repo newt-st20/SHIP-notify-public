@@ -14,7 +14,10 @@ from selenium.webdriver.chrome.options import Options
 import get
 
 DATABASE_URL = os.environ['DATABASE_URL']
-getTime = now.strftime('%Y/%m/%d %H:%M:%S')
+
+now = datetime.datetime.now()
+getTime = now.strftime('%Y-%m-%d %H:%M:%S')
+
 if os.environ['CHANNEL_TYPE'] == "public":
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
@@ -155,6 +158,7 @@ def main():
 
 def get_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
+
 
 def getWaitSecs():
     # 画面の待機秒数の取得
