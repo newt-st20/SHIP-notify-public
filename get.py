@@ -106,5 +106,14 @@ def main():
     return conList, studyList
 
 
+def getWaitSecs():
+    # 画面の待機秒数の取得
+    max_wait = 7.0  # 最大待機秒
+    min_wait = 3.0  # 最小待機秒
+    mean_wait = 5.0  # 平均待機秒
+    sigma_wait = 1.0  # 標準偏差（ブレ幅）
+    return min([max_wait, max([min_wait, round(random.normalvariate(mean_wait, sigma_wait))])])
+
+
 if __name__ == "__main__":
     main()

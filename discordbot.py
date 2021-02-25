@@ -11,6 +11,8 @@ import time
 import re
 import random
 
+import sqlpush
+
 TOKEN = os.environ['DISCORD_TOKEN']
 
 client = discord.Client()
@@ -29,11 +31,17 @@ async def on_message(message):
         await message.channel.send('にゃーん')
 
 
-@tasks.loop(seconds=60)
+@tasks.loop(seconds=3000)
 async def loop():
     await client.wait_until_ready()
     channel = client.get_channel(814460143001403423)
     await channel.send('時間だよ')
+    date = datetime.datetime.now().strftime("%H")
+    print(date)
+    if date == "21":
+        result = sqlpush.main()
+        await channel.send(mail)
+
 loop.start()
 
 

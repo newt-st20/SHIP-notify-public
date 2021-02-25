@@ -122,13 +122,7 @@ def main():
         print(jsonData)
         requests.post(broadcastEndPoint, json=jsonData, headers=headers)
         log = "[For]all following user\n[Message]" + mail.replace("\n", "")
-
-        for discordWebhook in discordWebhookList:
-            webhook_url = discordWebhook
-            main_content = {'content': mail}
-            headers = {'Content-Type': 'application/json'}
-            response = requests.post(
-                webhook_url, json.dumps(main_content), headers=headers)
+        return mail
     else:
         multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
         jsonAllData = jsonLoad['pushForNotifyAllUser']
@@ -147,6 +141,7 @@ def main():
         else:
             log = "[For]setting notify-all user\n[Random-num]" + \
                 num + "\n[Message]" + mail.replace("\n", "")
+        return mail
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
