@@ -29,6 +29,9 @@ async def on_message(message):
         return
     if message.content == '/neko':
         await message.channel.send('にゃーん')
+    if message.content == '/run':
+        result = sqlpush.main()
+        await channel.send(mail)
 
 
 @tasks.loop(seconds=3000)
