@@ -117,33 +117,32 @@ def main():
     }
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
-
-"""     if len(conSendData) != 0 or len(studySendData) != 0:
-        broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
-        jsonData = jsonLoad['default']
-        jsonData['messages'][0]['text'] = mail
-        print(jsonData)
-        requests.post(broadcastEndPoint, json=jsonData, headers=headers)
-        log = "[For]all following user\n[Message]" + mail.replace("\n", "")
-        return mail
-    else:
-        multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
-        jsonAllData = jsonLoad['pushForNotifyAllUser']
-        jsonAllData['messages'][0]['text'] = mail
-        jsonData['to'] = notifyAllUserList
-        requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
-        num = random.randrange(10)
-        if num == 0:
-            multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
-            jsonAllData = jsonLoad['pushForNotifyMiddleUser']
-            jsonAllData['messages'][0]['text'] = "【定期通知】SHIP-notifyは正常に動作しています。"
-            jsonData['to'] = notifyMiddleUserList
-            requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
-            log = "[For]setting notify-all user and notify-middle user\n[Random-num]" + \
-                num + "\n[Message]" + mail.replace("\n", "")
+    """     if len(conSendData) != 0 or len(studySendData) != 0:
+            broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
+            jsonData = jsonLoad['default']
+            jsonData['messages'][0]['text'] = mail
+            print(jsonData)
+            requests.post(broadcastEndPoint, json=jsonData, headers=headers)
+            log = "[For]all following user\n[Message]" + mail.replace("\n", "")
+            return mail
         else:
-            log = "[For]setting notify-all user\n[Random-num]" + \
-                num + "\n[Message]" + mail.replace("\n", "") """
+            multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
+            jsonAllData = jsonLoad['pushForNotifyAllUser']
+            jsonAllData['messages'][0]['text'] = mail
+            jsonData['to'] = notifyAllUserList
+            requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
+            num = random.randrange(10)
+            if num == 0:
+                multicastEndPoint = "https://api.line.me/v2/bot/message/multicast"
+                jsonAllData = jsonLoad['pushForNotifyMiddleUser']
+                jsonAllData['messages'][0]['text'] = "【定期通知】SHIP-notifyは正常に動作しています。"
+                jsonData['to'] = notifyMiddleUserList
+                requests.post(multicastEndPoint, json=jsonAllData, headers=headers)
+                log = "[For]setting notify-all user and notify-middle user\n[Random-num]" + \
+                    num + "\n[Message]" + mail.replace("\n", "")
+            else:
+                log = "[For]setting notify-all user\n[Random-num]" + \
+                    num + "\n[Message]" + mail.replace("\n", "") """
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
