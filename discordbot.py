@@ -1,30 +1,50 @@
 import discord
+from discord.ext import tasks
+import datetime
+import json
+import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import os
+import time
+import re
+import random
 
 TOKEN = os.environ['DISCORD_TOKEN']
 
-# 接続に必要なオブジェクトを生成
 client = discord.Client()
-
-# 起動時に動作する処理
 
 
 @client.event
 async def on_ready():
-    # 起動したらターミナルにログイン通知が表示される
     print('ログインしました')
-
-# メッセージ受信時に動作する処理
 
 
 @client.event
 async def on_message(message):
-    # メッセージ送信者がBotだった場合は無視する
     if message.author.bot:
         return
-    # 「/neko」と発言したら「にゃーん」が返る処理
     if message.content == '/neko':
         await message.channel.send('にゃーん')
 
-# Botの起動とDiscordサーバーへの接続
+
+@tasks.loop(seconds=60)
+CHANNEL_ID = 814451345267621888
+
+
+async def loop():
+    await client.wait_until_ready()
+    channel = client.get_channel(CHANNEL_ID)
+    await channel.send('時間だよ')
+
+
+async def good_morning():
+    now = datetime.now().strftime('%H:%M')
+    if now == '06:00':
+        channel = client.get_channel(CHANNEL_ID)
+        await channel.send('おはよう')
+loop.start()
+
+
 client.run(TOKEN)
