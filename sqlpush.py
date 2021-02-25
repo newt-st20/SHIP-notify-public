@@ -153,6 +153,9 @@ def main():
         traceback.print_exc()
 
 
+def get_connection():
+    return psycopg2.connect(DATABASE_URL, sslmode='require')
+
 def getWaitSecs():
     # 画面の待機秒数の取得
     max_wait = 7.0  # 最大待機秒
