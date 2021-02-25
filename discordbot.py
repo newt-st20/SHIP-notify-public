@@ -32,12 +32,8 @@ async def on_message(message):
 @tasks.loop(seconds=60)
 async def loop():
     await client.wait_until_ready()
-    channel = client.get_channel(814451345267621888)
+    channel = client.get_channel(814460143001403423)
     await channel.send('時間だよ')
-    now = datetime.now().strftime('%H:%M')
-    if now == '06:00':
-        channel = client.get_channel(814451345267621888)
-        await channel.send('おはよう')
 loop.start()
 
 
