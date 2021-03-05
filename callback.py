@@ -18,7 +18,6 @@ import re
 import datetime
 
 import push
-import owner
 
 app = Flask(__name__)
 
@@ -354,15 +353,6 @@ def handle_message(event):
         jsonData['replyToken'] = event.reply_token
         jsonData['messages'][0]['text'] = sendMessage
         requests.post(replyEndPoint, json=jsonData, headers=headers)
-    if event.source.user_id == os.environ['OWNER_USER_ID']:
-        if "!get" in event.message.text:
-            push.main()
-        if "!left" in event.message.text:
-            owner.main()
-        if "!test" in event.message.text:
-            jsonData = jsonLoad['push']
-            jsonData['pushForAll'] = event.reply_token
-            requests.post(replyEndPoint, json=jsonData, headers=headers)
     getlogsSheet = gc.open_by_key(SPREADSHEET_KEY).worksheet('getlogs')
     getlogsSheetLow = len(getlogsSheet.col_values(1))
     getlogsSheet.update_cell(getlogsSheetLow + 1, 1,
