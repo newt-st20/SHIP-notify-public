@@ -20,20 +20,16 @@ client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
-    print('ログインしました')
+    await client.wait_until_ready()
+    wakeLogChannel = client.get_channel(817389202161270794)
+    await wakeLogChannel.send('起動しました')
 
 
 @client.event
 async def on_member_join(member):
     guild = member.guild
-    channel = discord.utils.get(guild.text_channels, name="beta_welcome")
-    embed = discord.Embed(
-        title=f"{member.author.name}さんが参加しました", url="https://bit.ly/2JahfiF", color=0x00ffff)
-    embed.set_thumbnail(
-        url="https://nureyon.com/sample/84/check_mark-2-p53.svg?2020-09-09")
-    embed.add_field(name="参加者", value="f{member.author.mention}", inline=False)
-    embed.set_footer(text="サーバー参加を検知しました")
-    await channel.send(f'{member.author.mention}', embed=embed)
+    unauthenticatedRole = guild.get_role(813015195881570334)
+    await member.add_roles(unauthenticatedRole)
 
 
 @client.event
@@ -44,30 +40,33 @@ async def on_message(message):
     studyJuniorChannel = client.get_channel(814791146966220841)
     if message.author.bot:
         return
-    if message.content == '/neko':
-        await message.channel.send('にゃーん')
-    if message.content == '/run':
-        result = sqlpush.main()
-        if len(result[0]) != 0:
-            for conData in result[0]:
-                embed = discord.Embed(
-                    title="連絡事項更新通知", description="取得:"+result[2])
-                embed.add_field(name="date", value=conData[0])
-                embed.add_field(name="path", value=conData[1])
-                embed.add_field(name="title", value=conData[2])
-                try:
-                    embed.add_field(name="description", value=conData[3])
-                except:
-                    print("no data")
-                await conJuniorChannel.send(embed=embed)
-        if len(result[1]) != 0:
-            for studyData in result[1]:
-                embed = discord.Embed(
-                    title="学習教材更新通知", description="取得:"+result[2])
-                embed.add_field(name="date", value=studyData[0])
-                embed.add_field(name="path", value=studyData[1])
-                embed.add_field(name="title", value=studyData[2])
-                await studyJuniorChannel.send(embed=embed)
+    if 'sh!' in message.content:
+        if 'neko' in message.content:
+            await message.channel.send('にゃーん')
+        elif 'run' in message.content:
+            result = sqlpush.main()
+            if len(result[0]) != 0:
+                for conData in result[0]:
+                    embed = discord.Embed(
+                        title="連絡事項更新通知", description="取得:"+result[2])
+                    embed.add_field(name="date", value=conData[0])
+                    embed.add_field(name="path", value=conData[1])
+                    embed.add_field(name="title", value=conData[2])
+                    try:
+                        embed.add_field(name="description", value=conData[3])
+                    except:
+                        print("no data")
+                    await conJuniorChannel.send(embed=embed)
+            if len(result[1]) != 0:
+                for studyData in result[1]:
+                    embed = discord.Embed(
+                        title="学習教材更新通知", description="取得:"+result[2])
+                    embed.add_field(name="date", value=studyData[0])
+                    embed.add_field(name="path", value=studyData[1])
+                    embed.add_field(name="title", value=studyData[2])
+                    await studyJuniorChannel.send(embed=embed)
+        else:
+            await message.channel.send('このコマンドは用意されていません')
 
 
 @client.event
@@ -98,16 +97,15 @@ async def on_raw_reaction_remove(payload):
         print("complete")
 
 
-@tasks.loop(seconds=3000)
+@tasks.loop(seconds=1200)
 async def loop():
     await client.wait_until_ready()
     testChannel = client.get_channel(814460143001403423)
     conJuniorChannel = client.get_channel(812592878194262026)
     studyJuniorChannel = client.get_channel(814791146966220841)
-    await testChannel.send('時間だよ')
-    date = datetime.datetime.now().strftime("%H")
-    print(date)
-    if date == "21":
+    nowHour = int(datetime.datetime.now().strftime("%H"))
+    print(nowHour)
+    if nowHour % 2 == 0:
         result = sqlpush.main()
         if len(result[0]) != 0:
             for conData in result[0]:
