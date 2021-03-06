@@ -112,7 +112,7 @@ async def loop():
                     print("no data")
                 await conJuniorChannel.send(embed=embed)
         else:
-            getLogChannel.send('連絡事項に更新はありませんでした')
+            await getLogChannel.send('連絡事項に更新はありませんでした')
         if len(result[1]) != 0:
             for studyData in result[1]:
                 embed = discord.Embed(
@@ -122,7 +122,7 @@ async def loop():
                 embed.add_field(name="title", value=studyData[2])
                 await studyJuniorChannel.send(embed=embed)
         else:
-            getLogChannel.send('学習教材に更新はありませんでした')
+            await getLogChannel.send('学習教材に更新はありませんでした')
 
 
 loop.start()
