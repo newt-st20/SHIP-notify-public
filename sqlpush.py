@@ -195,11 +195,11 @@ def main():
                         highStudySendData.append([i[0][0], date, i[2], i[3]])
         conn.commit()
 
-    print(juniorConSendData[::-1])
-    print(juniorStudySendData[::-1])
-    print(highConSendData[::-1])
-    print(highStudySendData[::-1])
-    return juniorConSendData[::-1], juniorStudySendData[::-1], highConSendData[::-1], highStudySendData[::-1], getTime
+    print(juniorConSendData.reverse())
+    print(juniorStudySendData.reverse())
+    print(highConSendData.reverse())
+    print(highStudySendData.reverse())
+    return juniorConSendData.reverse(), juniorStudySendData.reverse(), highConSendData.reverse(), highStudySendData.reverse(), getTime
 
 
 def get_connection():
