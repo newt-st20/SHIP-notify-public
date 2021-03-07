@@ -169,7 +169,6 @@ def main():
                                     i[0][0], date, i[2], i[3]])
                         juniorStudySendData.append([i[0][0], date, i[2], i[3]])
             highConSendData = []
-            highStudySendData = []
             for i in highConList:
                 if i[0][0] != 0:
                     cur.execute('SELECT EXISTS (SELECT * FROM con_high WHERE id = %s)',
@@ -182,6 +181,7 @@ def main():
                                     i[0][0], date, i[2], i[3], i[4]])
                         highConSendData.append(
                             [i[0][0], date, i[2], i[3], i[4]])
+            highStudySendData = []
             for i in highStudyList:
                 if i[0][0] != 0:
                     cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',

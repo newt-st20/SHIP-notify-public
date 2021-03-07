@@ -128,6 +128,7 @@ async def loop():
             await getData()
         except Exception as e:
             await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        await message.channel.send('処理が完了しました')
 
 
 async def getData():
@@ -145,12 +146,17 @@ async def getData():
                 title="連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
             embed.add_field(name="id", value=conData[0])
             embed.add_field(name="date", value=conData[1])
-            embed.add_field(name="path", value=conData[2], inline=False)
-            embed.add_field(name="title", value=conData[3], inline=False)
-            try:
-                embed.add_field(name="description", value=conData[4])
-            except:
-                print("no data")
+            if conData[2] != '':
+                embed.add_field(name="path", value=conData[2], inline=False)
+            else:
+                embed.add_field(name="path", value="(トップフォルダ)", inline=False)
+            if conData[3] != '':
+                embed.add_field(name="title", value=conData[3], inline=False)
+            else:
+                embed.add_field(name="title", value="(タイトルなし)", inline=False)
+            if conData[4] != '':
+                embed.add_field(name="description",
+                                value=conData[4], inline=False)
             await conJuniorChannel.send(embed=embed)
     else:
         embed = discord.Embed(
@@ -164,8 +170,14 @@ async def getData():
                 title="中学学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
             embed.add_field(name="id", value=studyData[0])
             embed.add_field(name="date", value=studyData[1])
-            embed.add_field(name="path", value=studyData[2], inline=False)
-            embed.add_field(name="title", value=studyData[3], inline=False)
+            if studyData[2] != '':
+                embed.add_field(name="path", value=studyData[2], inline=False)
+            else:
+                embed.add_field(name="path", value="(トップフォルダ)", inline=False)
+            if studyData[3] != '':
+                embed.add_field(name="title", value=studyData[3], inline=False)
+            else:
+                embed.add_field(name="title", value="(タイトルなし)", inline=False)
             await studyJuniorChannel.send(embed=embed)
     else:
         embed = discord.Embed(
@@ -179,12 +191,15 @@ async def getData():
                 title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
             embed.add_field(name="id", value=conData[0])
             embed.add_field(name="date", value=conData[1])
-            embed.add_field(name="path", value=conData[2], inline=False)
-            embed.add_field(name="title", value=conData[3], inline=False)
-            try:
-                embed.add_field(name="description", value=conData[4])
-            except:
-                print("no data")
+            if conData[2] != '':
+                embed.add_field(name="path", value=conData[2], inline=False)
+            if conData[3] != '':
+                embed.add_field(name="title", value=conData[3], inline=False)
+            else:
+                embed.add_field(name="title", value="(タイトルなし)", inline=False)
+            if conData[4] != '':
+                embed.add_field(name="description",
+                                value=conData[4], inline=False)
             await conHighChannel.send(embed=embed)
     else:
         embed = discord.Embed(
@@ -198,8 +213,14 @@ async def getData():
                 title="高校学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
             embed.add_field(name="id", value=studyData[0])
             embed.add_field(name="date", value=studyData[1])
-            embed.add_field(name="path", value=studyData[2], inline=False)
-            embed.add_field(name="title", value=studyData[3], inline=False)
+            if studyData[2] != '':
+                embed.add_field(name="path", value=studyData[2], inline=False)
+            else:
+                embed.add_field(name="path", value="(トップフォルダ)", inline=False)
+            if studyData[３] != '':
+                embed.add_field(name="title", value=studyData[3], inline=False)
+            else:
+                embed.add_field(name="title", value="(タイトルなし)", inline=False)
             await studyHighChannel.send(embed=embed)
     else:
         embed = discord.Embed(
