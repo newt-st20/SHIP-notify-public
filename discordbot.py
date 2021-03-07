@@ -55,7 +55,7 @@ async def on_message(message):
 @client.event
 async def on_raw_reaction_add(payload):
     await client.wait_until_ready()
-    entranceMessageId = 814804313535807508
+    entranceMessageId = 817952115095109633
     roleLogChannel = client.get_channel(817401458244714506)
     if payload.message_id == entranceMessageId:
         guild = client.get_guild(payload.guild_id)
@@ -64,16 +64,14 @@ async def on_raw_reaction_add(payload):
         await member.add_roles(authenticatedRole)
         unauthenticatedRole = guild.get_role(813015195881570334)
         await member.remove_roles(unauthenticatedRole)
-        print("complete")
         user = client.get_user(payload.user_id)
-        print(user.name, user.discriminator, str(user))
-        await roleLogChannel.send(user.mention+'に`authenticated`ロールを付与し、`unauthenticated`ロールを剥奪しました。')
+        await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与し、'+unauthenticatedRole.mention+'ロールを剥奪しました。')
 
 
 @client.event
 async def on_raw_reaction_remove(payload):
     await client.wait_until_ready()
-    entranceMessageId = 814804313535807508
+    entranceMessageId = 817952115095109633
     roleLogChannel = client.get_channel(817401458244714506)
     if payload.message_id == entranceMessageId:
         guild = client.get_guild(payload.guild_id)
@@ -82,10 +80,8 @@ async def on_raw_reaction_remove(payload):
         await member.remove_roles(authenticatedRole)
         unauthenticatedRole = guild.get_role(813015195881570334)
         await member.add_roles(unauthenticatedRole)
-        print("complete")
         user = client.get_user(payload.user_id)
-        print(user.name, user.discriminator, str(user))
-        await roleLogChannel.send(user.mention+'から`authenticated`ロールを剥奪し、`unauthenticated`ロールを付与しました。')
+        await roleLogChannel.send(user.mention+'から'+authenticatedRole.mention+'ロールを剥奪し、'+unauthenticatedRole.mention+'ロールを付与しました。')
 
 
 @tasks.loop(seconds=600)
@@ -104,9 +100,9 @@ async def loop():
             for conData in result[0]:
                 embed = discord.Embed(
                     title="連絡事項更新通知", description="取得:"+result[2], color=discord.Colour.from_rgb(52, 235, 79))
-                embed.add_field(name="date", value=conData[0])
-                embed.add_field(name="path", value=conData[1])
-                embed.add_field(name="title", value=conData[2])
+                embed.add_field(name="date", value=conData[0], inline=False)
+                embed.add_field(name="path", value=conData[1], inline=False)
+                embed.add_field(name="title", value=conData[2], inline=False)
                 try:
                     embed.add_field(name="description", value=conData[3])
                 except:
@@ -118,9 +114,9 @@ async def loop():
             for studyData in result[1]:
                 embed = discord.Embed(
                     title="学習教材更新通知", description="取得:"+result[2], color=discord.Colour.from_rgb(52, 229, 235))
-                embed.add_field(name="date", value=studyData[0])
-                embed.add_field(name="path", value=studyData[1])
-                embed.add_field(name="title", value=studyData[2])
+                embed.add_field(name="date", value=studyData[0], inline=False)
+                embed.add_field(name="path", value=studyData[1], inline=False)
+                embed.add_field(name="title", value=studyData[2], inline=False)
                 await studyJuniorChannel.send(embed=embed)
         else:
             await getLogChannel.send('学習教材に更新はありませんでした')
