@@ -61,12 +61,15 @@ async def on_message(message):
             await message.channel.send(f'BOT数：{bot_count}')
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
-        elif 'get' in message.content and message.author.guild_permissions.administrator:
-            await message.channel.send('データの取得を開始します')
-            try:
-                await getData()
-            except Exception as e:
-                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif 'get' in message.content:
+            if message.author.guild_permissions.administrator:
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getData()
+                except Exception as e:
+                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            else:
+                await message.channel.send('このコマンドは管理者のみ利用することができます')
         else:
             await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
@@ -126,6 +129,7 @@ async def loop():
         except Exception as e:
             await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
+
 async def getData():
     await client.wait_until_ready()
     testChannel = client.get_channel(814460143001403423)
@@ -139,12 +143,12 @@ async def getData():
         for conData in result[0]:
             embed = discord.Embed(
                 title="連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
-            embed.add_field(name="id", value=conData[0], inline=False)
-            embed.add_field(name="date", value=conData[1], inline=False)
+            embed.add_field(name="id", value=conData[0])
+            embed.add_field(name="date", value=conData[1])
             embed.add_field(name="path", value=conData[2], inline=False)
             embed.add_field(name="title", value=conData[3], inline=False)
             try:
-                embed.add_field(name="description", value=conData[3])
+                embed.add_field(name="description", value=conData[4])
             except:
                 print("no data")
             await conJuniorChannel.send(embed=embed)
@@ -158,8 +162,8 @@ async def getData():
         for studyData in result[1]:
             embed = discord.Embed(
                 title="中学学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
-            embed.add_field(name="id", value=conData[0], inline=False)
-            embed.add_field(name="date", value=studyData[1], inline=False)
+            embed.add_field(name="id", value=studyData[0])
+            embed.add_field(name="date", value=studyData[1])
             embed.add_field(name="path", value=studyData[2], inline=False)
             embed.add_field(name="title", value=studyData[3], inline=False)
             await studyJuniorChannel.send(embed=embed)
@@ -173,12 +177,12 @@ async def getData():
         for conData in result[2]:
             embed = discord.Embed(
                 title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
-            embed.add_field(name="id", value=conData[0], inline=False)
-            embed.add_field(name="date", value=conData[1], inline=False)
+            embed.add_field(name="id", value=conData[0])
+            embed.add_field(name="date", value=conData[1])
             embed.add_field(name="path", value=conData[2], inline=False)
             embed.add_field(name="title", value=conData[3], inline=False)
             try:
-                embed.add_field(name="description", value=conData[3])
+                embed.add_field(name="description", value=conData[4])
             except:
                 print("no data")
             await conHighChannel.send(embed=embed)
@@ -192,8 +196,8 @@ async def getData():
         for studyData in result[3]:
             embed = discord.Embed(
                 title="高校学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
-            embed.add_field(name="id", value=conData[0], inline=False)
-            embed.add_field(name="date", value=studyData[1], inline=False)
+            embed.add_field(name="id", value=studyData[0])
+            embed.add_field(name="date", value=studyData[1])
             embed.add_field(name="path", value=studyData[2], inline=False)
             embed.add_field(name="title", value=studyData[3], inline=False)
             await studyHighChannel.send(embed=embed)
