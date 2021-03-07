@@ -217,7 +217,7 @@ async def getData():
                 embed.add_field(name="path", value=studyData[2], inline=False)
             else:
                 embed.add_field(name="path", value="(トップフォルダ)", inline=False)
-            if studyData[３] != '':
+            if studyData[3] != '':
                 embed.add_field(name="title", value=studyData[3], inline=False)
             else:
                 embed.add_field(name="title", value="(タイトルなし)", inline=False)
