@@ -54,11 +54,11 @@ async def on_message(message):
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
         elif 'get' in message.content and message.author.guild_permissions.administrator:
-            await message.channel.send('データの取得を開始...')
+            await message.channel.send('データの取得を開始します')
             try:
                 await getData()
             except Exception as e:
-                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + e.message)
+                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
         else:
             await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
@@ -112,7 +112,7 @@ async def loop():
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
     if nowHour % 6 == 0 and nowMinute < 10:
-        await getLogChannel.send('データの取得を開始...')
+        await getLogChannel.send('データの取得を開始します')
         result = sqlpush.main()
         if len(result[0]) != 0:
             for conData in result[0]:

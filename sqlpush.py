@@ -54,9 +54,9 @@ def main():
         menuStatus = menuSoup.find_all('table')[1].text
         menuBtn = menuSoup.find_all('table')[2].find_all('input')[1]
         if count == 0 and '中学校' in menuStatus:
-            menuBtn.click()
+            driver.find_element_by_name('cheng_hi').click()
         elif count == 1 and '高等学校' in menuStatus:
-            menuBtn.click()
+            driver.find_element_by_name('cheng_jr').click()
         driver.get(
             "https://ship.sakae-higashi.jp/connection/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
         con = driver.page_source
