@@ -88,7 +88,7 @@ async def on_raw_reaction_remove(payload):
         await roleLogChannel.send(user.mention+'から`authenticated`ロールを剥奪し、`unauthenticated`ロールを付与しました。')
 
 
-@tasks.loop(seconds=1200)
+@tasks.loop(seconds=600)
 async def loop():
     await client.wait_until_ready()
     testChannel = client.get_channel(814460143001403423)
@@ -96,13 +96,14 @@ async def loop():
     studyJuniorChannel = client.get_channel(814791146966220841)
     getLogChannel = client.get_channel(817400535639916544)
     nowHour = int(datetime.datetime.now().strftime("%H"))
+    nowMinute = int(datetime.datetime.now().strftime("%M"))
     print(nowHour)
-    if nowHour % 6 == 0:
+    if nowHour % 6 == 0 and nowMinute < 10:
         result = sqlpush.main()
         if len(result[0]) != 0:
             for conData in result[0]:
                 embed = discord.Embed(
-                    title="連絡事項更新通知", description="取得:"+result[2])
+                    title="連絡事項更新通知", description="取得:"+result[2], color=discord.Colour.from_rgb(52, 235, 79))
                 embed.add_field(name="date", value=conData[0])
                 embed.add_field(name="path", value=conData[1])
                 embed.add_field(name="title", value=conData[2])
@@ -116,7 +117,7 @@ async def loop():
         if len(result[1]) != 0:
             for studyData in result[1]:
                 embed = discord.Embed(
-                    title="学習教材更新通知", description="取得:"+result[2])
+                    title="学習教材更新通知", description="取得:"+result[2], color=discord.Colour.from_rgb(52, 229, 235))
                 embed.add_field(name="date", value=studyData[0])
                 embed.add_field(name="path", value=studyData[1])
                 embed.add_field(name="title", value=studyData[2])
