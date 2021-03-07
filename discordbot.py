@@ -51,6 +51,14 @@ async def on_message(message):
             await message.channel.send('ヘルプ')
         elif 'search' in message.content:
             await message.channel.send('検索')
+        elif 'count' in message.content:
+            guild = message.guild
+            member_count = guild.member_count
+            await message.channel.send(f'メンバー数：{member_count}')
+            user_count = sum(1 for member in guild.members if not member.bot)
+            await message.channel.send(f'ユーザ数：{user_count}')
+            bot_count = sum(1 for member in guild.members if member.bot)
+            await message.channel.send(f'BOT数：{bot_count}')
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
         elif 'get' in message.content and message.author.guild_permissions.administrator:
@@ -181,6 +189,11 @@ async def loop():
 
 
 async def getData():
+    await client.wait_until_ready()
+    testChannel = client.get_channel(814460143001403423)
+    conJuniorChannel = client.get_channel(812592878194262026)
+    studyJuniorChannel = client.get_channel(814791146966220841)
+    getLogChannel = client.get_channel(817400535639916544)
     result = sqlpush.main()
     if len(result[0]) != 0:
         for conData in result[0]:
