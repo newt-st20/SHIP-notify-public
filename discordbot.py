@@ -47,8 +47,18 @@ async def on_message(message):
     elif 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
+        elif 'help' in message.content:
+            await message.channel.send('ヘルプ')
+        elif 'search' in message.content:
+            await message.channel.send('検索')
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
+        elif 'get' in message.content and message.author.guild_permissions.administrator:
+            await message.channel.send('データの取得を開始...')
+            try:
+                await getData()
+            except Exception as e:
+                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + e.message)
         else:
             await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
@@ -101,13 +111,13 @@ async def loop():
     getLogChannel = client.get_channel(817400535639916544)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    print(nowMinute)
     if nowHour % 6 == 0 and nowMinute < 10:
+        await getLogChannel.send('データの取得を開始...')
         result = sqlpush.main()
         if len(result[0]) != 0:
             for conData in result[0]:
                 embed = discord.Embed(
-                    title="連絡事項更新通知", description="取得:"+result[2], color=discord.Colour.from_rgb(52, 235, 79))
+                    title="連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
                 embed.add_field(name="date", value=conData[0], inline=False)
                 embed.add_field(name="path", value=conData[1], inline=False)
                 embed.add_field(name="title", value=conData[2], inline=False)
@@ -117,18 +127,125 @@ async def loop():
                     print("no data")
                 await conJuniorChannel.send(embed=embed)
         else:
-            await getLogChannel.send('連絡事項に更新はありませんでした')
+            embed = discord.Embed(
+                title="中学連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            embed.add_field(name="system-log",
+                            value='中学連絡事項に更新はありませんでした', inline=False)
+            await getLogChannel.send(embed=embed)
         if len(result[1]) != 0:
             for studyData in result[1]:
                 embed = discord.Embed(
-                    title="学習教材更新通知", description="取得:"+result[2], color=discord.Colour.from_rgb(52, 229, 235))
+                    title="中学学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
                 embed.add_field(name="date", value=studyData[0], inline=False)
                 embed.add_field(name="path", value=studyData[1], inline=False)
                 embed.add_field(name="title", value=studyData[2], inline=False)
                 await studyJuniorChannel.send(embed=embed)
         else:
-            await getLogChannel.send('学習教材に更新はありませんでした')
+            embed = discord.Embed(
+                title="中学学習教材更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            embed.add_field(name="system-log",
+                            value='中学学習教材に更新はありませんでした', inline=False)
+            await getLogChannel.send(embed=embed)
+        if len(result[2]) != 0:
+            for conData in result[2]:
+                embed = discord.Embed(
+                    title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+                embed.add_field(name="date", value=conData[0], inline=False)
+                embed.add_field(name="path", value=conData[1], inline=False)
+                embed.add_field(name="title", value=conData[2], inline=False)
+                try:
+                    embed.add_field(name="description", value=conData[3])
+                except:
+                    print("no data")
+                await conHighChannel.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            embed.add_field(name="system-log",
+                            value='高校連絡事項に更新はありませんでした', inline=False)
+            await getLogChannel.send(embed=embed)
+        if len(result[3]) != 0:
+            for studyData in result[3]:
+                embed = discord.Embed(
+                    title="高校学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
+                embed.add_field(name="date", value=studyData[0], inline=False)
+                embed.add_field(name="path", value=studyData[1], inline=False)
+                embed.add_field(name="title", value=studyData[2], inline=False)
+                await studyHighChannel.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="高校学習教材更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            embed.add_field(name="system-log",
+                            value='高校学習教材に更新はありませんでした', inline=False)
+            await getLogChannel.send(embed=embed)
 
+
+async def getData():
+    result = sqlpush.main()
+    if len(result[0]) != 0:
+        for conData in result[0]:
+            embed = discord.Embed(
+                title="連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            embed.add_field(name="date", value=conData[0], inline=False)
+            embed.add_field(name="path", value=conData[1], inline=False)
+            embed.add_field(name="title", value=conData[2], inline=False)
+            try:
+                embed.add_field(name="description", value=conData[3])
+            except:
+                print("no data")
+            await conJuniorChannel.send(embed=embed)
+    else:
+        embed = discord.Embed(
+            title="中学連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+        embed.add_field(name="system-log",
+                        value='中学連絡事項に更新はありませんでした', inline=False)
+        await getLogChannel.send(embed=embed)
+    if len(result[1]) != 0:
+        for studyData in result[1]:
+            embed = discord.Embed(
+                title="中学学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
+            embed.add_field(name="date", value=studyData[0], inline=False)
+            embed.add_field(name="path", value=studyData[1], inline=False)
+            embed.add_field(name="title", value=studyData[2], inline=False)
+            await studyJuniorChannel.send(embed=embed)
+    else:
+        embed = discord.Embed(
+            title="中学学習教材更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+        embed.add_field(name="system-log",
+                        value='中学学習教材に更新はありませんでした', inline=False)
+        await getLogChannel.send(embed=embed)
+    if len(result[2]) != 0:
+        for conData in result[2]:
+            embed = discord.Embed(
+                title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            embed.add_field(name="date", value=conData[0], inline=False)
+            embed.add_field(name="path", value=conData[1], inline=False)
+            embed.add_field(name="title", value=conData[2], inline=False)
+            try:
+                embed.add_field(name="description", value=conData[3])
+            except:
+                print("no data")
+            await conHighChannel.send(embed=embed)
+    else:
+        embed = discord.Embed(
+            title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+        embed.add_field(name="system-log",
+                        value='高校連絡事項に更新はありませんでした', inline=False)
+        await getLogChannel.send(embed=embed)
+    if len(result[3]) != 0:
+        for studyData in result[3]:
+            embed = discord.Embed(
+                title="高校学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
+            embed.add_field(name="date", value=studyData[0], inline=False)
+            embed.add_field(name="path", value=studyData[1], inline=False)
+            embed.add_field(name="title", value=studyData[2], inline=False)
+            await studyHighChannel.send(embed=embed)
+    else:
+        embed = discord.Embed(
+            title="高校学習教材更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+        embed.add_field(name="system-log",
+                        value='高校学習教材に更新はありませんでした', inline=False)
+        await getLogChannel.send(embed=embed)
 
 loop.start()
 
