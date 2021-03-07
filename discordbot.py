@@ -41,15 +41,23 @@ async def on_message(message):
     conJuniorChannel = client.get_channel(812592878194262026)
     studyJuniorChannel = client.get_channel(814791146966220841)
     getLogChannel = client.get_channel(814791146966220841)
+    dmLogChannel = client.get_channel(817971315138756619)
     if message.author.bot:
         return
-    if 'sh!' in message.content:
+    elif 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
         else:
             await message.channel.send('このコマンドは用意されていません')
+    if isinstance(message.channel, discord.DMChannel):
+        user = client.get_user(message.author.id)
+        await dmLogChannel.send("from: "+str(message.author)+" ( "+str(message.author.id)+" ) \nbody: "+str(message.content)+"\nchannel-id: "+str(message.channel.id))
+    if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'reply!' in message.content:
+        replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
+        sendMessage = str(message.content.split('!')[2])
+        await replyDmChannel.send(sendMessage)
 
 
 @client.event
@@ -93,7 +101,7 @@ async def loop():
     getLogChannel = client.get_channel(817400535639916544)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    print(nowHour)
+    print(nowMinute)
     if nowHour % 6 == 0 and nowMinute < 10:
         result = sqlpush.main()
         if len(result[0]) != 0:
