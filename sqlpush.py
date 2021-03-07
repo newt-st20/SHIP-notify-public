@@ -155,7 +155,8 @@ def main():
                             "年", "/").replace("月", "/").replace("日", "")
                         cur.execute('INSERT INTO con_junior (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s)', [
                                     i[0][0], date, i[2], i[3], i[4]])
-                        juniorConSendData.append([date, i[2], i[3], i[4]])
+                        juniorConSendData.append(
+                            [i[0][0], date, i[2], i[3], i[4]])
             for i in juniorStudyList:
                 if i[0][0] != 0:
                     cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
@@ -166,7 +167,7 @@ def main():
                             "年", "/").replace("月", "/").replace("日", "")
                         cur.execute('INSERT INTO study_junior (id, date, folder, title) VALUES (%s, %s, %s, %s)', [
                                     i[0][0], date, i[2], i[3]])
-                        juniorStudySendData.append([date, i[2], i[3]])
+                        juniorStudySendData.append([i[0][0], date, i[2], i[3]])
             highConSendData = []
             highStudySendData = []
             for i in highConList:
@@ -179,7 +180,8 @@ def main():
                             "年", "/").replace("月", "/").replace("日", "")
                         cur.execute('INSERT INTO con_high (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s)', [
                                     i[0][0], date, i[2], i[3], i[4]])
-                        highConSendData.append([date, i[2], i[3], i[4]])
+                        highConSendData.append(
+                            [i[0][0], date, i[2], i[3], i[4]])
             for i in highStudyList:
                 if i[0][0] != 0:
                     cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
@@ -190,7 +192,7 @@ def main():
                             "年", "/").replace("月", "/").replace("日", "")
                         cur.execute('INSERT INTO study_high (id, date, folder, title) VALUES (%s, %s, %s, %s)', [
                                     i[0][0], date, i[2], i[3]])
-                        highStudySendData.append([date, i[2], i[3]])
+                        highStudySendData.append([i[0][0], date, i[2], i[3]])
         conn.commit()
 
     print(juniorConSendData[::-1])
