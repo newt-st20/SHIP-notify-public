@@ -194,12 +194,23 @@ def main():
                                     i[0][0], date, i[2], i[3]])
                         highStudySendData.append([i[0][0], date, i[2], i[3]])
         conn.commit()
-
-    print(juniorConSendData.reverse())
-    print(juniorStudySendData.reverse())
-    print(highConSendData.reverse())
-    print(highStudySendData.reverse())
-    return juniorConSendData.reverse(), juniorStudySendData.reverse(), highConSendData.reverse(), highStudySendData.reverse(), getTime
+    sortedJuniorConSendData = []
+    for value in reversed(juniorConSendData):
+        sortedJuniorConSendData.append(value)
+    sortedJuniorStudySendData = []
+    for value in reversed(juniorStudySendData):
+        sortedJuniorStudySendData.append(value)
+    sortedHighConSendData = []
+    for value in reversed(highConSendData):
+        sortedHighConSendData.append(value)
+    sortedHighStudySendData = []
+    for value in reversed(highStudySendData):
+        sortedHighStudySendData.append(value)
+    print(sortedJuniorConSendData)
+    print(sortedJuniorStudySendData)
+    print(sortedHighConSendData)
+    print(sortedHighStudySendData)
+    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime
 
 
 def get_connection():
