@@ -10,8 +10,10 @@ import os
 import time
 import re
 import random
+import wikipedia
 
 import sqlpush
+import shnews
 
 
 TOKEN = os.environ['DISCORD_TOKEN']
@@ -50,6 +52,26 @@ async def on_message(message):
             await message.channel.send('`sh!`はコマンドです。')
         elif 'search' in message.content:
             await message.channel.send('検索')
+        elif 'wiki' in message.content:
+            word = message.content.split()[1]
+            await message.channel.send('Wikipediaで`'+word+'`を検索...')
+            wikipedia.set_lang("ja")
+            response = wikipedia.search(word)
+            if not response:
+                await message.channel.send('Wikipediaで`'+word+'`に関連するページが見つかりませんでした')
+            try:
+                page = wikipedia.page(response[0])
+                content = page.content.splitlines()[0]
+                if len(content) > 1000:
+                    content = content[0:1000] + "..."
+                embed = discord.Embed(title=word)
+                embed.add_field(name="wikipediaで検索した結果",
+                                value=content.splitlines()[0], inline=False)
+                embed.add_field(name="▶リンク",
+                                value='['+page.url+']('+page.url+')', inline=False)
+                await message.channel.send(embed=embed)
+            except Exception as e:
+                await message.channel.send("エラー:"+str(e))
         elif 'count' in message.content:
             guild = message.guild
             member_count = guild.member_count
@@ -59,6 +81,15 @@ async def on_message(message):
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
         elif 'get' in message.content:
+            if message.author.guild_permissions.administrator:
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getData()
+                except Exception as e:
+                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            else:
+                await message.channel.send('このコマンドは管理者のみ利用することができます')
+        elif 'shnews' in message.content:
             if message.author.guild_permissions.administrator:
                 await message.channel.send('データの取得を開始します')
                 try:
@@ -229,6 +260,29 @@ async def getData():
             title="高校学習教材更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
         embed.add_field(name="system-log",
                         value='高校学習教材に更新はありませんでした', inline=False)
+        await getLogChannel.send(embed=embed)
+
+
+async def getNewsData():
+    await client.wait_until_ready()
+    shnewsChannel = client.get_channel(814460143001403423)
+    getLogChannel = client.get_channel(817400535639916544)
+    result = shnews.main()
+    if len(result[0]) != 0:
+        for conData in result[0]:
+            embed = discord.Embed(
+                title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(52, 235, 79))
+            embed.add_field(name="title", value=conData[0], inline=False)
+            embed.add_field(name="datetime", value=conData[1])
+            embed.add_field(name="category", value=conData[4], inline=False)
+            embed.add_field(name="body", value=conData[2], inline=False)
+            embed.add_field(name="link", value=conData[3], inline=False)
+            await shnewsChannel.send(embed=embed)
+    else:
+        embed = discord.Embed(
+            title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(52, 235, 79))
+        embed.add_field(name="system-log",
+                        value='栄東ニュースに更新はありませんでした', inline=False)
         await getLogChannel.send(embed=embed)
 
 loop.start()
