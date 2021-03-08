@@ -213,9 +213,6 @@ def main():
     print(sortedHighStudySendData)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    if len(sortedJuniorConSendData) != 0 or len(sortedJuniorStudySendData) != 0:
-        if nowHour == 22 and nowMinute < 10:
-            push.main(sortedJuniorConSendData, sortedJuniorStudySendData, getTime)
     return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime
 
 
