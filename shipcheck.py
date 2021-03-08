@@ -182,7 +182,7 @@ def main():
             highStudySendData = []
             for i in highStudyList:
                 if i[0][0] != 0:
-                    cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
+                    cur.execute('SELECT EXISTS (SELECT * FROM study_high WHERE id = %s)',
                                 [int(i[0][0])])
                     (b,) = cur.fetchone()
                     if b == False:
