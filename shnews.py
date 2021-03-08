@@ -40,8 +40,8 @@ def main():
         gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
         postDateTime = date + gtime
         body = newsEntry.text.strip(title).strip(date).replace("\n", "")
-        if len(body) > 1000:
-            body = body[0:1000] + "...((省略))"
+        if len(body) > 100:
+            body = body[0:100] + "...((省略))"
         link = newsEntry.find_all('a')[0].get('href')
         category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
         newsTextList.append([title, postDateTime, body, link, category])
