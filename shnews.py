@@ -33,13 +33,12 @@ def main():
     news = driver.page_source
     newsSoup = BeautifulSoup(news, 'html.parser')
     newsTextList = []
-    newsEntryList = conSoup.find_all(class_='entry')
+    newsEntryList = newsSoup.find_all(class_='entry')
     for newsEntry in newsEntryList:
         title = newsEntry.find_all('h3')[0].text
         date = newsEntry.find_all(class_='date')[0].text
-        time = newsEntry.find_all(class_='time')[0].find_all(
-            class_='time')[0].text.strip("投稿時刻")
-        postDateTime = date + time
+        gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
+        postDateTime = date + gtime
         body = newsEntry.text.strip(title).strip(date)
         link = newsEntry.find_all('a')[0].get('href')
         category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
@@ -55,7 +54,7 @@ def main():
                             [i[0]])
                 (b,) = cur.fetchone()
                 if b == False:
-                    cur.execute('INSERT INTO con_junior (title, datetime, body, link, category) VALUES (%s, %s, %s, %s, %s)', [
+                    cur.execute('INSERT INTO sh_news (title, datetime, body, link, category) VALUES (%s, %s, %s, %s, %s)', [
                                 i[0], i[1], i[2], i[3], i[4]])
                     newsSendData.append(
                         [i[0], i[1], i[2], i[3], i[4]])
