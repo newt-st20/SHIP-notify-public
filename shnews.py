@@ -39,20 +39,22 @@ def main():
         date = newsEntry.find_all(class_='date')[0].text
         gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
         postDateTime = date + gtime
-        body = newsEntry.text.strip(title).strip(date)
-        link = newsEntry.find_all('a')[0].get('href')
-        category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
+        body = newsEntry.text.strip(title).strip(date).replace("\n", ""))
+        if len(body) > 1000:
+            body=body[0:1000] + "...((省略))"
+        link=newsEntry.find_all('a')[0].get('href')
+        category=newsEntry.find_all(class_ = 'cat')[0].find_all('a')[0].text
         newsTextList.append([title, postDateTime, body, link, category])
     time.sleep(getWaitSecs())
     driver.quit()
 
     with get_connection() as conn:
         with conn.cursor() as cur:
-            newsSendData = []
+            newsSendData=[]
             for i in newsTextList:
                 cur.execute('SELECT EXISTS (SELECT * FROM sh_news WHERE title = %s)',
                             [i[0]])
-                (b,) = cur.fetchone()
+                (b,)=cur.fetchone()
                 if b == False:
                     cur.execute('INSERT INTO sh_news (title, datetime, body, link, category) VALUES (%s, %s, %s, %s, %s)', [
                                 i[0], i[1], i[2], i[3], i[4]])
