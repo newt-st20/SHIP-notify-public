@@ -85,6 +85,7 @@ async def on_message(message):
                 await message.channel.send('データの取得を開始します')
                 try:
                     await getData()
+                    await message.channel.send('処理が完了しました')
                 except Exception as e:
                     await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
             else:
@@ -94,6 +95,7 @@ async def on_message(message):
                 await message.channel.send('データの取得を開始します')
                 try:
                     await getNewsData()
+                    await message.channel.send('処理が完了しました')
                 except Exception as e:
                     await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
             else:
@@ -265,7 +267,7 @@ async def getData():
 
 async def getNewsData():
     await client.wait_until_ready()
-    shnewsChannel = client.get_channel(814460143001403423)
+    shnewsChannel = client.get_channel(818480374334226443)
     getLogChannel = client.get_channel(817400535639916544)
     result = shnews.main()
     if len(result[0]) != 0:
