@@ -12,7 +12,7 @@ import re
 import random
 import wikipedia
 
-import sqlpush
+import shipcheck
 import shnews
 
 
@@ -172,7 +172,7 @@ async def getData():
     conHighChannel = client.get_channel(818066947463053312)
     studyHighChannel = client.get_channel(818066981982830613)
     getLogChannel = client.get_channel(817400535639916544)
-    result = sqlpush.main()
+    result = shipcheck.main()
     if len(result[0]) != 0:
         for conData in result[0]:
             embed = discord.Embed(
