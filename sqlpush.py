@@ -11,9 +11,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-import get
-import push
-
 DATABASE_URL = os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
