@@ -16,6 +16,7 @@ import sqlpush
 
 TOKEN = os.environ['DISCORD_TOKEN']
 
+
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
@@ -54,11 +55,9 @@ async def on_message(message):
         elif 'count' in message.content:
             guild = message.guild
             member_count = guild.member_count
-            await message.channel.send(f'メンバー数：{member_count}')
             user_count = sum(1 for member in guild.members if not member.bot)
-            await message.channel.send(f'ユーザ数：{user_count}')
             bot_count = sum(1 for member in guild.members if member.bot)
-            await message.channel.send(f'BOT数：{bot_count}')
+            await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
         elif 'get' in message.content:
@@ -68,6 +67,11 @@ async def on_message(message):
                     await getData()
                 except Exception as e:
                     await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            else:
+                await message.channel.send('このコマンドは管理者のみ利用することができます')
+        elif 'members' in message.content:
+            if message.author.guild_permissions.administrator:
+                await message.channel.send(message.guild.members)
             else:
                 await message.channel.send('このコマンドは管理者のみ利用することができます')
         else:
@@ -123,12 +127,12 @@ async def loop():
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
     if nowHour % 6 == 0 and nowMinute < 10:
-        await message.channel.send('データの取得を開始します')
+        await getLogChannel.send('データの取得を開始します')
         try:
             await getData()
+            await getLogChannel.send('処理が完了しました')
         except Exception as e:
-            await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        await message.channel.send('処理が完了しました')
+            await getLogChannel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
 
 async def getData():
