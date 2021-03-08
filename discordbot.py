@@ -48,8 +48,6 @@ async def on_message(message):
     elif 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
-        elif 'help' in message.content:
-            await message.channel.send('ヘルプ')
         elif 'search' in message.content:
             await message.channel.send('検索')
         elif 'count' in message.content:
