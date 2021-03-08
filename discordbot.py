@@ -93,7 +93,7 @@ async def on_message(message):
             if message.author.guild_permissions.administrator:
                 await message.channel.send('データの取得を開始します')
                 try:
-                    await getData()
+                    await getNewsData()
                 except Exception as e:
                     await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
             else:
