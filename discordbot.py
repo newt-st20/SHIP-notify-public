@@ -83,51 +83,39 @@ async def on_message(message):
             await message.channel.send('🐱にゃーん')
         elif 'inu' in message.content or 'dog' in message.content:
             await message.channel.send('🐶わん！')
-        elif 'get' in message.content:
-            if message.author.guild_permissions.administrator:
-                await message.channel.send('データの取得を開始します')
-                try:
-                    await getData()
-                    await message.channel.send('処理が完了しました')
-                except Exception as e:
-                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-            else:
-                await message.channel.send('🚫このコマンドは管理者のみ利用することができます')
-        elif 'shnews' in message.content:
-            if message.author.guild_permissions.administrator:
-                await message.channel.send('データの取得を開始します')
-                try:
-                    await getNewsData()
-                    await message.channel.send('処理が完了しました')
-                except Exception as e:
-                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-            else:
-                await message.channel.send('🚫このコマンドは管理者のみ利用することができます')
-        elif 'members' in message.content:
-            if message.author.guild_permissions.administrator:
-                await message.channel.send(message.guild.members)
-            else:
-                await message.channel.send('🚫このコマンドは管理者のみ利用することができます')
         else:
-            await message.channel.send('このコマンドは用意されていません')
-        elif 'whengetconfig' in message.content:
             if message.author.guild_permissions.administrator:
-                timeWord = message.content.split()[1]
-                discordconfig.changeGetTime(timeWord)
-                timeList = timeWord.split(',')
-                body = "現在は毎日以下の時間に取得しています。データを取得する時間は変更する場合があります。\n" + timeWord
-                announceChannel = client.get_channel(810813852140306442)
-                whenMessage = await entranceChannel.fetch_message(818636188084076594)
-                updateDate = "更新日:" + datetime.datetime.now().strftime("%Y/%M/%D")
-                embed = discord.Embed(
-                    title="データ取得タイミング", description=updateDate, color=discord.Colour.from_rgb(245, 236, 66))
-        embed.add_field(name="SHIPデータを取得する時間",
-                        value=body, inline=False)
-                await whenMessage.edit(embed=embed)
+                if 'get' in message.content:
+                    await message.channel.send('データの取得を開始します')
+                    try:
+                        await getData()
+                        await message.channel.send('処理が完了しました')
+                    except Exception as e:
+                        await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+                elif 'shnews' in message.content:
+                    await message.channel.send('データの取得を開始します')
+                    try:
+                        await getNewsData()
+                        await message.channel.send('処理が完了しました')
+                    except Exception as e:
+                        await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+                elif 'members' in message.content:
+                    await message.channel.send(message.guild.members)
+                elif 'whengetconfig' in message.content:
+                    timeWord = message.content.split()[1]
+                    discordconfig.changeGetTime(timeWord)
+                    timeList = timeWord.split(',')
+                    body = "現在は毎日以下の時間に取得しています。データを取得する時間は変更する場合があります。\n" + timeWord
+                    announceChannel = client.get_channel(810813852140306442)
+                    whenMessage = await entranceChannel.fetch_message(818636188084076594)
+                    updateDate = "更新日:" + datetime.datetime.now().strftime("%Y/%M/%D")
+                    embed = discord.Embed(
+                        title="データ取得タイミング", description=updateDate, color=discord.Colour.from_rgb(245, 236, 66))
+                    embed.add_field(name="SHIPデータを取得する時間",
+                                    value=body, inline=False)
+                    await whenMessage.edit(embed=embed)
             else:
-                await message.channel.send('🚫このコマンドは管理者のみ利用することができます')
-        else:
-            await message.channel.send('このコマンドは用意されていません')
+                await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
         user = client.get_user(message.author.id)
         await dmLogChannel.send("from: "+str(message.author)+" ( "+str(message.author.id)+" ) \nbody: "+str(message.content)+"\nchannel-id: "+str(message.channel.id))

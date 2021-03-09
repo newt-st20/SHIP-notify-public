@@ -21,7 +21,7 @@ def chengeGetTime(timeWord):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                'UPDATE key SET value = %s WHERE key = whenget', [timeWord])
+                'UPDATE discord_config SET value = %s WHERE key = whenget', [timeWord])
         conn.commit()
 
 
