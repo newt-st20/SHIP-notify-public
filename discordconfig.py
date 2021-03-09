@@ -8,6 +8,8 @@ import requests
 import re
 import random
 
+# TODO: psycopg2.errors.UndefinedColumn: column "whenget" does not exist line20, 31
+
 DATABASE_URL = os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
