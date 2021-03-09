@@ -31,9 +31,9 @@ def whenGetTime():
             cur.execute(
                 'SELECT EXISTS (SELECT * FROM discord_config WHERE key = whenget)')
             res = cur.fetchone()
-            timeWord = res[0]
-            timeList = timeWord.split(',')
         conn.commit()
+        timeWord = res[0]
+        timeList = timeWord.split(',')
     return timeList
 
 

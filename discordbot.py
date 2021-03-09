@@ -90,6 +90,17 @@ async def on_message(message):
                         nextGetHour = eachHour
                         break
             await message.channel.send('次回の取得は'+nextGetHour+'時ごろの予定です。')
+        elif 'later' in message.content:
+            hourList = discordconfig.whenGetTime()
+            nowHour = int(datetime.datetime.now().strftime("%H"))
+            if nowHour < int(hourList[0]):
+                nextGetHour = hourList[-1]
+            else:
+                for eachHour in sorted(hourList):
+                    if nowHour < int(eachHour):
+                        nextGetHour = eachHour
+                        break
+            await message.channel.send('前回の取得は'+nextGetHour+'時ごろでした。')
         elif 'neko' in message.content or 'cat' in message.content:
             await message.channel.send('🐱にゃーん')
         elif 'inu' in message.content or 'dog' in message.content:
