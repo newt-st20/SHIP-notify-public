@@ -79,6 +79,17 @@ async def on_message(message):
             user_count = sum(1 for member in guild.members if not member.bot)
             bot_count = sum(1 for member in guild.members if member.bot)
             await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
+        elif 'next' in message.content:
+            hourList = discordconfig.whenGetTime()
+            nowHour = int(datetime.datetime.now().strftime("%H"))
+            if nowHour > int(hourList[-1]):
+                nextGetHour = hourList[0]
+            else:
+                for eachHour in hourList:
+                    if nowHour > int(eachHour):
+                        nextGetHour = eachHour
+                        break
+            await message.channel.send('次回の取得は'+nextGetHour+'時ごろの予定です。')
         elif 'neko' in message.content or 'cat' in message.content:
             await message.channel.send('🐱にゃーん')
         elif 'inu' in message.content or 'dog' in message.content:
@@ -101,7 +112,7 @@ async def on_message(message):
                         await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
                 elif 'members' in message.content:
                     await message.channel.send(message.guild.members)
-                elif 'whengetconfig' in message.content:
+                elif 'whenconfig' in message.content:
                     timeWord = message.content.split()[1]
                     discordconfig.changeGetTime(timeWord)
                     timeList = timeWord.split(',')
