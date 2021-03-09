@@ -14,6 +14,7 @@ import wikipedia
 
 import shipcheck
 import shnews
+import discordconfig
 
 
 TOKEN = os.environ['DISCORD_TOKEN']
@@ -109,6 +110,24 @@ async def on_message(message):
                 await message.channel.send('🚫このコマンドは管理者のみ利用することができます')
         else:
             await message.channel.send('このコマンドは用意されていません')
+        elif 'whengetconfig' in message.content:
+            if message.author.guild_permissions.administrator:
+                timeWord = message.content.split()[1]
+                discordconfig.changeGetTime(timeWord)
+                timeList = timeWord.split(',')
+                body = "現在は毎日以下の時間に取得しています。データを取得する時間は変更する場合があります。\n" + timeWord
+                announceChannel = client.get_channel(810813852140306442)
+                whenMessage = await entranceChannel.fetch_message(818636188084076594)
+                updateDate = "更新日:" + datetime.datetime.now().strftime("%Y/%M/%D")
+                embed = discord.Embed(
+                    title="データ取得タイミング", description=updateDate, color=discord.Colour.from_rgb(245, 236, 66))
+        embed.add_field(name="SHIPデータを取得する時間",
+                        value=body, inline=False)
+                await whenMessage.edit(embed=embed)
+            else:
+                await message.channel.send('🚫このコマンドは管理者のみ利用することができます')
+        else:
+            await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
         user = client.get_user(message.author.id)
         await dmLogChannel.send("from: "+str(message.author)+" ( "+str(message.author.id)+" ) \nbody: "+str(message.content)+"\nchannel-id: "+str(message.channel.id))
@@ -159,7 +178,9 @@ async def loop():
     getLogChannel = client.get_channel(817400535639916544)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    if nowHour % 6 == 0 and nowMinute < 10:
+    timeList = discordconfig.whenGetTime()
+    print(timeList)
+    if nowHour in timeList and nowMinute < 10:
         await getLogChannel.send('データの取得を開始します')
         try:
             await getData()
