@@ -79,28 +79,6 @@ async def on_message(message):
             user_count = sum(1 for member in guild.members if not member.bot)
             bot_count = sum(1 for member in guild.members if member.bot)
             await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
-        elif 'next' in message.content:
-            hourList = discordconfig.whenGetTime()
-            nowHour = int(datetime.datetime.now().strftime("%H"))
-            if nowHour > int(hourList[-1]):
-                nextGetHour = hourList[0]
-            else:
-                for eachHour in hourList:
-                    if nowHour > int(eachHour):
-                        nextGetHour = eachHour
-                        break
-            await message.channel.send('⏱次回の取得は'+nextGetHour+'時ごろの予定です。')
-        elif 'later' in message.content:
-            hourList = discordconfig.whenGetTime()
-            nowHour = int(datetime.datetime.now().strftime("%H"))
-            if nowHour < int(hourList[0]):
-                nextGetHour = hourList[-1]
-            else:
-                for eachHour in sorted(hourList):
-                    if nowHour < int(eachHour):
-                        nextGetHour = eachHour
-                        break
-            await message.channel.send('⏱前回の取得は'+nextGetHour+'時ごろでした。')
         elif 'neko' in message.content or 'cat' in message.content:
             await message.channel.send('🐱にゃーん')
         elif 'inu' in message.content or 'dog' in message.content:
@@ -123,19 +101,6 @@ async def on_message(message):
                         await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
                 elif 'members' in message.content:
                     await message.channel.send(message.guild.members)
-                elif 'whenconfig' in message.content:
-                    timeWord = message.content.split()[1]
-                    discordconfig.changeGetTime(timeWord)
-                    timeList = timeWord.split(',')
-                    body = "現在は毎日以下の時間に取得しています。データを取得する時間は変更する場合があります。\n" + timeWord
-                    announceChannel = client.get_channel(810813852140306442)
-                    whenMessage = await entranceChannel.fetch_message(818636188084076594)
-                    updateDate = "更新日:" + datetime.datetime.now().strftime("%Y/%M/%D")
-                    embed = discord.Embed(
-                        title="データ取得タイミング", description=updateDate, color=discord.Colour.from_rgb(245, 236, 66))
-                    embed.add_field(name="SHIPデータを取得する時間",
-                                    value=body, inline=False)
-                    await whenMessage.edit(embed=embed)
             else:
                 await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
@@ -188,15 +153,14 @@ async def loop():
     getLogChannel = client.get_channel(817400535639916544)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    timeList = discordconfig.whenGetTime()
-    print(timeList)
-    if nowHour in timeList and nowMinute < 10:
-        await getLogChannel.send('データの取得を開始します')
-        try:
-            await getData()
-            await getLogChannel.send('処理が完了しました')
-        except Exception as e:
-            await getLogChannel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+    if nowHour == 5 or nowHour == 12 or nowHour == 17 or nowHour == 22:
+        if nowMinute < 10:
+            await getLogChannel.send('データの取得を開始します')
+            try:
+                await getData()
+                await getLogChannel.send('処理が完了しました')
+            except Exception as e:
+                await getLogChannel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
 
 async def getData():
