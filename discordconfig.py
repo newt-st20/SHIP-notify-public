@@ -17,11 +17,11 @@ now = datetime.datetime.now()
 getTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
 
-def chengeGetTime(timeWord):
+def changeGetTime(timeWord):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                'UPDATE discord_config SET value = %s WHERE key = whenget', [timeWord])
+                'UPDATE discord_config SET value = %s WHERE key = "whenget"', [timeWord])
         conn.commit()
 
 
@@ -29,7 +29,7 @@ def whenGetTime():
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                'SELECT EXISTS (SELECT * FROM discord_config WHERE key = whenget)')
+                'SELECT EXISTS (SELECT * FROM discord_config WHERE key = "whenget")')
             res = cur.fetchone()
         conn.commit()
         timeWord = res[0]
