@@ -7,9 +7,6 @@ import datetime
 import requests
 import re
 import random
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -21,15 +18,15 @@ def changeGetTime(timeWord):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                'UPDATE discord_config SET value = %s WHERE key = "whenget"', [timeWord])
+                'UPDATE discord_setting SET text = %s WHERE name = "whenget"', [str(timeWord)])
         conn.commit()
 
 
 def whenGetTime():
     with get_connection() as conn:
-        with conn.cursor() as cur:
+        with conn.cursor(cursor_factory=DictCursor) as cur:
             cur.execute(
-                'SELECT EXISTS (SELECT * FROM discord_config WHERE key = "whenget")')
+                'SELECT text FROM discord_setting WHERE name = "whenget"')
             res = cur.fetchone()
         conn.commit()
         timeWord = res[0]
