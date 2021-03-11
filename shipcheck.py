@@ -16,13 +16,6 @@ DATABASE_URL = os.environ['DATABASE_URL']
 now = datetime.datetime.now()
 getTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
-if os.environ['CHANNEL_TYPE'] == "public":
-    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
-    YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
-else:
-    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
-    YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
-
 
 def main():
     now = datetime.datetime.now()
