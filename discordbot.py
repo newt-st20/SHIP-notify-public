@@ -29,6 +29,8 @@ async def on_ready():
     await client.wait_until_ready()
     wakeLogChannel = client.get_channel(817389202161270794)
     await wakeLogChannel.send('起動しました')
+    game = discord.Game("prefix: [sh!]")
+    await client.change_presence(status=discord.Status.idle, activity=game)
 
 
 @client.event
@@ -55,20 +57,20 @@ async def on_message(message):
             await message.channel.send('検索')
         elif 'wiki' in message.content:
             word = message.content.split()[1]
-            await message.channel.send('🔎Wikipediaで`'+word+'`を検索中...')
+            await message.channel.send('Wikipediaで`'+word+'`を検索...')
             wikipedia.set_lang("ja")
             response = wikipedia.search(word)
             if not response:
-                await message.channel.send('⚠Wikipediaで`'+word+'`に関連するページが見つかりませんでした')
+                await message.channel.send('Wikipediaで`'+word+'`に関連するページが見つかりませんでした')
             try:
                 page = wikipedia.page(response[0])
                 content = page.content.splitlines()[0]
                 if len(content) > 1000:
                     content = content[0:1000] + "..."
                 embed = discord.Embed(title=word)
-                embed.add_field(name="Wikipediaで検索した結果",
+                embed.add_field(name="wikipediaで検索した結果",
                                 value=content.splitlines()[0], inline=False)
-                embed.add_field(name="🔗リンク",
+                embed.add_field(name="▶リンク",
                                 value='['+page.url+']('+page.url+')', inline=False)
                 await message.channel.send(embed=embed)
             except Exception as e:
@@ -79,30 +81,40 @@ async def on_message(message):
             user_count = sum(1 for member in guild.members if not member.bot)
             bot_count = sum(1 for member in guild.members if member.bot)
             await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
-        elif 'neko' in message.content or 'cat' in message.content:
-            await message.channel.send('🐱にゃーん')
-        elif 'inu' in message.content or 'dog' in message.content:
-            await message.channel.send('🐶わん！')
-        else:
+        elif 'sm' in message.content:
+            messages = await message.channel.history().flatten()
+            for msg in messages:
+                if word in msg.content:
+                    await message.channel.send(msg.jump_url)
+        elif 'neko' in message.content:
+            await message.channel.send('にゃーん')
+        elif 'get' in message.content:
             if message.author.guild_permissions.administrator:
-                if 'get' in message.content:
-                    await message.channel.send('データの取得を開始します')
-                    try:
-                        await getData()
-                        await message.channel.send('処理が完了しました')
-                    except Exception as e:
-                        await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-                elif 'shnews' in message.content:
-                    await message.channel.send('データの取得を開始します')
-                    try:
-                        await getNewsData()
-                        await message.channel.send('処理が完了しました')
-                    except Exception as e:
-                        await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-                elif 'members' in message.content:
-                    await message.channel.send(message.guild.members)
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getData()
+                except Exception as e:
+                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
             else:
-                await message.channel.send('このコマンドは用意されていません')
+                await message.channel.send('このコマンドは管理者のみ利用することができます')
+        elif 'shnews' in message.content:
+            if message.author.guild_permissions.administrator:
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getNewsData()
+                except Exception as e:
+                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            else:
+                await message.channel.send('このコマンドは管理者のみ利用することができます')
+        elif 'members' in message.content:
+            if message.author.guild_permissions.administrator:
+                await message.channel.send(message.guild.members)
+            else:
+                await message.channel.send('このコマンドは管理者のみ利用することができます')
+        else:
+            await trigger_typing()
+            time.sleep(3)
+            await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
         user = client.get_user(message.author.id)
         await dmLogChannel.send("from: "+str(message.author)+" ( "+str(message.author.id)+" ) \nbody: "+str(message.content)+"\nchannel-id: "+str(message.channel.id))
@@ -147,20 +159,34 @@ async def on_raw_reaction_remove(payload):
 @tasks.loop(seconds=600)
 async def loop():
     await client.wait_until_ready()
-    testChannel = client.get_channel(814460143001403423)
     conJuniorChannel = client.get_channel(812592878194262026)
     studyJuniorChannel = client.get_channel(814791146966220841)
     getLogChannel = client.get_channel(817400535639916544)
+    configChannel = client.get_channel(820242721330561044)
+    announceChannel = client.get_channel(810813852140306442)
+    messages = await configChannel.history().flatten()
+    for msg in messages:
+        if "GET_HOUR=" in msg.content:
+            whenGetConfigMessage = msg.content.lstrip("GET_HOUR=")
+            continue
+    hourList = [int(x) for x in whenGetConfigMessage.split()]
+    announceMessage = await announceChannel.fetch_message(818636188084076594)
+    editDatetime = "更新日時: " + str(datetime.datetime.now())
+    editedBody = "現在は"+str(hourList)+"時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
+    embed = discord.Embed(
+        title="データ取得タイミング", description=editDatetime, color=discord.Colour.from_rgb(245, 236, 66))
+    embed.add_field(name="SHIPデータを取得する時間",
+                    value=editedBody, inline=False)
+    await announceMessage.edit(embed=embed)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    if nowHour == 5 or nowHour == 12 or nowHour == 17 or nowHour == 22:
-        if nowMinute < 10:
-            await getLogChannel.send('データの取得を開始します')
-            try:
-                await getData()
-                await getLogChannel.send('処理が完了しました')
-            except Exception as e:
-                await getLogChannel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+    if nowHour in hourList and nowMinute < 10:
+        await getLogChannel.send('データの取得を開始します')
+        try:
+            await getData()
+            await getLogChannel.send('処理が完了しました')
+        except Exception as e:
+            await getLogChannel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
 
 async def getData():
@@ -174,18 +200,16 @@ async def getData():
     result = shipcheck.main()
     if len(result[0]) != 0:
         for conData in result[0]:
-            embed = discord.Embed(
-                title="連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            if conData[3] != '':
+                embed = discord.Embed(
+                    title=conData[3], description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            else:
+                embed = discord.Embed(
+                    title="中学連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
             embed.add_field(name="id", value=conData[0])
             embed.add_field(name="date", value=conData[1])
             if conData[2] != '':
                 embed.add_field(name="path", value=conData[2], inline=False)
-            else:
-                embed.add_field(name="path", value="(トップフォルダ)", inline=False)
-            if conData[3] != '':
-                embed.add_field(name="title", value=conData[3], inline=False)
-            else:
-                embed.add_field(name="title", value="(タイトルなし)", inline=False)
             if conData[4] != '':
                 embed.add_field(name="description",
                                 value=conData[4], inline=False)
@@ -198,18 +222,16 @@ async def getData():
         await getLogChannel.send(embed=embed)
     if len(result[1]) != 0:
         for studyData in result[1]:
-            embed = discord.Embed(
-                title="中学学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
+            if studyData[3] != '':
+                embed = discord.Embed(
+                    title=studyData[3], description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
+            else:
+                embed = discord.Embed(
+                    title="中学学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
             embed.add_field(name="id", value=studyData[0])
             embed.add_field(name="date", value=studyData[1])
             if studyData[2] != '':
                 embed.add_field(name="path", value=studyData[2], inline=False)
-            else:
-                embed.add_field(name="path", value="(トップフォルダ)", inline=False)
-            if studyData[3] != '':
-                embed.add_field(name="title", value=studyData[3], inline=False)
-            else:
-                embed.add_field(name="title", value="(タイトルなし)", inline=False)
             await studyJuniorChannel.send(embed=embed)
     else:
         embed = discord.Embed(
@@ -219,16 +241,16 @@ async def getData():
         await getLogChannel.send(embed=embed)
     if len(result[2]) != 0:
         for conData in result[2]:
-            embed = discord.Embed(
-                title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            if conData[3] != '':
+                embed = discord.Embed(
+                    title=conData[3], description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
+            else:
+                embed = discord.Embed(
+                    title="高校連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
             embed.add_field(name="id", value=conData[0])
             embed.add_field(name="date", value=conData[1])
             if conData[2] != '':
                 embed.add_field(name="path", value=conData[2], inline=False)
-            if conData[3] != '':
-                embed.add_field(name="title", value=conData[3], inline=False)
-            else:
-                embed.add_field(name="title", value="(タイトルなし)", inline=False)
             if conData[4] != '':
                 embed.add_field(name="description",
                                 value=conData[4], inline=False)
@@ -241,18 +263,16 @@ async def getData():
         await getLogChannel.send(embed=embed)
     if len(result[3]) != 0:
         for studyData in result[3]:
-            embed = discord.Embed(
-                title="高校学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
+            if studyData[3] != '':
+                embed = discord.Embed(
+                    title=result[3], description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
+            else:
+                embed = discord.Embed(
+                    title="高校学習教材更新通知", description="取得:"+result[4], color=discord.Colour.from_rgb(52, 229, 235))
             embed.add_field(name="id", value=studyData[0])
             embed.add_field(name="date", value=studyData[1])
             if studyData[2] != '':
                 embed.add_field(name="path", value=studyData[2], inline=False)
-            else:
-                embed.add_field(name="path", value="(トップフォルダ)", inline=False)
-            if studyData[3] != '':
-                embed.add_field(name="title", value=studyData[3], inline=False)
-            else:
-                embed.add_field(name="title", value="(タイトルなし)", inline=False)
             await studyHighChannel.send(embed=embed)
     else:
         embed = discord.Embed(
@@ -264,13 +284,13 @@ async def getData():
 
 async def getNewsData():
     await client.wait_until_ready()
-    shnewsChannel = client.get_channel(818480374334226443)
+    shnewsChannel = client.get_channel(814460143001403423)
     getLogChannel = client.get_channel(817400535639916544)
     result = shnews.main()
     if len(result[0]) != 0:
         for conData in result[0]:
             embed = discord.Embed(
-                title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(247, 77, 233))
+                title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(52, 235, 79))
             embed.add_field(name="title", value=conData[0], inline=False)
             embed.add_field(name="datetime", value=conData[1])
             embed.add_field(name="category", value=conData[4], inline=False)
@@ -279,7 +299,7 @@ async def getNewsData():
             await shnewsChannel.send(embed=embed)
     else:
         embed = discord.Embed(
-            title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(247, 77, 233))
+            title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(52, 235, 79))
         embed.add_field(name="system-log",
                         value='栄東ニュースに更新はありませんでした', inline=False)
         await getLogChannel.send(embed=embed)

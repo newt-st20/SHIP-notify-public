@@ -39,7 +39,7 @@ def main():
         date = newsEntry.find_all(class_='date')[0].text
         gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
         postDateTime = date + gtime
-        body = newsEntry.text.strip(title).strip(date).replace("\n", "")
+        body = newsEntry.text[len(title):-len(date)].replace("\n", "")
         if len(body) > 100:
             body = body[0:100] + "...((省略))"
         link = newsEntry.find_all('a')[0].get('href')
