@@ -30,7 +30,7 @@ async def on_ready():
     wakeLogChannel = client.get_channel(817389202161270794)
     await wakeLogChannel.send('起動しました')
     game = discord.Game("prefix: [sh!]")
-    await client.change_presence(status=discord.Status.idle, activity=game)
+    await client.change_presence(activity=game)
 
 
 @client.event
@@ -38,6 +38,12 @@ async def on_member_join(member):
     guild = member.guild
     unauthenticatedRole = guild.get_role(813015195881570334)
     await member.add_roles(unauthenticatedRole)
+
+
+async def on_member_remove(member):
+    await client.wait_until_ready()
+    joinLeaveLogChannel = client.get_channel(810813680618831906)
+    await joinLeaveLogChannel.send(member.name+"("+member.id+") が退出しました")
 
 
 @client.event
@@ -112,12 +118,17 @@ async def on_message(message):
             else:
                 await message.channel.send('このコマンドは管理者のみ利用することができます')
         else:
-            await trigger_typing()
-            time.sleep(3)
             await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
         user = client.get_user(message.author.id)
-        await dmLogChannel.send("from: "+str(message.author)+" ( "+str(message.author.id)+" ) \nbody: "+str(message.content)+"\nchannel-id: "+str(message.channel.id))
+        embed = discord.Embed(title="DMを受信しました")
+        embed.add_field(name="ユーザー名",
+                        value=message.author.mention+str(message.author.id), inline=False)
+        embed.add_field(name="本文",
+                        value=message.content, inline=False)
+        embed.add_field(name="チャンネルID",
+                        value=str(message.channel.id), inline=False)
+        await dmLogChannel.send(embed=embed)
     if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'reply!' in message.content:
         replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
         sendMessage = str(message.content.split('!')[2])
@@ -140,22 +151,6 @@ async def on_raw_reaction_add(payload):
         await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与し、'+unauthenticatedRole.mention+'ロールを剥奪しました。')
 
 
-@client.event
-async def on_raw_reaction_remove(payload):
-    await client.wait_until_ready()
-    entranceMessageId = 817952115095109633
-    roleLogChannel = client.get_channel(817401458244714506)
-    if payload.message_id == entranceMessageId:
-        guild = client.get_guild(payload.guild_id)
-        member = guild.get_member(payload.user_id)
-        authenticatedRole = guild.get_role(813014134001500170)
-        await member.remove_roles(authenticatedRole)
-        unauthenticatedRole = guild.get_role(813015195881570334)
-        await member.add_roles(unauthenticatedRole)
-        user = client.get_user(payload.user_id)
-        await roleLogChannel.send(user.mention+'から'+authenticatedRole.mention+'ロールを剥奪し、'+unauthenticatedRole.mention+'ロールを付与しました。')
-
-
 @tasks.loop(seconds=600)
 async def loop():
     await client.wait_until_ready()
@@ -171,13 +166,15 @@ async def loop():
             continue
     hourList = [int(x) for x in whenGetConfigMessage.split()]
     announceMessage = await announceChannel.fetch_message(818636188084076594)
-    editDatetime = "更新日時: " + str(datetime.datetime.now())
-    editedBody = "現在は"+str(hourList)+"時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
-    embed = discord.Embed(
-        title="データ取得タイミング", description=editDatetime, color=discord.Colour.from_rgb(245, 236, 66))
-    embed.add_field(name="SHIPデータを取得する時間",
-                    value=editedBody, inline=False)
-    await announceMessage.edit(embed=embed)
+    if str(hourList) not in announceMessage.embeds[0].to_dict().values():
+        editDatetime = "更新日時: " + str(datetime.datetime.now())
+        editedBody = "現在は"+str(hourList) + \
+            "時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
+        embed = discord.Embed(
+            title="データ取得タイミング", description=editDatetime, color=discord.Colour.from_rgb(245, 236, 66))
+        embed.add_field(name="SHIPデータを取得する時間",
+                        value=editedBody, inline=False)
+        await announceMessage.edit(embed=embed)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
     if nowHour in hourList and nowMinute < 10:
