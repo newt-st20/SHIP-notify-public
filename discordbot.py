@@ -108,6 +108,7 @@ async def on_message(message):
                 await message.channel.send('データの取得を開始します')
                 try:
                     await getNewsData()
+                    await getLogChannel.send('処理が完了しました')
                 except Exception as e:
                     await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
             else:
@@ -166,7 +167,7 @@ async def loop():
             continue
     hourList = [int(x) for x in whenGetConfigMessage.split()]
     announceMessage = await announceChannel.fetch_message(818636188084076594)
-    if str(hourList) not in announceMessage.embeds[0].to_dict().values():
+    if str(hourList) not in str(announceMessage.embeds[0].to_dict()):
         editDatetime = "更新日時: " + str(datetime.datetime.now())
         editedBody = "現在は"+str(hourList) + \
             "時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
