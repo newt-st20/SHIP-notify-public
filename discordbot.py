@@ -11,12 +11,12 @@ import time
 import re
 import random
 import wikipedia
+from dotenv import load_dotenv
 
 import shipcheck
 import shnews
-import discordconfig
 
-
+load_dotenv()
 TOKEN = os.environ['DISCORD_TOKEN']
 
 
@@ -59,8 +59,13 @@ async def on_message(message):
     elif 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
-        elif 'search' in message.content:
-            await message.channel.send('検索')
+        # メッセージリンク返信
+        elif 'sm' in message.content:
+            messages = await message.channel.history().flatten()
+            for msg in messages:
+                if word in msg.content:
+                    await message.channel.send(msg.jump_url)
+        # Wikipedia検索
         elif 'wiki' in message.content:
             word = message.content.split()[1]
             await message.channel.send('Wikipediaで`'+word+'`を検索...')
@@ -81,49 +86,37 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             except Exception as e:
                 await message.channel.send("エラー:"+str(e))
+        # 天気予報検索
         elif 'weather' in message.content:
-            r = requests.get("https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json")
+            r = requests.get(
+                "https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json")
             data = r.json
             await message.channel.send("【東京都の天気概況】\n"+data["text"])
+        elif 'neko' in message.content:
+            await message.channel.send('にゃーん')
+    # 管理者用コマンド
+    elif 'sa!' in message.content and message.author.guild_permissions.administrator:
+        if 'get' in message.content:
+            await message.channel.send('データの取得を開始します')
+            try:
+                await getData()
+            except Exception as e:
+                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif 'shnews' in message.content:
+            await message.channel.send('データの取得を開始します')
+            try:
+                await getNewsData()
+                await getLogChannel.send('処理が完了しました')
+            except Exception as e:
+                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
         elif 'count' in message.content:
             guild = message.guild
             member_count = guild.member_count
             user_count = sum(1 for member in guild.members if not member.bot)
             bot_count = sum(1 for member in guild.members if member.bot)
             await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
-        elif 'sm' in message.content:
-            messages = await message.channel.history().flatten()
-            for msg in messages:
-                if word in msg.content:
-                    await message.channel.send(msg.jump_url)
-        elif 'neko' in message.content:
-            await message.channel.send('にゃーん')
-        elif 'get' in message.content:
-            if message.author.guild_permissions.administrator:
-                await message.channel.send('データの取得を開始します')
-                try:
-                    await getData()
-                except Exception as e:
-                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-            else:
-                await message.channel.send('このコマンドは管理者のみ利用することができます')
-        elif 'shnews' in message.content:
-            if message.author.guild_permissions.administrator:
-                await message.channel.send('データの取得を開始します')
-                try:
-                    await getNewsData()
-                    await getLogChannel.send('処理が完了しました')
-                except Exception as e:
-                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-            else:
-                await message.channel.send('このコマンドは管理者のみ利用することができます')
-        elif 'members' in message.content:
-            if message.author.guild_permissions.administrator:
-                await message.channel.send(message.guild.members)
-            else:
-                await message.channel.send('このコマンドは管理者のみ利用することができます')
-        else:
-            await message.channel.send('このコマンドは用意されていません')
+    else:
+        await message.channel.send('このコマンドは用意されていません')
     if isinstance(message.channel, discord.DMChannel):
         user = client.get_user(message.author.id)
         embed = discord.Embed(title="DMを受信しました")
