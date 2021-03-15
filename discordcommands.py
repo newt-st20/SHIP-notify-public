@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.environ['DISCORD_TOKEN']
 
-bot = commands.Bot(command_prefix='$',
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('sh!'),
                    description='A bot that greets the user back.')
 
 

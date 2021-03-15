@@ -86,14 +86,42 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             except Exception as e:
                 await message.channel.send("エラー:"+str(e))
-        # 天気予報検索
-        elif 'weather' in message.content:
+        # ひまわり
+        elif 'himawari' in message.content:
+            targetTimeResponse = requests.get(
+                "https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_jp.json")
+            targetTimeList = targetTimeResponse.json()
+            targetTimeData = targetTimeList[0]
+            embed = discord.Embed(
+                title="ひまわりからのトゥルーカラー再現画像", description="basetime:"+targetTimeData["basetime"], color=discord.Colour.from_rgb(255, 0, 0))
+            embed.set_image(
+                url="https://www.jma.go.jp/bosai/himawari/data/satimg/" + targetTimeData["basetime"]+"/jp/" + targetTimeData["validtime"]+"/REP/ETC/6/56/25.jpg")
+            await message.channel.send(embed=embed)
+        # 天気概況
+        elif 'forecast' in message.content:
             r = requests.get(
                 "https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json")
-            data = r.json
-            await message.channel.send("【東京都の天気概況】\n"+data["text"])
+            data = r.json()
+            print(data)
+            print(data["text"])
+            await message.channel.send("東京都の天気概況\n＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝\n"+data["text"])
+        # アメダス
+        elif 'amedas' in message.content:
+            latestDate = datetime.datetime.now().strftime("%Y%m%d")
+            print(latestDate)
+            latestTime = int(datetime.datetime.now().strftime(
+                "%H")) - (int(datetime.datetime.now().strftime("%H")) % 3)
+            print(latestTime)
+            r = requests.get(
+                "https://www.jma.go.jp/bosai/amedas/data/point/44132/"+str(latestDate)+"_"+str(latestTime)+".json")
+            data = r.json()[str(latestDate)+str(latestTime)+"0000"]
+            await message.channel.send("【"+data["obsStation"]+"】\n日時：\n"+str(latestDate)+"_"+str(latestTime)+"\n気温："+data["temp"])
         elif 'neko' in message.content:
+            def check(msg):
+                return msg.author == message.author
             await message.channel.send('にゃーん')
+            wait_message = await client.wait_for("message", check=check)
+            await message.channel.send(wait_message.content)
     # 管理者用コマンド
     elif 'sa!' in message.content and message.author.guild_permissions.administrator:
         if 'get' in message.content:
