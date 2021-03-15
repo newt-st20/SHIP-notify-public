@@ -81,6 +81,10 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             except Exception as e:
                 await message.channel.send("エラー:"+str(e))
+        elif 'weather' in message.content:
+            r = requests.get("https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json")
+            data = r.json
+            await message.channel.send("【東京都の天気概況】\n"+data["text"])
         elif 'count' in message.content:
             guild = message.guild
             member_count = guild.member_count
