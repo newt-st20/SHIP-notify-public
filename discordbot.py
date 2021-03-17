@@ -70,8 +70,8 @@ async def on_message(message):
                     body = data[0][4][0]
                 else:
                     body = ""
-                    for file in data[0][4]
-                    body += file + "\n"
+                    for file in data[0][4]:
+                        body += file + "\n"
             await message.channel.send(body)
         # メッセージリンク返信
         elif 'sm' in message.content:
