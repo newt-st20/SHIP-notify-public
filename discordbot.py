@@ -57,7 +57,7 @@ async def on_message(message):
     dmLogChannel = client.get_channel(817971315138756619)
     if message.author.bot:
         return
-    elif 'sh!' in message.content:
+    if 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
         elif message.content == 'sh!s':
@@ -69,16 +69,16 @@ async def on_message(message):
                 data = search.main(wait_message.content)
                 if len(data) == 0 or str(data[0][0]) == "{}":
                     embed = discord.Embed(
-                        title=wait_message.content+"の検索結果")
+                        title=wait_message.content)
                     embed.add_field(name="error",
                                     value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
                 else:
                     embed = discord.Embed(
-                        title=wait_message.content+"の検索結果", color=discord.Colour.from_rgb(50, 168, 82))
+                        title=wait_message.content, color=discord.Colour.from_rgb(50, 168, 82))
                     linkList = str(data[0][0])[1:-1].split(",")
                     body = ""
                     for link in linkList:
-                        body += link + "\n"
+                        body += "`-` " + link + "\n"
                     embed.add_field(name="link", value=body, inline=False)
                 await message.channel.send(embed=embed)
             except Exception as e:
@@ -87,16 +87,16 @@ async def on_message(message):
             word = message.content.split()[1]
             data = search.main(word)
             if len(data) == 0 or str(data[0][0]) == "{}":
-                embed = discord.Embed(title=word+"の検索結果")
+                embed = discord.Embed(title=word)
                 embed.add_field(name="error",
                                 value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
             else:
                 embed = discord.Embed(
-                    title=wait_message.content+"の検索結果", color=discord.Colour.from_rgb(50, 168, 82))
+                    title=word, color=discord.Colour.from_rgb(50, 168, 82))
                 linkList = str(data[0][0])[1:-1].split(",")
                 body = ""
                 for link in linkList:
-                    body += link + "\n"
+                    body += "`-` " + link + "\n"
                 embed.add_field(name="link", value=body, inline=False)
             await message.channel.send(embed=embed)
         # Wikipedia検索
@@ -129,7 +129,7 @@ async def on_message(message):
         else:
             await message.channel.send('このコマンドは用意されていません')
     # 管理者用コマンド
-    elif 'sa!' in message.content and message.author.guild_permissions.administrator:
+    if 'sa!' in message.content and message.author.guild_permissions.administrator:
         if 'get' in message.content:
             await message.channel.send('データの取得を開始します')
             try:
@@ -163,6 +163,21 @@ async def on_message(message):
         replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
         sendMessage = str(message.content.split('!')[2])
         await replyDmChannel.send(sendMessage)
+    if "https://discord.com/" in message.content:
+        messageChannel = message.content.split("/")[-2]
+        messageId = message.content.split("/")[-1]
+        oldchannel = client.get_channel(int(messageChannel))
+        oldmessage = await oldchannel.fetch_message(int(messageId))
+        if message.type == "default":
+            embed = discord.Embed(timestamp=oldmessage.created_at,
+                                  description=oldmessage.content)
+        elif message.type == "rich":
+            embed = discord.Embed(timestamp=oldmessage.created_at,
+                                  description="(リッチメッセージ)")
+        embed.set_author(name=oldmessage.author.name,
+                         icon_url=oldmessage.author.avatar_url)
+        embed.set_footer(text=oldchannel.name+"でのメッセージ")
+        await message.channel.send(embed=embed)
 
 
 @client.event
