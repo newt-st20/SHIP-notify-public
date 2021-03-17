@@ -41,7 +41,6 @@ def main():
         os.mkdir(DOWNLOAD_DIR)
     # chromeの起動オプションを設定
     options = webdriver.ChromeOptions()
-    options.add_argument('--window-size=1920,1080')
     options.add_argument('start-maximized')
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
@@ -89,12 +88,6 @@ def main():
             driver.get(
                 "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
             conEachPage.append(driver.page_source)
-
-        driver.get(
-            "https://ship.sakae-higashi.jp/study/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
-        study = driver.page_source
-        studySoup = BeautifulSoup(study, 'html.parser')
-
         conBody = conSoup.find("body")
         conTrs = conSoup.find_all(class_='allc')[0].find_all('tr')
         conTrs.pop(0)
@@ -130,7 +123,7 @@ def main():
                 result = re.match(".*name=(.*)&size.*",
                                   eachConPageLink.get("href"))
                 print(result.group(1))
-                time.sleep(5)
+                time.sleep(3)
                 if os.environ['STATUS'] == "local":
                     photo_path = 'D:\Downloads/' + result.group(1)
                 else:
@@ -142,9 +135,9 @@ def main():
                     schooltype = "junior"
                 try:
                     storage.child(
-                        'pdf/'+schooltype+'-con'+eachconList[0][0]+'/'+result.group(1)).put(photo_path)
+                        'pdf/'+schooltype+'-con/'+str(eachconList[0][0])+'/'+result.group(1)).put(photo_path)
                     conPageLinkList.append(storage.child(
-                        'pdf/'+schooltype+'-con'+eachconList[0][0]+'/'+result.group(1)).get_url(token=None))
+                        'pdf/'+schooltype+'-con/'+str(eachconList[0][0])+'/'+result.group(1)).get_url(token=None))
                 except Exception as e:
                     print(str(e))
             eachconList.append(conPageLinkList)
@@ -152,6 +145,19 @@ def main():
             conc += 1
         print(conList)
 
+        driver.get(
+            "https://ship.sakae-higashi.jp/study/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
+        study = driver.page_source
+        studySoup = BeautifulSoup(study, 'html.parser')
+        studyLinks = studySoup.find_all(class_='allc')[0].find_all('a')
+        studyEachPage = []
+        for studyLink in studyLinks:
+            studyOnclick = studyLink.get('onclick')
+            studyId = re.findall("'([^']*)'", studyOnclick)[0]
+            time.sleep(2)
+            driver.get(
+                "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+studyId+"&t=7")
+            studyEachPage.append(driver.page_source)
         studyBody = studySoup.find("body")
         studyTrs = studySoup.find_all(class_='allc')[0].find_all('tr')
         studyTrs.pop(0)
@@ -171,6 +177,40 @@ def main():
             except:
                 eachstudyList.append(studyTrTds[1].text)
             eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
+            studyEachPageSoup = BeautifulSoup(
+                studyEachPage[studyc], 'html.parser')
+            try:
+                studyPageMain = studyEachPageSoup.find_all(
+                    class_='ac')[0].find_all("table")[1]
+                studyPageLinks = studyPageMain.find_all(
+                    "table")[-1].find_all("a")
+            except Exception as e:
+                print(str(e))
+            studyPageLinkList = []
+            for eachstudyPageLink in studyPageLinks:
+                driver.get("https://ship.sakae-higashi.jp" +
+                           eachstudyPageLink.get("href"))
+                result = re.match(".*name=(.*)&size.*",
+                                  eachstudyPageLink.get("href"))
+                print(result.group(1))
+                time.sleep(3)
+                if os.environ['STATUS'] == "local":
+                    photo_path = 'D:\Downloads/' + result.group(1)
+                else:
+                    photo_path = DOWNLOAD_DIR + '/' + result.group(1)
+                storage = firebase.storage()
+                if count == 0:
+                    schooltype = "high"
+                elif count == 1:
+                    schooltype = "junior"
+                try:
+                    storage.child(
+                        'pdf/'+schooltype+'-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).put(photo_path)
+                    studyPageLinkList.append(storage.child(
+                        'pdf/'+schooltype+'-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).get_url(token=None))
+                except Exception as e:
+                    print(str(e))
+            eachstudyList.append(studyPageLinkList)
             studyList.append(eachstudyList)
             studyc += 1
         print(studyList)
@@ -187,6 +227,81 @@ def main():
             highStudyList = studyList
         count += 1
     driver.quit()
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            juniorConSendData = []
+            juniorStudySendData = []
+            for i in juniorConList:
+                if i[0][0] != 0:
+                    cur.execute('SELECT EXISTS (SELECT * FROM con_junior WHERE id = %s)',
+                                [int(i[0][0])])
+                    (b,) = cur.fetchone()
+                    if b == False:
+                        date = i[1].replace(
+                            "年", "/").replace("月", "/").replace("日", "")
+                        cur.execute('INSERT INTO con_junior (id, date, folder, title, description, link) VALUES (%s, %s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[2], i[3], i[4], i[5]])
+                        juniorConSendData.append(
+                            [i[0][0], date, i[2], i[3], i[4], i[5]])
+            for i in juniorStudyList:
+                if i[0][0] != 0:
+                    cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
+                                [int(i[0][0])])
+                    (b,) = cur.fetchone()
+                    if b == False:
+                        date = i[1].replace(
+                            "年", "/").replace("月", "/").replace("日", "")
+                        cur.execute('INSERT INTO study_junior (id, date, folder, title, link) VALUES (%s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[2], i[3], i[4]])
+                        juniorStudySendData.append(
+                            [i[0][0], date, i[2], i[3], i[4]])
+            highConSendData = []
+            for i in highConList:
+                if i[0][0] != 0:
+                    cur.execute('SELECT EXISTS (SELECT * FROM con_high WHERE id = %s)',
+                                [int(i[0][0])])
+                    (b,) = cur.fetchone()
+                    if b == False:
+                        date = i[1].replace(
+                            "年", "/").replace("月", "/").replace("日", "")
+                        cur.execute('INSERT INTO con_high (id, date, folder, title, description, link) VALUES (%s, %s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[2], i[3], i[4], i[5]])
+                        highConSendData.append(
+                            [i[0][0], date, i[2], i[3], i[4], i[5]])
+            highStudySendData = []
+            for i in highStudyList:
+                if i[0][0] != 0:
+                    cur.execute('SELECT EXISTS (SELECT * FROM study_high WHERE id = %s)',
+                                [int(i[0][0])])
+                    (b,) = cur.fetchone()
+                    if b == False:
+                        date = i[1].replace(
+                            "年", "/").replace("月", "/").replace("日", "")
+                        cur.execute('INSERT INTO study_high (id, date, folder, title) VALUES (%s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[2], i[3], i[4]])
+                        highStudySendData.append(
+                            [i[0][0], date, i[2], i[3], i[4]])
+        conn.commit()
+    sortedJuniorConSendData = []
+    for value in reversed(juniorConSendData):
+        sortedJuniorConSendData.append(value)
+    sortedJuniorStudySendData = []
+    for value in reversed(juniorStudySendData):
+        sortedJuniorStudySendData.append(value)
+    sortedHighConSendData = []
+    for value in reversed(highConSendData):
+        sortedHighConSendData.append(value)
+    sortedHighStudySendData = []
+    for value in reversed(highStudySendData):
+        sortedHighStudySendData.append(value)
+    print(sortedJuniorConSendData)
+    print(sortedJuniorStudySendData)
+    print(sortedHighConSendData)
+    print(sortedHighStudySendData)
+    nowHour = int(datetime.datetime.now().strftime("%H"))
+    nowMinute = int(datetime.datetime.now().strftime("%M"))
+    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime
 
 
 def get_connection():

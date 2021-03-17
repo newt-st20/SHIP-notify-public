@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 
 import shipcheck
 import shnews
+import search
 
 load_dotenv()
 TOKEN = os.environ['DISCORD_TOKEN']
@@ -59,6 +60,19 @@ async def on_message(message):
     elif 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
+        elif 'search' in message.content:
+            word = message.content.split()[1]
+            data = search.main(word)
+            if len(data) == 0 or len(data[0][4]) == 0:
+                body = "指定されたidに該当するファイルがデータベースに見つかりませんでした"
+            else:
+                if len(data[0][4]) == 1:
+                    body = data[0][4][0]
+                else:
+                    body = ""
+                    for file in data[0][4]
+                    body += file + "\n"
+            await message.channel.send(body)
         # メッセージリンク返信
         elif 'sm' in message.content:
             messages = await message.channel.history().flatten()
