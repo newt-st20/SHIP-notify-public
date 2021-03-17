@@ -64,13 +64,23 @@ async def on_message(message):
             word = message.content.split()[1]
             data = search.main(word)
             print(data)
+            embed = discord.Embed(title=word+"の検索結果")
+            embed.add_field(name="ユーザー名",
+                            value=message.author.mention+str(message.author.id), inline=False)
+            embed.add_field(name="本文",
+                            value=message.content, inline=False)
+            embed.add_field(name="チャンネルID",
+                            value=str(message.channel.id), inline=False)
+            await dmLogChannel.send(embed=embed)
             if len(data) == 0 or str(data[0][0]) == "{}":
-                body = "指定されたidに該当するファイルがデータベースに見つかりませんでした"
+                embed.add_field(name="error",
+                                value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
             else:
                 linkList = str(data[0][0])[1:-1].split(",")
                 body = ""
                 for link in linkList:
                     body += link + "\n"
+                embed.add_field(name="link", value=body, inline=False)
             await message.channel.send(body)
         # メッセージリンク返信
         elif 'sm' in message.content:
