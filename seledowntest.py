@@ -130,20 +130,25 @@ def main():
                 result = re.match(".*name=(.*)&size.*",
                                   eachConPageLink.get("href"))
                 print(result.group(1))
-                time.sleep(1)
-                conPageLinkList.append(result.group(1))
+                time.sleep(5)
                 if os.environ['STATUS'] == "local":
                     photo_path = 'D:\Downloads/' + result.group(1)
                 else:
                     photo_path = DOWNLOAD_DIR + '/' + result.group(1)
                 storage = firebase.storage()
+                if count == 0:
+                    schooltype = "high"
+                elif count == 1:
+                    schooltype = "junior"
                 try:
                     storage.child(
-                        'pdf/'+eachconList[0][0]+'/'+result.group(1)).put(photo_path)
+                        'pdf/'+schooltype+'-con'+eachconList[0][0]+'/'+result.group(1)).put(photo_path)
+                    conPageLinkList.append(storage.child(
+                        'pdf/'+schooltype+'-con'+eachconList[0][0]+'/'+result.group(1)).get_url(token=None))
                 except Exception as e:
                     print(str(e))
-                eachconList.append(conPageLinkList)
-                conList.append(eachconList)
+            eachconList.append(conPageLinkList)
+            conList.append(eachconList)
             conc += 1
         print(conList)
 
