@@ -117,7 +117,7 @@ def main():
                 result = re.match(".*name=(.*)&size.*",
                                   eachConPageLink.get("href"))
                 print(result.group(1))
-                time.sleep(3)
+                time.sleep(5)
                 if os.environ['STATUS'] == "local":
                     filepath = 'D:\Downloads/' + result.group(1)
                 else:
@@ -162,15 +162,53 @@ def main():
             studyTrTds = studyTr.find_all('td')
             try:
                 stage = studyTrTds[2].find('a').get('onclick')
-                eachstudyList.append(re.findall("'([^']*)'", stage))
+                studyId = re.findall("'([^']*)'", stage)
+                eachstudyList.append(studyId)
+                driver.get(
+                    "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+studyId+"&t=7")
+                studyEachPageSoup = BeautifulSoup(
+                    driver.page_source, 'html.parser')
+                try:
+                    studyPageMain = studyEachPageSoup.find_all(
+                        class_='ac')[0].find_all("table")[1]
+                    studyPageLinks = studyPageMain.find_all(
+                        "table")[-1].find_all("a")
+                except Exception as e:
+                    print(str(e))
+                studyPageLinkList = []
+                for eachstudyPageLink in studyPageLinks:
+                    driver.get("https://ship.sakae-higashi.jp" +
+                               eachstudyPageLink.get("href"))
+                    result = re.match(".*name=(.*)&size.*",
+                                      eachstudyPageLink.get("href"))
+                    print(result.group(1))
+                    time.sleep(5)
+                    if os.environ['STATUS'] == "local":
+                        filepath = 'D:\Downloads/' + result.group(1)
+                    else:
+                        filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                    storage = firebase.storage()
+                    if count == 0:
+                        schooltype = "high"
+                    elif count == 1:
+                        schooltype = "junior"
+                    try:
+                        storage.child(
+                            'pdf/'+schooltype+'-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).put(filepath)
+                        studyPageLinkList.append(storage.child(
+                            'pdf/'+schooltype+'-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).get_url(token=None))
+                    except Exception as e:
+                        print(str(e))
+                eachstudyList.append(studyPageLinkList)
             except:
-                eachstudyList.append([0, 0])
+                eachstudyList.append([0, 0], [])
             eachstudyList.append(studyTrTds[0].text)
             try:
                 eachstudyList.append(studyTrTds[1].find('span').get('title'))
             except:
                 eachstudyList.append(studyTrTds[1].text)
             eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
+
             studyEachPageSoup = BeautifulSoup(
                 studyEachPage[studyc], 'html.parser')
             try:
@@ -187,7 +225,7 @@ def main():
                 result = re.match(".*name=(.*)&size.*",
                                   eachstudyPageLink.get("href"))
                 print(result.group(1))
-                time.sleep(3)
+                time.sleep(5)
                 if os.environ['STATUS'] == "local":
                     filepath = 'D:\Downloads/' + result.group(1)
                 else:
@@ -244,12 +282,12 @@ def main():
                                 [int(i[0][0])])
                     (b,) = cur.fetchone()
                     if b == False:
-                        date = i[1].replace(
+                        date = i[2].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO study_junior (id, date, folder, title, link) VALUES (%s, %s, %s, %s, %s)', [
-                                    i[0][0], date, i[2], i[3], i[4]])
+                        cur.execute('INSERT INTO study_junior (id, link, date, folder, title) VALUES (%s, %s, %s, %s, %s)', [
+                                    i[0][0], i[1], date, i[3], i[4])
                         juniorStudySendData.append(
-                            [i[0][0], date, i[2], i[3], i[4]])
+                            [i[0][0], i[1], date, i[3], i[4])
             highConSendData = []
             for i in highConList:
                 if i[0][0] != 0:
@@ -270,12 +308,12 @@ def main():
                                 [int(i[0][0])])
                     (b,) = cur.fetchone()
                     if b == False:
-                        date = i[1].replace(
+                        date = i[2].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO study_high (id, date, folder, title) VALUES (%s, %s, %s, %s, %s)', [
-                                    i[0][0], date, i[2], i[3], i[4]])
+                        cur.execute('INSERT INTO study_high (id, link, date, folder, title) VALUES (%s, %s, %s, %s, %s)', [
+                                    i[0][0], i[1], date, i[3], i[4])
                         highStudySendData.append(
-                            [i[0][0], date, i[2], i[3], i[4]])
+                            [i[0][0], i[1], date, i[3], i[4])
         conn.commit()
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):
