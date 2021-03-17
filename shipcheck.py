@@ -10,7 +10,8 @@ import random
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
+from dotenv import load_dotenv
+load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()

@@ -63,15 +63,14 @@ async def on_message(message):
         elif 'search' in message.content:
             word = message.content.split()[1]
             data = search.main(word)
-            if len(data) == 0 or len(data[0][4]) == 0:
+            print(data)
+            if len(data) == 0 or str(data[0][0]) == "{}":
                 body = "指定されたidに該当するファイルがデータベースに見つかりませんでした"
             else:
-                if len(data[0][4]) == 1:
-                    body = data[0][4][0]
-                else:
-                    body = ""
-                    for file in data[0][4]:
-                        body += file + "\n"
+                linkList = str(data[0][0])[1:-1].split(",")
+                body = ""
+                for link in linkList:
+                    body += link + "\n"
             await message.channel.send(body)
         # メッセージリンク返信
         elif 'sm' in message.content:
