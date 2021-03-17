@@ -20,15 +20,19 @@ getTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
 
 def main(id):
+    data = []
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute('SELECT * FROM con_high WHERE id = %s',
+            cur.execute('SELECT link FROM con_high WHERE id = %s',
                         [id])
             result = cur.fetchall()
+            for item in result:
+                data.append([item[0]])
+            cur.execute('SELECT link FROM study_high WHERE id = %s', [id])
+            result = cur.fetchall()
+            for item in result:
+                data.append([item[0]])
         conn.commit()
-    data = []
-    for item in result:
-        data.append([item[0], item[1], item[2], item[3], item[4]])
     return data
 
 
