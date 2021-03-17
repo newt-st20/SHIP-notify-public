@@ -60,34 +60,45 @@ async def on_message(message):
     elif 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
+        elif message.content == 'sh!s':
+            def check(msg):
+                return msg.author == message.author
+            try:
+                await message.channel.send("ダウンロードリンクを表示したいもののidを入力してください")
+                wait_message = await client.wait_for("message", check=check, timeout=60)
+                data = search.main(wait_message.content)
+                if len(data) == 0 or str(data[0][0]) == "{}":
+                    embed = discord.Embed(
+                        title=wait_message.content+"の検索結果")
+                    embed.add_field(name="error",
+                                    value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
+                else:
+                    embed = discord.Embed(
+                        title=wait_message.content+"の検索結果", color=discord.Colour.from_rgb(50, 168, 82))
+                    linkList = str(data[0][0])[1:-1].split(",")
+                    body = ""
+                    for link in linkList:
+                        body += link + "\n"
+                    embed.add_field(name="link", value=body, inline=False)
+                await message.channel.send(embed=embed)
+            except Exception as e:
+                await message.channel.send("セッションがタイムアウトしました:"+str(e))
         elif 'search' in message.content:
             word = message.content.split()[1]
             data = search.main(word)
-            print(data)
-            embed = discord.Embed(title=word+"の検索結果")
-            embed.add_field(name="ユーザー名",
-                            value=message.author.mention+str(message.author.id), inline=False)
-            embed.add_field(name="本文",
-                            value=message.content, inline=False)
-            embed.add_field(name="チャンネルID",
-                            value=str(message.channel.id), inline=False)
-            await dmLogChannel.send(embed=embed)
             if len(data) == 0 or str(data[0][0]) == "{}":
+                embed = discord.Embed(title=word+"の検索結果")
                 embed.add_field(name="error",
                                 value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
             else:
+                embed = discord.Embed(
+                    title=wait_message.content+"の検索結果", color=discord.Colour.from_rgb(50, 168, 82))
                 linkList = str(data[0][0])[1:-1].split(",")
                 body = ""
                 for link in linkList:
                     body += link + "\n"
                 embed.add_field(name="link", value=body, inline=False)
-            await message.channel.send(body)
-        # メッセージリンク返信
-        elif 'sm' in message.content:
-            messages = await message.channel.history().flatten()
-            for msg in messages:
-                if word in msg.content:
-                    await message.channel.send(msg.jump_url)
+            await message.channel.send(embed=embed)
         # Wikipedia検索
         elif 'wiki' in message.content:
             word = message.content.split()[1]
@@ -178,13 +189,14 @@ async def loop():
     getLogChannel = client.get_channel(817400535639916544)
     configChannel = client.get_channel(820242721330561044)
     announceChannel = client.get_channel(810813852140306442)
+    ruleChannel = client.get_channel(821735577383731231)
     messages = await configChannel.history().flatten()
     for msg in messages:
         if "GET_HOUR=" in msg.content:
             whenGetConfigMessage = msg.content.lstrip("GET_HOUR=")
             continue
     hourList = [int(x) for x in whenGetConfigMessage.split()]
-    announceMessage = await announceChannel.fetch_message(818636188084076594)
+    announceMessage = await ruleChannel.fetch_message(821736777391538206)
     if str(hourList) not in str(announceMessage.embeds[0].to_dict()):
         editDatetime = "更新日時: " + str(datetime.datetime.now())
         editedBody = "現在は"+str(hourList) + \
