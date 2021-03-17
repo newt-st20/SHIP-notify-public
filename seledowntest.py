@@ -31,13 +31,14 @@ def main():
     now = datetime.datetime.now()
     getTime = now.strftime('%Y/%m/%d %H:%M:%S')
     # ローカルに保存しているChrome Driverを指定(※デプロイするときはコメントアウトする)
-    #CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
-    #DOWNLOAD_DIR = 'D:\Downloads'
-    # Heroku上のChrome Driverを指定(※デプロイするときはコメントを外す)
-    CHROME_DRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
-    # ダウンロードフォルダ―の場所を設定・作成
-    DOWNLOAD_DIR = '/app/tmp'
-    os.mkdir(DOWNLOAD_DIR)
+    if os.environ['STATUS'] == "local":
+        CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
+        DOWNLOAD_DIR = 'D:\Downloads'
+    else:
+        # Heroku上のChrome Driverを指定(※デプロイするときはコメントを外す)
+        CHROME_DRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
+        DOWNLOAD_DIR = '/app/tmp'
+        os.mkdir(DOWNLOAD_DIR)
     # chromeの起動オプションを設定
     options = webdriver.ChromeOptions()
     options.add_argument('--window-size=1920,1080')
@@ -126,12 +127,15 @@ def main():
             for eachConPageLink in conPageLinks:
                 driver.get("https://ship.sakae-higashi.jp" +
                            eachConPageLink.get("href"))
-                print(eachConPageLink.get("href"))
                 result = re.match(".*name=(.*)&size.*",
                                   eachConPageLink.get("href"))
-                conPageLinkList.append(
-                    "https://ship.sakae-higashi.jp" + result.group(1))
-                photo_path = 'D:\Downloads/' + result.group(1)
+                print(result.group(1))
+                time.sleep(1)
+                conPageLinkList.append(result.group(1))
+                if os.environ['STATUS'] == "local":
+                    photo_path = 'D:\Downloads/' + result.group(1)
+                else:
+                    photo_path = DOWNLOAD_DIR + '/' + result.group(1)
                 storage = firebase.storage()
                 try:
                     storage.child(
@@ -140,7 +144,7 @@ def main():
                     print(str(e))
                 eachconList.append(conPageLinkList)
                 conList.append(eachconList)
-                conc += 1
+            conc += 1
         print(conList)
 
         studyBody = studySoup.find("body")
