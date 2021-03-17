@@ -152,12 +152,12 @@ def main():
                 except Exception as e:
                     print(str(e))
                     eachconList.append([0, 0])
-                    eachconList.append([])
+                    eachconList.append("")
                 eachconList.append(conTrTds[0].text)
                 try:
                     eachconList.append(conTrTds[1].find('span').get('title'))
                 except:
-                    eachconList.append(conTrTds[1].text)
+                    eachconList.append("")
                 eachconList.append(conTrTds[2].text.replace("\n", ""))
                 conList.append(eachconList)
             conc += 1
@@ -222,14 +222,15 @@ def main():
                 except Exception as e:
                     print(str(e))
                     eachstudyList.append([0, 0])
-                    eachstudyList.append([])
                 eachstudyList.append(studyTrTds[0].text)
                 try:
-                    eachstudyList.append(
-                        studyTrTds[1].find('span').get('title'))
+                    eachstudyList.append(studyTrTds[1].find('span').get('title'))
                 except:
-                    eachstudyList.append(studyTrTds[1].text)
+                    eachstudyList.append("")
+                try:
                     eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
+                except:
+                    eachstudyList.append("")
                 studyList.append(eachstudyList)
             studyc += 1
         print(studyList)
@@ -259,7 +260,7 @@ def main():
                     if b == False:
                         date = i[2].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO con_junior (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s, %s)', [
+                        cur.execute('INSERT INTO con_junior (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s)', [
                                     i[0][0], date, i[3], i[4], i[1]])
                         juniorConSendData.append(
                             [i[0][0], date, i[3], i[4], i[1]])
@@ -271,7 +272,7 @@ def main():
                     if b == False:
                         date = i[1].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO study_junior (id, date, folder, title) VALUES (%s, %s, %s, %s, %s)', [
+                        cur.execute('INSERT INTO study_junior (id, date, folder, title) VALUES (%s, %s, %s, %s)', [
                                     i[0][0], date, i[2], i[3]])
                         juniorStudySendData.append(
                             [i[0][0], date, i[2], i[3]])
