@@ -1,3 +1,4 @@
+import pyrebase
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -17,29 +18,73 @@ DATABASE_URL = os.environ['DATABASE_URL']
 now = datetime.datetime.now()
 getTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
+config = {
+    'apiKey': os.environ['FIREBASE_API_KEY'],
+    'authDomain': os.environ['FIREBASE_AUTH_DOMAIN'],
+    "databaseURL": "xxxxxx",
+    'storageBucket': os.environ['FIREBASE_STORAGE_BUCKET']
+}
+firebase = pyrebase.initialize_app(config)
+
 
 def main():
-    now = datetime.datetime.now()
-    getTime = now.strftime('%Y/%m/%d %H:%M:%S')
-    driver_path = '/app/.chromedriver/bin/chromedriver'
-    options = Options()
+    getedList = []
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT id FROM con_high')
+            result = cur.fetchall()
+            for item in result:
+                getedList.append(item[0])
+            cur.execute('SELECT id FROM study_high')
+            result = cur.fetchall()
+            for item in result:
+                getedList.append(item[0])
+            cur.execute('SELECT id FROM con_junior')
+            result = cur.fetchall()
+            for item in result:
+                getedList.append(item[0])
+            cur.execute('SELECT id FROM study_junior')
+            result = cur.fetchall()
+            for item in result:
+                getedList.append(item[0])
+        conn.commit()
+    print(getedList)
+    if os.environ['STATUS'] == "local":
+        CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
+        DOWNLOAD_DIR = 'D:\Downloads'
+    else:
+        CHROME_DRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
+        DOWNLOAD_DIR = '/app/tmp'
+        os.mkdir(DOWNLOAD_DIR)
+    options = webdriver.ChromeOptions()
+    options.add_argument('start-maximized')
     options.add_argument('--disable-gpu')
-    options.add_argument('--disable-extensions')
-    options.add_argument('--proxy-server="direct://"')
-    options.add_argument('--proxy-bypass-list=*')
-    options.add_argument('--start-maximized')
-    options.add_argument('--headless')
-    driver = webdriver.Chrome(executable_path=driver_path, options=options)
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    prefs = {'download.default_directory': DOWNLOAD_DIR,
+             'download.prompt_for_download': False}
+    options.add_experimental_option('prefs', prefs)
+    driver = webdriver.Chrome(executable_path=CHROME_DRIVER_PATH,
+                              options=options)
+    driver.command_executor._commands['send_command'] = ('POST',
+                                                         '/session/$sessionId/chromium/send_command')
+    params = {'cmd': 'Page.setDownloadBehavior',
+              'params': {'behavior': 'allow',
+                         'downloadPath': DOWNLOAD_DIR}}
+    driver.execute('send_command', params)
     driver.get('https://ship.sakae-higashi.jp/')
-    time.sleep(getWaitSecs())
     ship_id = driver.find_element_by_name("ship_id")
     password = driver.find_element_by_name("pass")
     ship_id.send_keys(os.environ['SHIP_ID'])
     password.send_keys(os.environ['SHIP_PASS'])
     driver.find_element_by_name('login').click()
-    time.sleep(getWaitSecs())
+    time.sleep(1)
     count = 0
     while count < 2:
+        if count == 0:
+            schooltype = "high"
+        elif count == 1:
+            schooltype = "junior"
         driver.get("https://ship.sakae-higashi.jp/menu.php")
         menu = driver.page_source
         menuSoup = BeautifulSoup(menu, 'html.parser')
@@ -54,69 +99,138 @@ def main():
         con = driver.page_source
         conSoup = BeautifulSoup(con, 'html.parser')
         conLinks = conSoup.find_all(class_='allc')[0].find_all('a')
-        conEachPage = []
-        for conLink in conLinks:
-            conOnclick = conLink.get('onclick')
-            conId = re.findall("'([^']*)'", conOnclick)[0]
-            time.sleep(getWaitSecs())
-            driver.get(
-                "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId+"&t=3")
-            conEachPage.append(driver.page_source)
-
-        driver.get(
-            "https://ship.sakae-higashi.jp/study/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
-        study = driver.page_source
-        studySoup = BeautifulSoup(study, 'html.parser')
-
         conBody = conSoup.find("body")
         conTrs = conSoup.find_all(class_='allc')[0].find_all('tr')
         conTrs.pop(0)
         conList = []
         conc = 0
         for conTr in conTrs:
+            time.sleep(1)
             eachconList = []
             conTrTds = conTr.find_all('td')
             try:
                 stage = conTrTds[2].find('a').get('onclick')
-                eachconList.append(re.findall("'([^']*)'", stage))
-            except:
-                eachconList.append([0, 0])
-            eachconList.append(conTrTds[0].text)
-            try:
-                eachconList.append(conTrTds[1].find('span').get('title'))
-            except:
-                eachconList.append(conTrTds[1].text)
-            eachconList.append(conTrTds[2].text.replace("\n", ""))
-            conEachPageSoup = BeautifulSoup(conEachPage[conc], 'html.parser')
-            conPageMain = conEachPageSoup.find_all(
-                class_='ac')[0].find_all("table")[1]
-            conPageDescription = conPageMain.find_all(
-                "table")[-2].text.replace("\n", "")
-            eachconList.append(conPageDescription)
-            conList.append(eachconList)
+                conId = re.findall("'([^']*)'", stage)
+            except Exception as e:
+                print(str(e))
+            if int(conId[0]) not in getedList:
+                try:
+                    eachconList.append(conId)
+                    driver.get(
+                        "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId[0]+"&t=3")
+                    conEachPageSoup = BeautifulSoup(
+                        driver.page_source, 'html.parser')
+                    conPageMain = conEachPageSoup.find_all(
+                        class_='ac')[0].find_all("table")[1]
+                    conPageDescription = conPageMain.find_all(
+                        "table")[-2].text.replace("\n", "")
+                    eachconList.append(conPageDescription)
+                    if schooltype == "high":
+                        conPageLinks = conPageMain.find_all(
+                            "table")[-1].find_all("a")
+                        conPageLinkList = []
+                        for eachConPageLink in conPageLinks:
+                            driver.get("https://ship.sakae-higashi.jp" +
+                                       eachConPageLink.get("href"))
+                            result = re.match(".*name=(.*)&size.*",
+                                              eachConPageLink.get("href"))
+                            print(result.group(1))
+                            time.sleep(5)
+                            if os.environ['STATUS'] == "local":
+                                filepath = 'D:\Downloads/' + result.group(1)
+                            else:
+                                filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                            storage = firebase.storage()
+                            try:
+                                storage.child(
+                                    'pdf/high-con/'+str(eachconList[0][0])+'/'+result.group(1)).put(filepath)
+                                conPageLinkList.append(storage.child(
+                                    'pdf/high-con/'+str(eachconList[0][0])+'/'+result.group(1)).get_url(token=None))
+                            except Exception as e:
+                                print(str(e))
+                        eachconList.append(conPageLinkList)
+                except Exception as e:
+                    print(str(e))
+                    eachconList.append([0, 0])
+                    eachconList.append([])
+                eachconList.append(conTrTds[0].text)
+                try:
+                    eachconList.append(conTrTds[1].find('span').get('title'))
+                except:
+                    eachconList.append(conTrTds[1].text)
+                eachconList.append(conTrTds[2].text.replace("\n", ""))
+                conList.append(eachconList)
             conc += 1
         print(conList)
 
+        driver.get(
+            "https://ship.sakae-higashi.jp/study/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
+        study = driver.page_source
+        studySoup = BeautifulSoup(study, 'html.parser')
+        studyLinks = studySoup.find_all(class_='allc')[0].find_all('a')
         studyBody = studySoup.find("body")
         studyTrs = studySoup.find_all(class_='allc')[0].find_all('tr')
         studyTrs.pop(0)
         studyList = []
         studyc = 0
         for studyTr in studyTrs:
+            time.sleep(1)
             eachstudyList = []
             studyTrTds = studyTr.find_all('td')
             try:
                 stage = studyTrTds[2].find('a').get('onclick')
-                eachstudyList.append(re.findall("'([^']*)'", stage))
-            except:
-                eachstudyList.append([0, 0])
-            eachstudyList.append(studyTrTds[0].text)
-            try:
-                eachstudyList.append(studyTrTds[1].find('span').get('title'))
-            except:
-                eachstudyList.append(studyTrTds[1].text)
-            eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
-            studyList.append(eachstudyList)
+                studyId = re.findall("'([^']*)'", stage)
+            except Exception as e:
+                pass
+            print(int(studyId[0]))
+            if int(studyId[0]) not in getedList:
+                try:
+                    eachstudyList.append(studyId)
+                    driver.get(
+                        "https://ship.sakae-higashi.jp/sub_window_study/?obj_id="+studyId[0]+"&t=7")
+                    studyEachPageSoup = BeautifulSoup(
+                        driver.page_source, 'html.parser')
+                    if schooltype == "high":
+                        try:
+                            studyPageMain = studyEachPageSoup.find_all(
+                                class_='ac')[0].find_all("table")[1]
+                            studyPageLinks = studyPageMain.find_all(
+                                "table")[-1].find_all("a")
+                        except Exception as e:
+                            print(str(e))
+                        studyPageLinkList = []
+                        for eachstudyPageLink in studyPageLinks:
+                            driver.get("https://ship.sakae-higashi.jp" +
+                                       eachstudyPageLink.get("href"))
+                            result = re.match(".*name=(.*)&size.*",
+                                              eachstudyPageLink.get("href"))
+                            print(result.group(1))
+                            time.sleep(4)
+                            if os.environ['STATUS'] == "local":
+                                filepath = 'D:\Downloads/' + result.group(1)
+                            else:
+                                filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                            storage = firebase.storage()
+                            try:
+                                storage.child(
+                                    'pdf/high-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).put(filepath)
+                                studyPageLinkList.append(storage.child(
+                                    'pdf/high-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).get_url(token=None))
+                            except Exception as e:
+                                print(str(e))
+                        eachstudyList.append(studyPageLinkList)
+                except Exception as e:
+                    print(str(e))
+                    eachstudyList.append([0, 0])
+                    eachstudyList.append([])
+                eachstudyList.append(studyTrTds[0].text)
+                try:
+                    eachstudyList.append(
+                        studyTrTds[1].find('span').get('title'))
+                except:
+                    eachstudyList.append(studyTrTds[1].text)
+                    eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
+                studyList.append(eachstudyList)
             studyc += 1
         print(studyList)
 
@@ -143,12 +257,12 @@ def main():
                                 [int(i[0][0])])
                     (b,) = cur.fetchone()
                     if b == False:
-                        date = i[1].replace(
+                        date = i[2].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO con_junior (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s)', [
-                                    i[0][0], date, i[2], i[3], i[4]])
+                        cur.execute('INSERT INTO con_junior (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[3], i[4], i[1]])
                         juniorConSendData.append(
-                            [i[0][0], date, i[2], i[3], i[4]])
+                            [i[0][0], date, i[3], i[4], i[1]])
             for i in juniorStudyList:
                 if i[0][0] != 0:
                     cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
@@ -157,9 +271,10 @@ def main():
                     if b == False:
                         date = i[1].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO study_junior (id, date, folder, title) VALUES (%s, %s, %s, %s)', [
+                        cur.execute('INSERT INTO study_junior (id, date, folder, title) VALUES (%s, %s, %s, %s, %s)', [
                                     i[0][0], date, i[2], i[3]])
-                        juniorStudySendData.append([i[0][0], date, i[2], i[3]])
+                        juniorStudySendData.append(
+                            [i[0][0], date, i[2], i[3]])
             highConSendData = []
             for i in highConList:
                 if i[0][0] != 0:
@@ -167,12 +282,12 @@ def main():
                                 [int(i[0][0])])
                     (b,) = cur.fetchone()
                     if b == False:
-                        date = i[1].replace(
+                        date = i[3].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO con_high (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s)', [
-                                    i[0][0], date, i[2], i[3], i[4]])
+                        cur.execute('INSERT INTO con_high (id, date, folder, title, description, link) VALUES (%s, %s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[4], i[5], i[1], i[2]])
                         highConSendData.append(
-                            [i[0][0], date, i[2], i[3], i[4]])
+                            [i[0][0], date, i[4], i[5], i[1]])
             highStudySendData = []
             for i in highStudyList:
                 if i[0][0] != 0:
@@ -180,11 +295,12 @@ def main():
                                 [int(i[0][0])])
                     (b,) = cur.fetchone()
                     if b == False:
-                        date = i[1].replace(
+                        date = i[2].replace(
                             "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO study_high (id, date, folder, title) VALUES (%s, %s, %s, %s)', [
-                                    i[0][0], date, i[2], i[3]])
-                        highStudySendData.append([i[0][0], date, i[2], i[3]])
+                        cur.execute('INSERT INTO study_high (id, date, folder, title, link) VALUES (%s, %s, %s, %s, %s)', [
+                                    i[0][0], date, i[3], i[4], i[1]])
+                        highStudySendData.append(
+                            [i[0][0], date, i[3], i[4]])
         conn.commit()
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):
