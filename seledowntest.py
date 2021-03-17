@@ -28,18 +28,13 @@ firebase = pyrebase.initialize_app(config)
 
 
 def main():
-    now = datetime.datetime.now()
-    getTime = now.strftime('%Y/%m/%d %H:%M:%S')
-    # ローカルに保存しているChrome Driverを指定(※デプロイするときはコメントアウトする)
     if os.environ['STATUS'] == "local":
         CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
         DOWNLOAD_DIR = 'D:\Downloads'
     else:
-        # Heroku上のChrome Driverを指定(※デプロイするときはコメントを外す)
         CHROME_DRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
         DOWNLOAD_DIR = '/app/tmp'
         os.mkdir(DOWNLOAD_DIR)
-    # chromeの起動オプションを設定
     options = webdriver.ChromeOptions()
     options.add_argument('start-maximized')
     options.add_argument('--disable-gpu')
@@ -57,11 +52,10 @@ def main():
                          'downloadPath': DOWNLOAD_DIR}}
     driver.execute('send_command', params)
     driver.get('https://ship.sakae-higashi.jp/')
-    time.sleep(1)
     ship_id = driver.find_element_by_name("ship_id")
     password = driver.find_element_by_name("pass")
-    ship_id.send_keys("shj181152")
-    password.send_keys("ry9k5btx")
+    ship_id.send_keys(os.environ['SHIP_ID'])
+    password.send_keys(os.environ['SHIP_PASS'])
     driver.find_element_by_name('login').click()
     time.sleep(1)
     count = 0
@@ -125,9 +119,9 @@ def main():
                 print(result.group(1))
                 time.sleep(3)
                 if os.environ['STATUS'] == "local":
-                    photo_path = 'D:\Downloads/' + result.group(1)
+                    filepath = 'D:\Downloads/' + result.group(1)
                 else:
-                    photo_path = DOWNLOAD_DIR + '/' + result.group(1)
+                    filepath = DOWNLOAD_DIR + '/' + result.group(1)
                 storage = firebase.storage()
                 if count == 0:
                     schooltype = "high"
@@ -135,7 +129,7 @@ def main():
                     schooltype = "junior"
                 try:
                     storage.child(
-                        'pdf/'+schooltype+'-con/'+str(eachconList[0][0])+'/'+result.group(1)).put(photo_path)
+                        'pdf/'+schooltype+'-con/'+str(eachconList[0][0])+'/'+result.group(1)).put(filepath)
                     conPageLinkList.append(storage.child(
                         'pdf/'+schooltype+'-con/'+str(eachconList[0][0])+'/'+result.group(1)).get_url(token=None))
                 except Exception as e:
@@ -195,9 +189,9 @@ def main():
                 print(result.group(1))
                 time.sleep(3)
                 if os.environ['STATUS'] == "local":
-                    photo_path = 'D:\Downloads/' + result.group(1)
+                    filepath = 'D:\Downloads/' + result.group(1)
                 else:
-                    photo_path = DOWNLOAD_DIR + '/' + result.group(1)
+                    filepath = DOWNLOAD_DIR + '/' + result.group(1)
                 storage = firebase.storage()
                 if count == 0:
                     schooltype = "high"
@@ -205,7 +199,7 @@ def main():
                     schooltype = "junior"
                 try:
                     storage.child(
-                        'pdf/'+schooltype+'-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).put(photo_path)
+                        'pdf/'+schooltype+'-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).put(filepath)
                     studyPageLinkList.append(storage.child(
                         'pdf/'+schooltype+'-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).get_url(token=None))
                 except Exception as e:
