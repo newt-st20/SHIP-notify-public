@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
-import time
 import re
 import random
 import wikipedia
@@ -19,7 +18,6 @@ import search
 
 load_dotenv()
 TOKEN = os.environ['DISCORD_TOKEN']
-
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -50,17 +48,13 @@ async def on_member_remove(member):
 @client.event
 async def on_message(message):
     await client.wait_until_ready()
-    testChannel = client.get_channel(814460143001403423)
-    conJuniorChannel = client.get_channel(812592878194262026)
-    studyJuniorChannel = client.get_channel(814791146966220841)
-    getLogChannel = client.get_channel(817400535639916544)
     dmLogChannel = client.get_channel(817971315138756619)
     if message.author.bot:
         return
     if 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
-        elif message.content == 'sh!s':
+        elif message.content == 'sh!s' or message.content == 'sh!f' or message.content == 'sh!d':
             def check(msg):
                 return msg.author == message.author
             try:
@@ -83,7 +77,7 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             except Exception as e:
                 await message.channel.send("セッションがタイムアウトしました:"+str(e))
-        elif 'search' in message.content:
+        elif 'search' in message.content or 'file' in message.content or 'download' in message.content:
             word = message.content.split()[1]
             data = search.main(word)
             if len(data) == 0 or str(data[0][0]) == "{}":
@@ -130,30 +124,30 @@ async def on_message(message):
             await message.channel.send('このコマンドは用意されていません')
     # 管理者用コマンド
     if 'sa!' in message.content and message.author.guild_permissions.administrator:
-        if 'get' in message.content:
+        if message.content == 'sa!get':
             await message.channel.send('データの取得を開始します')
             try:
                 await getData()
+                await message.channel.send('処理が完了しました')
             except Exception as e:
                 await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif 'shnews' in message.content:
+        elif message.content == 'sa!shnews':
             await message.channel.send('データの取得を開始します')
             try:
                 await getNewsData()
-                await getLogChannel.send('処理が完了しました')
+                await message.channel.send('処理が完了しました')
             except Exception as e:
                 await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif 'count' in message.content:
+        elif message.content == 'sa!count':
             guild = message.guild
             member_count = guild.member_count
             user_count = sum(1 for member in guild.members if not member.bot)
             bot_count = sum(1 for member in guild.members if member.bot)
             await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
     if isinstance(message.channel, discord.DMChannel):
-        user = client.get_user(message.author.id)
         embed = discord.Embed(title="DMを受信しました")
         embed.add_field(name="ユーザー名",
-                        value=message.author.mention+str(message.author.id), inline=False)
+                        value=message.author.mention+" ("+str(message.author.id)+")", inline=False)
         embed.add_field(name="本文",
                         value=message.content, inline=False)
         embed.add_field(name="チャンネルID",
@@ -212,11 +206,8 @@ async def on_raw_reaction_add(payload):
 @tasks.loop(seconds=600)
 async def loop():
     await client.wait_until_ready()
-    conJuniorChannel = client.get_channel(812592878194262026)
-    studyJuniorChannel = client.get_channel(814791146966220841)
     getLogChannel = client.get_channel(817400535639916544)
     configChannel = client.get_channel(820242721330561044)
-    announceChannel = client.get_channel(810813852140306442)
     ruleChannel = client.get_channel(821735577383731231)
     messages = await configChannel.history().flatten()
     for msg in messages:
@@ -351,8 +342,8 @@ async def getNewsData():
             embed.add_field(name="datetime", value=conData[1])
             embed.add_field(name="category", value=conData[4], inline=False)
             embed.add_field(name="body", value=conData[2], inline=False)
-            if len(result[5]) != 0:
-                embed.set_image(url=result[5][0])
+            if len(conData[5]) != 0:
+                embed.set_image(url=conData[5][0])
             embed.add_field(name="link", value=conData[3], inline=False)
             await shnewsChannel.send(embed=embed)
     else:
