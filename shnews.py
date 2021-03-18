@@ -10,24 +10,25 @@ import random
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
+from dotenv import load_dotenv
+load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
-getTime = now.strftime('%Y-%m-%d %H:%M:%S')
+getTime = now.strftime('%Y/%m/%d %H:%M:%S')
 
 
 def main():
-    now = datetime.datetime.now()
-    getTime = now.strftime('%Y/%m/%d %H:%M:%S')
-    driver_path = '/app/.chromedriver/bin/chromedriver'
+    if os.environ['STATUS'] == "local":
+        driver_path = 'C:\chromedriver.exe'
+    else:
+        driver_path = '/app/.chromedriver/bin/chromedriver'
     options = Options()
     options.add_argument('--disable-gpu')
     options.add_argument('--disable-extensions')
     options.add_argument('--proxy-server="direct://"')
     options.add_argument('--proxy-bypass-list=*')
     options.add_argument('--start-maximized')
-    options.add_argument('--headless')
     driver = webdriver.Chrome(executable_path=driver_path, options=options)
     driver.get('http://www.sakaehigashi.ed.jp/news/')
     news = driver.page_source
@@ -39,12 +40,18 @@ def main():
         date = newsEntry.find_all(class_='date')[0].text
         gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
         postDateTime = date + gtime
-        body = newsEntry.text[len(title):-len(date)].replace("\n", "")
-        if len(body) > 100:
-            body = body[0:100] + "...((省略))"
         link = newsEntry.find_all('a')[0].get('href')
         category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
-        newsTextList.append([title, postDateTime, body, link, category])
+        imageAreas = newsEntry.find_all('img')
+        images = []
+        for imageArea in imageAreas:
+            images.append(imageArea.get('src'))
+        body = newsEntry.text.replace(title, "").replace(date, "").replace(
+            "カテゴリー："+category, "").replace("投稿時刻", "").replace(gtime, "").replace("\n", "")
+        if len(body) > 100:
+            body = body[0:100] + "...((省略))"
+        newsTextList.append(
+            [title, postDateTime, body, link, category, images])
     time.sleep(getWaitSecs())
     driver.quit()
 
@@ -56,10 +63,12 @@ def main():
                             [i[0]])
                 (b,) = cur.fetchone()
                 if b == False:
-                    cur.execute('INSERT INTO sh_news (title, datetime, body, link, category) VALUES (%s, %s, %s, %s, %s)', [
-                                i[0], i[1], i[2], i[3], i[4]])
+                    cur.execute('INSERT INTO sh_news (title, datetime, body, link, category, images) VALUES (%s, %s, %s, %s, %s, %s)', [
+                                i[0], i[1], i[2], i[3], i[4], i[5]])
+                    if len(i[2]) > 100:
+                        body = i[2][0:100] + "...((省略))"
                     newsSendData.append(
-                        [i[0], i[1], i[2], i[3], i[4]])
+                        [i[0], i[1], i[2], i[3], i[4], i[5]])
         conn.commit()
     sortedNewsSendData = []
     for value in reversed(newsSendData):

@@ -53,7 +53,7 @@ async def on_message(message):
     testChannel = client.get_channel(814460143001403423)
     conJuniorChannel = client.get_channel(812592878194262026)
     studyJuniorChannel = client.get_channel(814791146966220841)
-    getLogChannel = client.get_channel(814791146966220841)
+    getLogChannel = client.get_channel(817400535639916544)
     dmLogChannel = client.get_channel(817971315138756619)
     if message.author.bot:
         return
@@ -163,20 +163,33 @@ async def on_message(message):
         replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
         sendMessage = str(message.content.split('!')[2])
         await replyDmChannel.send(sendMessage)
-    if "https://discord.com/" in message.content:
+    if "https://discord.com/channels/" in message.content:
         messageChannel = message.content.split("/")[-2]
         messageId = message.content.split("/")[-1]
         oldchannel = client.get_channel(int(messageChannel))
         oldmessage = await oldchannel.fetch_message(int(messageId))
-        if message.type == "default":
-            embed = discord.Embed(timestamp=oldmessage.created_at,
-                                  description=oldmessage.content)
-        elif message.type == "rich":
-            embed = discord.Embed(timestamp=oldmessage.created_at,
-                                  description="(リッチメッセージ)")
+        if str(message.type) == "MessageType.default":
+            if len(oldmessage.attachments) != 0:
+                if oldmessage.content == "":
+                    body = oldmessage.attachments[0].filename
+                else:
+                    body = oldmessage.content+"," + \
+                        oldmessage.attachments[0].filename
+                embed = discord.Embed(timestamp=oldmessage.created_at,
+                                      description=body)
+                embed.set_image(url=str(oldmessage.attachments[0].url))
+            elif oldmessage.content != "":
+                embed = discord.Embed(timestamp=oldmessage.created_at,
+                                      description=oldmessage.content)
+            elif oldmessage.embeds:
+                embed = discord.Embed(timestamp=oldmessage.created_at,
+                                      description="リッチメッセージ")
+            else:
+                embed = discord.Embed(timestamp=oldmessage.created_at,
+                                      description="システムメッセージ")
         embed.set_author(name=oldmessage.author.name,
                          icon_url=oldmessage.author.avatar_url)
-        embed.set_footer(text=oldchannel.name+"でのメッセージ")
+        embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
 
 
@@ -213,7 +226,8 @@ async def loop():
     hourList = [int(x) for x in whenGetConfigMessage.split()]
     announceMessage = await ruleChannel.fetch_message(821736777391538206)
     if str(hourList) not in str(announceMessage.embeds[0].to_dict()):
-        editDatetime = "更新日時: " + str(datetime.datetime.now())
+        editDatetime = "更新日時: " + \
+            str(announceMessage.edited_at.strftime("%Y/%m/%d %H:%M:%S"))
         editedBody = "現在は"+str(hourList) + \
             "時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
         embed = discord.Embed(
@@ -234,7 +248,6 @@ async def loop():
 
 async def getData():
     await client.wait_until_ready()
-    testChannel = client.get_channel(814460143001403423)
     conJuniorChannel = client.get_channel(812592878194262026)
     studyJuniorChannel = client.get_channel(814791146966220841)
     conHighChannel = client.get_channel(818066947463053312)
@@ -327,7 +340,7 @@ async def getData():
 
 async def getNewsData():
     await client.wait_until_ready()
-    shnewsChannel = client.get_channel(814460143001403423)
+    shnewsChannel = client.get_channel(818480374334226443)
     getLogChannel = client.get_channel(817400535639916544)
     result = shnews.main()
     if len(result[0]) != 0:
@@ -338,6 +351,8 @@ async def getNewsData():
             embed.add_field(name="datetime", value=conData[1])
             embed.add_field(name="category", value=conData[4], inline=False)
             embed.add_field(name="body", value=conData[2], inline=False)
+            if len(result[5]) != 0:
+                embed.set_image(url=result[5][0])
             embed.add_field(name="link", value=conData[3], inline=False)
             await shnewsChannel.send(embed=embed)
     else:
