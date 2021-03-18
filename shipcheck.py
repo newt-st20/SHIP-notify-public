@@ -16,7 +16,7 @@ load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
-getTime = now.strftime('%Y-%m-%d %H:%M:%S')
+getTime = now.strftime('%Y/%m/%d %H:%M:%S')
 
 config = {
     'apiKey': os.environ['FIREBASE_API_KEY'],
