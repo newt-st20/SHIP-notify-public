@@ -76,7 +76,7 @@ def main():
     for value in reversed(newsSendData):
         sortedNewsSendData.append(value)
     print(sortedNewsSendData)
-    return sortedNewsSendData, getTime
+    return sortedNewsSendData, now
 
 
 def get_connection():
