@@ -16,8 +16,7 @@ load_dotenv()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
-now = datetime.datetime.now()
-getTime = now.strftime('%Y/%m/%d %H:%M:%S')
+
 
 config = {
     'apiKey': os.environ['FIREBASE_API_KEY'],
@@ -29,6 +28,8 @@ firebase = pyrebase.initialize_app(config)
 
 
 def main():
+    now = datetime.datetime.now()
+    getTime = now.strftime('%H:%M:%S')
     getedList = []
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -306,7 +307,7 @@ def main():
     print(sortedJuniorStudySendData)
     print(sortedHighConSendData)
     print(sortedHighStudySendData)
-    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, now
+    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime
 
 
 def get_connection():
