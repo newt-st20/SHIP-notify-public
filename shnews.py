@@ -1,14 +1,19 @@
-import os
-import psycopg2
-from psycopg2.extras import DictCursor
-import time
 import datetime
+import os
 import random
+import re
+import time
+
+import psycopg2
+import pyrebase
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+from psycopg2.extras import DictCursor
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from dotenv import load_dotenv
+
 load_dotenv()
+
 DATABASE_URL = os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()

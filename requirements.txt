@@ -7,9 +7,6 @@ discord==1.0.1
 discord.py==1.6.0
 Flask==1.1.2
 future==0.18.2
-google-auth==1.24.0
-google-auth-oauthlib==0.4.2
-gspread==3.6.0
 gunicorn==20.0.4
 Hamlish-Jinja==0.3.3
 httplib2==0.18.1

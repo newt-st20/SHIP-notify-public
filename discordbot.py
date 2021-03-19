@@ -1,22 +1,24 @@
-import discord
-from discord.ext import tasks
 import datetime
 import json
+import os
+import random
+import re
+
+import discord
 import requests
+import wikipedia
 from bs4 import BeautifulSoup
+from discord.ext import tasks
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import os
-import re
-import random
-import wikipedia
-from dotenv import load_dotenv
 
+import search
 import shipcheck
 import shnews
-import search
 
 load_dotenv()
+
 TOKEN = os.environ['DISCORD_TOKEN']
 
 intents = discord.Intents.all()
@@ -256,7 +258,7 @@ async def getData():
             embed.add_field(name="id", value=conData[0])
             embed.add_field(name="date", value=conData[1])
             if conData[2] != '':
-                embed.add_field(name="path", value=conData[2], inline=False)
+                embed.add_field(name="path", value=conData[2])
             if conData[4] != '':
                 embed.add_field(name="description",
                                 value=conData[4], inline=False)
@@ -265,7 +267,7 @@ async def getData():
         embed = discord.Embed(
             title="中学連絡事項更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
         embed.add_field(name="system-log",
-                        value='中学連絡事項に更新はありませんでした', inline=False)
+                        value='中学連絡事項に更新はありませんでした')
         await getLogChannel.send(embed=embed)
     if len(result[1]) != 0:
         for studyData in result[1]:
@@ -278,13 +280,13 @@ async def getData():
             embed.add_field(name="id", value=studyData[0])
             embed.add_field(name="date", value=studyData[1])
             if studyData[2] != '':
-                embed.add_field(name="path", value=studyData[2], inline=False)
+                embed.add_field(name="path", value=studyData[2])
             await studyJuniorChannel.send(embed=embed)
     else:
         embed = discord.Embed(
             title="中学学習教材更新通知", description="取得日時:"+result[4], color=discord.Colour.from_rgb(52, 235, 79))
         embed.add_field(name="system-log",
-                        value='中学学習教材に更新はありませんでした', inline=False)
+                        value='中学学習教材に更新はありませんでした')
         await getLogChannel.send(embed=embed)
     if len(result[2]) != 0:
         for conData in result[2]:
@@ -297,7 +299,7 @@ async def getData():
             embed.add_field(name="id", value=conData[0])
             embed.add_field(name="date", value=conData[1])
             if conData[2] != '':
-                embed.add_field(name="path", value=conData[2], inline=False)
+                embed.add_field(name="path", value=conData[2])
             if conData[4] != '':
                 embed.add_field(name="description",
                                 value=conData[4], inline=False)
@@ -319,7 +321,7 @@ async def getData():
             embed.add_field(name="id", value=studyData[0])
             embed.add_field(name="date", value=studyData[1])
             if studyData[2] != '':
-                embed.add_field(name="path", value=studyData[2], inline=False)
+                embed.add_field(name="path", value=studyData[2])
             await studyHighChannel.send(embed=embed)
     else:
         embed = discord.Embed(
@@ -337,10 +339,9 @@ async def getNewsData():
     if len(result[0]) != 0:
         for conData in result[0]:
             embed = discord.Embed(
-                title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(52, 235, 79))
-            embed.add_field(name="title", value=conData[0], inline=False)
+                title=conData[0], description="取得日時:"+result[1], color=discord.Colour.from_rgb(230, 32, 226))
             embed.add_field(name="datetime", value=conData[1])
-            embed.add_field(name="category", value=conData[4], inline=False)
+            embed.add_field(name="category", value=conData[4])
             embed.add_field(name="body", value=conData[2], inline=False)
             if len(conData[5]) != 0:
                 embed.set_image(url=conData[5][0])
@@ -348,9 +349,9 @@ async def getNewsData():
             await shnewsChannel.send(embed=embed)
     else:
         embed = discord.Embed(
-            title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(52, 235, 79))
+            title="栄東ニュース更新通知", description="取得日時:"+result[1], color=discord.Colour.from_rgb(230, 32, 226))
         embed.add_field(name="system-log",
-                        value='栄東ニュースに更新はありませんでした', inline=False)
+                        value='栄東ニュースに更新はありませんでした')
         await getLogChannel.send(embed=embed)
 
 loop.start()

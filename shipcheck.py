@@ -1,16 +1,19 @@
-import pyrebase
-import os
-import psycopg2
-from psycopg2.extras import DictCursor
-import time
 import datetime
-import re
+import os
 import random
+import re
+import time
+
+import psycopg2
+import pyrebase
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+from psycopg2.extras import DictCursor
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from dotenv import load_dotenv
+
 load_dotenv()
+
 DATABASE_URL = os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
@@ -46,14 +49,13 @@ def main():
             for item in result:
                 getedList.append(item[0])
         conn.commit()
-    print(getedList)
     if os.environ['STATUS'] == "local":
         CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
         DOWNLOAD_DIR = 'D:\Downloads'
     else:
         CHROME_DRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
         DOWNLOAD_DIR = '/app/tmp'
-        os.mkdir(DOWNLOAD_DIR)
+        os.makedirs(DOWNLOAD_DIR, exist_ok=True)
     options = webdriver.ChromeOptions()
     options.add_argument('start-maximized')
     options.add_argument('--disable-gpu')
@@ -87,9 +89,9 @@ def main():
         menu = driver.page_source
         menuSoup = BeautifulSoup(menu, 'html.parser')
         menuStatus = menuSoup.find_all('table')[1].text
-        if count == 0 and '中学校' in menuStatus:
+        if schooltype == "high" and '中学校' in menuStatus:
             driver.find_element_by_name('cheng_hi').click()
-        elif count == 1 and '高等学校' in menuStatus:
+        elif schooltype == "junior" and '高等学校' in menuStatus:
             driver.find_element_by_name('cheng_jr').click()
         driver.get(
             "https://ship.sakae-higashi.jp/connection/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
@@ -98,7 +100,6 @@ def main():
         conTrs = conSoup.find_all(class_='allc')[0].find_all('tr')
         conTrs.pop(0)
         conList = []
-        conc = 0
         for conTr in conTrs:
             time.sleep(1)
             eachconList = []
@@ -155,7 +156,6 @@ def main():
                     eachconList.append("")
                 eachconList.append(conTrTds[2].text.replace("\n", ""))
                 conList.append(eachconList)
-            conc += 1
         print(conList)
 
         driver.get(
@@ -165,7 +165,6 @@ def main():
         studyTrs = studySoup.find_all(class_='allc')[0].find_all('tr')
         studyTrs.pop(0)
         studyList = []
-        studyc = 0
         for studyTr in studyTrs:
             time.sleep(1)
             eachstudyList = []
@@ -175,7 +174,6 @@ def main():
                 studyId = re.findall("'([^']*)'", stage)
             except Exception as e:
                 pass
-            print(int(studyId[0]))
             if int(studyId[0]) not in getedList:
                 try:
                     eachstudyList.append(studyId)
@@ -217,7 +215,8 @@ def main():
                     eachstudyList.append([0, 0])
                 eachstudyList.append(studyTrTds[0].text)
                 try:
-                    eachstudyList.append(studyTrTds[1].find('span').get('title'))
+                    eachstudyList.append(
+                        studyTrTds[1].find('span').get('title'))
                 except:
                     eachstudyList.append("")
                 try:
@@ -225,17 +224,12 @@ def main():
                 except:
                     eachstudyList.append("")
                 studyList.append(eachstudyList)
-            studyc += 1
         print(studyList)
 
-        driver.get("https://ship.sakae-higashi.jp/menu.php")
-        menu = driver.page_source
-        menuSoup = BeautifulSoup(menu, 'html.parser')
-        menuStatus = menuSoup.find_all('table')[1].text
-        if '中学校' in menuStatus:
+        if schooltype == "junior":
             juniorConList = conList
             juniorStudyList = studyList
-        elif '高等学校' in menuStatus:
+        elif schooltype == "high":
             highConList = conList
             highStudyList = studyList
         count += 1
