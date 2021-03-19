@@ -13,16 +13,58 @@ def main(id):
     data = []
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute('SELECT link FROM con_high WHERE id = %s',
+            cur.execute('SELECT title, link, date FROM con_high WHERE id = %s',
                         [id])
             result = cur.fetchall()
             for item in result:
-                data.append([item[0]])
-            cur.execute('SELECT link FROM study_high WHERE id = %s', [id])
+                data.append([item[0], item[1], item[2]])
+            cur.execute(
+                'SELECT title, link, date FROM study_high WHERE id = %s', [id])
             result = cur.fetchall()
             for item in result:
-                data.append([item[0]])
+                data.append([item[0], item[1], item[2]])
         conn.commit()
+    return data
+
+
+def recently(type, howmany):
+    data = []
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            if type == 1:
+                cur.execute(
+                    'SELECT title, date, id FROM con_high ORDER BY id desc LIMIT %s', [howmany])
+                result = cur.fetchall()
+                for item in result:
+                    data.append([item[0], item[1], item[2]])
+            elif type == 2:
+                cur.execute(
+                    'SELECT title, date, id FROM study_high ORDER BY id desc LIMIT %s', [howmany])
+                result = cur.fetchall()
+                for item in result:
+                    data.append([item[0], item[1], item[2]])
+        conn.commit()
+    print(data)
+    return data
+
+
+def count(type):
+    data = []
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            if type == 1:
+                cur.execute('SELECT COUNT (*) FROM con_high')
+                result = cur.fetchall()
+                for item in result:
+                    data = item[0]
+            elif type == 2:
+                cur.execute(
+                    'SELECT COUNT (*) FROM study_high')
+                result = cur.fetchall()
+                for item in result:
+                    data = item[0]
+        conn.commit()
+    print(data)
     return data
 
 
@@ -31,4 +73,4 @@ def get_connection():
 
 
 if __name__ == "__main__":
-    main()
+    count(1)
