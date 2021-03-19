@@ -16,11 +16,12 @@ load_dotenv()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
-now = datetime.datetime.now()
-getTime = now.strftime('%Y/%m/%d %H:%M:%S')
+
 
 
 def main():
+    now = datetime.datetime.now()
+    getTime = now.strftime('%H:%M:%S')
     if os.environ['STATUS'] == "local":
         driver_path = 'C:\chromedriver.exe'
     else:
@@ -76,7 +77,7 @@ def main():
     for value in reversed(newsSendData):
         sortedNewsSendData.append(value)
     print(sortedNewsSendData)
-    return sortedNewsSendData, now
+    return sortedNewsSendData, getTime
 
 
 def get_connection():
