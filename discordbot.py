@@ -64,19 +64,20 @@ async def on_message(message):
                 await message.channel.send("ダウンロードリンクを表示したいもののidを入力してください")
                 wait_message = await client.wait_for("message", check=check, timeout=60)
                 data = search.main(wait_message.content)
-                if len(data) == 0 or str(data[0][0]) == "{}":
+                if len(data) == 0 or str(data[0][1]) == "{}":
                     embed = discord.Embed(
                         title=wait_message.content)
                     embed.add_field(name="error",
                                     value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
                 else:
-                    embed = discord.Embed(
-                        title=wait_message.content, color=discord.Colour.from_rgb(50, 168, 82))
-                    linkList = str(data[0][0])[1:-1].split(",")
+                    linkList = str(data[0][1])[1:-1].split(",")
                     body = ""
+                    lc = 1
                     for link in linkList:
-                        body += "`-` " + link + "\n"
-                    embed.add_field(name="link", value=body, inline=False)
+                        body += "`" + str(lc) + ".` " + link + "\n"
+                        lc += 1
+                    embed = discord.Embed(
+                        title=data[0][0]+" - "+str(data[0][2]).replace("-", "/"), description=body, color=discord.Colour.from_rgb(50, 168, 82))
                 await message.channel.send(embed=embed)
             except Exception as e:
                 await message.channel.send("セッションがタイムアウトしました:"+str(e))
@@ -96,6 +97,49 @@ async def on_message(message):
                     body += "`-` " + link + "\n"
                 embed.add_field(name="link", value=body, inline=False)
             await message.channel.send(embed=embed)
+        elif message.content == 'sh!r':
+            embed = discord.Embed(title="最近の更新の取得",
+                                  description="高校連絡事項→ 1\n高校学習教材→ 2", color=discord.Colour.from_rgb(252, 186, 3))
+            await message.channel.send(embed=embed)
+
+            def check(msg):
+                return msg.author == message.author
+            try:
+                typeMessage = await client.wait_for("message", check=check, timeout=60)
+                data = search.count(int(typeMessage.content))
+                if data == 0:
+                    embed = discord.Embed(
+                        description="指定されたtypeに該当するオブジェクトがデータベースに見つかりませんでした")
+                    await message.channel.send(embed=embed)
+                else:
+                    await message.channel.send(str(data)+"件のデータが見つかりました。何件表示しますか？(最大50件まで)")
+                    try:
+                        howmany = await client.wait_for("message", check=check, timeout=60)
+                        mainData = search.recently(
+                            int(typeMessage.content), int(howmany.content))
+                        body = ""
+                        lc = 1
+                        for eachData in mainData:
+                            body += "`" + str(lc) + ".` __" + \
+                                eachData[0] + "__ - " + \
+                                    str(eachData[1].strftime(
+                                        '%Y/%m/%d')) + " - `" + str(eachData[2]) + "`" + "\n"
+                            if int(howmany.content) == lc:
+                                break
+                            lc += 1
+                        if body == "":
+                            body = "empty"
+                        if int(typeMessage.content) == 1:
+                            titlebody = "最近の高校連絡事項"
+                        elif int(typeMessage.content) == 2:
+                            titlebody = "最近の高校学習教材"
+                        embed = discord.Embed(
+                            title=titlebody, description=body, color=discord.Colour.from_rgb(252, 186, 3))
+                        await message.channel.send(embed=embed)
+                    except Exception as e:
+                        await message.channel.send("セッションがタイムアウトしました:"+str(e))
+            except Exception as e:
+                await message.channel.send("セッションがタイムアウトしました:"+str(e))
         # Wikipedia検索
         elif 'wiki' in message.content:
             word = message.content.split()[1]
