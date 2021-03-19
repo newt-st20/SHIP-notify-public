@@ -306,9 +306,7 @@ def main():
     print(sortedJuniorStudySendData)
     print(sortedHighConSendData)
     print(sortedHighStudySendData)
-    nowHour = int(datetime.datetime.now().strftime("%H"))
-    nowMinute = int(datetime.datetime.now().strftime("%M"))
-    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime
+    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, now
 
 
 def get_connection():
