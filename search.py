@@ -41,6 +41,16 @@ def info(id):
             result = cur.fetchall()
             for item in result:
                 data.append([item[0], item[1], item[2], item[3], "高校学習教材"])
+            cur.execute('SELECT title, date, folder FROM con_junior WHERE id = %s',
+                        [id])
+            result = cur.fetchall()
+            for item in result:
+                data.append([item[0], item[1], item[2], "", "中学連絡事項"])
+            cur.execute(
+                'SELECT title, date, folder FROM study_junior WHERE id = %s', [id])
+            result = cur.fetchall()
+            for item in result:
+                data.append([item[0], item[1], item[2], "", "中学学習教材"])
         conn.commit()
     return data
 
@@ -58,6 +68,18 @@ def recently(type, howmany):
             elif type == 2:
                 cur.execute(
                     'SELECT title, date, id FROM study_high ORDER BY id desc LIMIT %s', [howmany])
+                result = cur.fetchall()
+                for item in result:
+                    data.append([item[0], item[1], item[2]])
+            elif type == 3:
+                cur.execute(
+                    'SELECT title, date, id FROM con_junior ORDER BY id desc LIMIT %s', [howmany])
+                result = cur.fetchall()
+                for item in result:
+                    data.append([item[0], item[1], item[2]])
+            elif type == 4:
+                cur.execute(
+                    'SELECT title, date, id FROM study_junior ORDER BY id desc LIMIT %s', [howmany])
                 result = cur.fetchall()
                 for item in result:
                     data.append([item[0], item[1], item[2]])
@@ -80,6 +102,19 @@ def count(type):
                 result = cur.fetchall()
                 for item in result:
                     data = item[0]
+            elif type == 3:
+                cur.execute('SELECT COUNT (*) FROM con_junior')
+                result = cur.fetchall()
+                for item in result:
+                    data = item[0]
+            elif type == 4:
+                cur.execute(
+                    'SELECT COUNT (*) FROM study_junior')
+                result = cur.fetchall()
+                for item in result:
+                    data = item[0]
+            else:
+                data = 0
         conn.commit()
     return data
 
