@@ -29,7 +29,7 @@ client = discord.Client(intents=intents)
 async def on_ready():
     await client.wait_until_ready()
     wakeLogChannel = client.get_channel(817389202161270794)
-    wakeMessage = os.environ['STATUS'] + ":起動しました"
+    wakeMessage = os.environ['STATUS'] + ": 起動しました"
     await wakeLogChannel.send(wakeMessage)
     game = discord.Game("prefix: [sh!]")
     await client.change_presence(activity=game)
@@ -52,23 +52,61 @@ async def on_member_remove(member):
 async def on_message(message):
     await client.wait_until_ready()
     dmLogChannel = client.get_channel(817971315138756619)
+    conHighChannel = client.get_channel(818066947463053312)
+    studyHighChannel = client.get_channel(818066981982830613)
     if message.author.bot:
         return
     if 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
-        elif message.content == 'sh!s' or message.content == 'sh!f' or message.content == 'sh!d':
+        elif 'info' in message.content or message.content == 'sh!i':
             def check(msg):
                 return msg.author == message.author
             try:
-                await message.channel.send("ダウンロードリンクを表示したいもののidを入力してください")
-                wait_message = await client.wait_for("message", check=check, timeout=60)
-                data = search.main(wait_message.content)
+                embed = discord.Embed(title="情報取得", description="情報を取得したいもののidを入力してください。idは通知チャンネル("+conHighChannel.mention +
+                                      ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(190, 252, 3))
+                await message.channel.send(embed=embed)
+                idMessage = await client.wait_for("message", check=check, timeout=60)
+                try:
+                    idMessageTyped = int(idMessage.content)
+                except:
+                    await message.channel.send("入力された文字は数字ではありません。最初からやり直してください。")
+                    pass
+                data = search.info(idMessageTyped)
+                if len(data) == 0:
+                    embed = discord.Embed(
+                        title=idMessage.content, description="指定されたidに該当するファイルがデータベースに見つかりませんでした")
+                else:
+                    body = "`page` "+data[0][4]+"\n"
+                    body += "`id` "+idMessage.content+"\n"
+                    body += "`date` "+str(data[0][1]).replace("-", "/")+"\n"
+                    body += "`folder` "+data[0][2]+"\n"
+                    linkList = str(data[0][3])[1:-1].split(",")
+                    body += "`file` "+str(len(linkList))+"\n"
+                    if data[0][4] == "高校連絡事項":
+                        body += "`link` https://ship.sakae-higashi.jp/sub_window_anke/?obj_id=" + \
+                            idMessage.content+"&t=3\n"
+                    elif data[0][4] == "高校学習教材":
+                        body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
+                            idMessage.content+"&t=7\n"
+                    body += "※リンクはSHIPにログインした状態でのみ開けます"
+                    embed = discord.Embed(
+                        title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
+                await message.channel.send(embed=embed)
+            except Exception as e:
+                await message.channel.send("セッションがタイムアウトしました:"+str(e))
+        elif 'file' in message.content or 'download' in message.content or message.content == 'sh!f' or message.content == 'sh!d':
+            def check(msg):
+                return msg.author == message.author
+            try:
+                embed = discord.Embed(title="ファイル取得", description="ダウンロードリンクを表示したいもののidを入力してください。idは通知チャンネル("+conHighChannel.mention +
+                                      ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(50, 168, 82))
+                await message.channel.send(embed=embed)
+                idMessage = await client.wait_for("message", check=check, timeout=60)
+                data = search.__file__(int(idMessage.content))
                 if len(data) == 0 or str(data[0][1]) == "{}":
                     embed = discord.Embed(
-                        title=wait_message.content)
-                    embed.add_field(name="error",
-                                    value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
+                        description="指定されたidに該当するファイルがデータベースに見つかりませんでした")
                 else:
                     linkList = str(data[0][1])[1:-1].split(",")
                     body = ""
@@ -81,29 +119,12 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             except Exception as e:
                 await message.channel.send("セッションがタイムアウトしました:"+str(e))
-        elif 'search' in message.content or 'file' in message.content or 'download' in message.content:
-            word = message.content.split()[1]
-            data = search.main(word)
-            if len(data) == 0 or str(data[0][0]) == "{}":
-                embed = discord.Embed(title=word)
-                embed.add_field(name="error",
-                                value="指定されたidに該当するファイルがデータベースに見つかりませんでした", inline=False)
-            else:
-                embed = discord.Embed(
-                    title=word, color=discord.Colour.from_rgb(50, 168, 82))
-                linkList = str(data[0][0])[1:-1].split(",")
-                body = ""
-                for link in linkList:
-                    body += "`-` " + link + "\n"
-                embed.add_field(name="link", value=body, inline=False)
-            await message.channel.send(embed=embed)
-        elif message.content == 'sh!r':
-            embed = discord.Embed(title="最近の更新の取得",
-                                  description="高校連絡事項→ 1\n高校学習教材→ 2", color=discord.Colour.from_rgb(252, 186, 3))
-            await message.channel.send(embed=embed)
-
+        elif 'recently' in message.content or message.content == 'sh!r':
             def check(msg):
                 return msg.author == message.author
+            embed = discord.Embed(title="最近の更新の取得",
+                                  description="高校連絡事項→ `1`\n高校学習教材→ `2`", color=discord.Colour.from_rgb(252, 186, 3))
+            await message.channel.send(embed=embed)
             try:
                 typeMessage = await client.wait_for("message", check=check, timeout=60)
                 data = search.count(int(typeMessage.content))
@@ -120,10 +141,8 @@ async def on_message(message):
                         body = ""
                         lc = 1
                         for eachData in mainData:
-                            body += "`" + str(lc) + ".` __" + \
-                                eachData[0] + "__ - " + \
-                                    str(eachData[1].strftime(
-                                        '%Y/%m/%d')) + " - `" + str(eachData[2]) + "`" + "\n"
+                            body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(
+                                eachData[1].strftime('%Y/%m/%d')) + "\n"
                             if int(howmany.content) == lc:
                                 break
                             lc += 1
@@ -421,6 +440,7 @@ async def getNewsData():
                         value='栄東ニュースに更新はありませんでした')
         embed.set_footer(text="取得: "+result[1])
         await getLogChannel.send(embed=embed)
+
 
 loop.start()
 

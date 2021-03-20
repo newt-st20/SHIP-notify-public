@@ -9,7 +9,7 @@ load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
-def main(id):
+def file(id):
     data = []
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -23,6 +23,24 @@ def main(id):
             result = cur.fetchall()
             for item in result:
                 data.append([item[0], item[1], item[2]])
+        conn.commit()
+    return data
+
+
+def info(id):
+    data = []
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT title, date, folder, link FROM con_high WHERE id = %s',
+                        [id])
+            result = cur.fetchall()
+            for item in result:
+                data.append([item[0], item[1], item[2], item[3], "高校連絡事項"])
+            cur.execute(
+                'SELECT title, date, folder, link FROM study_high WHERE id = %s', [id])
+            result = cur.fetchall()
+            for item in result:
+                data.append([item[0], item[1], item[2], item[3], "高校学習教材"])
         conn.commit()
     return data
 
@@ -44,7 +62,6 @@ def recently(type, howmany):
                 for item in result:
                     data.append([item[0], item[1], item[2]])
         conn.commit()
-    print(data)
     return data
 
 
@@ -64,7 +81,6 @@ def count(type):
                 for item in result:
                     data = item[0]
         conn.commit()
-    print(data)
     return data
 
 
@@ -73,4 +89,4 @@ def get_connection():
 
 
 if __name__ == "__main__":
-    count(1)
+    file()
