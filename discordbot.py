@@ -120,7 +120,7 @@ async def on_message(message):
                     else:
                         await message.channel.send("入力された文字は数字ではありません。最初からやり直してください。")
                         pass
-                data = search.__file__(int(idMessage.content))
+                data = search.file(int(idMessage.content))
                 if len(data) == 0 or str(data[0][1]) == "{}":
                     embed = discord.Embed(
                         description="指定されたidに該当するファイルがデータベースに見つかりませんでした")
