@@ -7,15 +7,13 @@ import re
 import discord
 import requests
 import wikipedia
-from bs4 import BeautifulSoup
 from discord.ext import tasks
 from dotenv import load_dotenv
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
 import search
 import shipcheck
 import shnews
+import line
 
 load_dotenv()
 
@@ -91,7 +89,7 @@ async def on_message(message):
                     if data[0][4] == "高校連絡事項" or data[0][4] == "中学連絡事項":
                         body += "`link` https://ship.sakae-higashi.jp/sub_window_anke/?obj_id=" + \
                             idMessage.content+"&t=3\n"
-                    elif data[0][4] == "高校学習教材"or data[0][4] == "中学学習教材":
+                    elif data[0][4] == "高校学習教材" or data[0][4] == "中学学習教材":
                         body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
                             idMessage.content+"&t=7\n"
                     body += "※リンクはSHIPにログインした状態でのみ開けます"
@@ -439,6 +437,12 @@ async def getData():
                         value='高校学習教材に更新はありませんでした', inline=False)
         embed.set_footer(text="取得: "+result[4])
         await getLogChannel.send(embed=embed)
+    if len(result[2]) != 0 or len(result[3]) != 0:
+        try:
+            line.main(result)
+            await getLogChannel.send("LINE版処理完了")
+        except Exception as e:
+            await getLogChannel.send("LINE版での不具合:"+str(e))
 
 
 async def getNewsData():
