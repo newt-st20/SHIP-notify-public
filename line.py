@@ -1,5 +1,6 @@
 from linebot.models import TextSendMessage
 from linebot import LineBotApi
+import datetime
 import json
 import requests
 import os
@@ -20,7 +21,7 @@ line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 def main(data):
     HighConData = data[2]
     HighStudyData = data[3]
-    getTime = data[4]
+    getTime = str(data[4])
     message1 = ""
     try:
         for a in HighConData:
@@ -29,20 +30,18 @@ def main(data):
                 a[3].replace("\n", "")
             if a[4].replace("\n", "") != "":
                 message1 += "\n《" + a[4].replace("\n", "") + "》"
-    except:
+    except Exception as e:
         message1 = "\n・連絡事項取得エラー:更新の有無を取得できませんでした"
-        import traceback
-        traceback.print_exc()
+        return str(e)
     message2 = ""
     try:
         for a in HighStudyData:
             message2 += "\n・学習教材:" + \
                 a[1] + "-" + a[2] + "-" + \
                 a[3].replace("\n", "")
-    except:
+    except Exception as e:
         message2 = "\n・学習教材取得エラー:更新の有無を取得できませんでした"
-        import traceback
-        traceback.print_exc()
+        return str(e)
 
     headers = {
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
@@ -55,10 +54,11 @@ def main(data):
     jsonData = jsonLoad['default']
     jsonData['messages'][0]['text'] = mail
     print(jsonData)
-    requests.post(broadcastEndPoint, json=jsonData, headers=headers)
-    logMessage = "send message:" + \
-        str(mail)+" send for all followed user."
-    print(logMessage)
+    if message1 != "" or message2 != "":
+        requests.post(broadcastEndPoint, json=jsonData, headers=headers)
+        logMessage = "send message:" + \
+            str(mail)+" send for all followed user."
+        return logMessage
 
 
 if __name__ == "__main__":

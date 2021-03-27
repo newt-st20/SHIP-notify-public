@@ -2,3 +2,4 @@
 test/
 .env
 discordlocal.py
+vetur.config.js
