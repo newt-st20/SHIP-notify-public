@@ -437,10 +437,11 @@ async def getData():
                         value='高校学習教材に更新はありませんでした', inline=False)
         embed.set_footer(text="取得: "+result[4])
         await getLogChannel.send(embed=embed)
+    await getLogChannel.send(str(result))
     if len(result[2]) != 0 or len(result[3]) != 0:
         try:
-            line.main(result)
-            await getLogChannel.send("LINE版処理完了")
+            log = line.main(result)
+            await getLogChannel.send("LINE版処理完了"+ log)
         except Exception as e:
             await getLogChannel.send("LINE版での不具合:"+str(e))
 
