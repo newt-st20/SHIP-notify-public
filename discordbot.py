@@ -9,6 +9,7 @@ import requests
 import wikipedia
 from discord.ext import tasks
 from dotenv import load_dotenv
+import billboard
 
 import search
 import shipcheck
@@ -273,6 +274,70 @@ async def on_message(message):
                          icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
+    # その他どうでもいいコマンド
+    if 'op!' in message.content:
+        if message.content == 'op!billboard':
+            chartList = billboard.ChartData('japan-hot-100')
+            body = ''
+            c = 0
+            for song in chartList:
+                body += '\n`' + str(c) + '` **' + \
+                    song.title + '** / '+song.artist
+                if c >= 10:
+                    break
+                else:
+                    c += 1
+            embed = discord.Embed(title='Billboard `japan-hot-100` top 10',
+                                  description=body, color=discord.Colour.from_rgb(50, 168, 82))
+            await message.channel.send(embed=embed)
+        elif message.content == 'op!nhk':
+            def check(msg):
+                return msg.author == message.author
+            jsonOpen = open('json/nhk.json', 'r', encoding="utf-8_sig")
+            jsonLoad = json.load(jsonOpen)
+            jsonAreaData = jsonLoad["areas"]
+            body = ''
+            c = 0
+            for i in jsonAreaData:
+                body += '\n`' + str(c+1) + '` **'+i['title']+'**'
+                c += 1
+            await message.channel.send('地域を選択してください'+body)
+            nhkAreaId = await client.wait_for("message", check=check, timeout=60)
+            jsonChannelData = jsonLoad["channnels"]
+            body = ''
+            c = 0
+            for i in jsonChannelData:
+                body += '\n`' + str(c+1) + '` **'+i['title']+'**'
+                c += 1
+            await message.channel.send('チャンネルを選択してください'+body)
+            nhkChannnelId = await client.wait_for("message", check=check, timeout=60)
+            response = requests.get(
+                "https://api.nhk.or.jp/v2/pg/now/"+jsonAreaData[int(nhkAreaId.content)-1]['id']+"/"+jsonChannelData[int(nhkChannnelId.content)-1]['id']+'.json?key='+os.environ['NHK_ACCESS_KEY'])
+            responseJson = response.json()
+            responseDataPresent = responseJson['nowonair_list'][jsonChannelData[int(
+                nhkChannnelId.content)-1]['id']]['present']
+            responseDataFollowing = responseJson['nowonair_list'][jsonChannelData[int(
+                nhkChannnelId.content)-1]['id']]['following']
+            present = '`title` **'+responseDataPresent['title']+'**\n`subtitle` '+responseDataPresent['subtitle'] + \
+                '\n`start` ' + \
+                responseDataPresent['start_time']+'\n`end` ' + \
+                responseDataPresent['end_time']+'\n'
+            following = '`title` **'+responseDataFollowing['title']+'**\n`subtitle` '+responseDataFollowing['subtitle'] + \
+                '\n`start` '+responseDataFollowing['start_time'] + \
+                '\n`end` '+responseDataFollowing['end_time']+'\n'
+            embed = discord.Embed(title=jsonChannelData[int(nhkChannnelId.content)-1]['title']+'('+jsonAreaData[int(nhkAreaId.content)-1]['title']+')',
+                                  description='【現在放送中】\n'+present+'\n【次に放送】\n'+following, color=discord.Colour.from_rgb(50, 168, 82))
+            await message.channel.send(embed=embed)
+        elif message.content == 'op!himawari':
+            targetTimeResponse = requests.get(
+                "https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_jp.json")
+            targetTimeList = targetTimeResponse.json()
+            targetTimeData = targetTimeList[0]
+            embed = discord.Embed(
+                title="ひまわりからのトゥルーカラー再現画像", description="basetime:"+targetTimeData["basetime"], color=discord.Colour.from_rgb(255, 0, 0))
+            embed.set_image(
+                url="https://www.jma.go.jp/bosai/himawari/data/satimg/" + targetTimeData["basetime"]+"/jp/" + targetTimeData["validtime"]+"/REP/ETC/6/56/25.jpg")
+            await message.channel.send(embed=embed)
 
 
 @client.event
@@ -441,7 +506,7 @@ async def getData():
     if len(result[2]) != 0 or len(result[3]) != 0:
         try:
             log = line.main(result)
-            await getLogChannel.send("LINE版処理完了"+ log)
+            await getLogChannel.send("LINE版処理完了" + log)
         except Exception as e:
             await getLogChannel.send("LINE版での不具合:"+str(e))
 
