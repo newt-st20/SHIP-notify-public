@@ -15,6 +15,7 @@ import search
 import shipcheck
 import shnews
 import line
+import narou
 
 load_dotenv()
 
@@ -338,6 +339,30 @@ async def on_message(message):
             embed.set_image(
                 url="https://www.jma.go.jp/bosai/himawari/data/satimg/" + targetTimeData["basetime"]+"/jp/" + targetTimeData["validtime"]+"/REP/ETC/6/56/25.jpg")
             await message.channel.send(embed=embed)
+        elif message.content == 'op!naroucheck':
+            try:
+                await getNarou()
+                await message.channel.send('なろうの更新取得処理が完了しました')
+            except Exception as e:
+                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif 'op!narouadd' in message.content:
+            ncode = message.content.split()[1]
+            resMessage = narou.add(ncode)
+            await message.channel.send(str(resMessage))
+        elif 'op!narouremove' in message.content:
+            ncode = message.content.split()[1]
+            resMessage = narou.remove(ncode)
+            await message.channel.send(resMessage)
+        elif message.content == 'op!naroulist':
+            try:
+                data = narou.list()
+                for i in data:
+                    body = ""
+                    body += "**title** " + \
+                        i[1]+" ( https://ncode.syosetu.com/"+i[0]+" )\n"
+                    await message.channel.send(body)
+            except Exception as e:
+                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
 
 @client.event
@@ -381,20 +406,26 @@ async def loop():
         await announceMessage.edit(embed=embed)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    if nowHour in hourList and nowMinute < 10:
-        await getLogChannel.send('データの取得を開始します')
-        try:
-            await getData()
-            await getLogChannel.send('処理が完了しました')
-        except Exception as e:
-            await getLogChannel.send('【SHIP】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        if random.randrange(10) == 0:
-            await getLogChannel.send('栄東ニュースの取得を開始します')
+    if nowMinute < 10:
+        if nowHour in hourList:
+            await getLogChannel.send('データの取得を開始します')
             try:
-                await getNewsData()
-                await getLogChannel.send('栄東ニュースの取得処理が完了しました')
+                await getData()
+                await getLogChannel.send('処理が完了しました')
             except Exception as e:
-                await getLogChannel.send('【栄東ニュース】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+                await getLogChannel.send('【SHIP】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            if random.randrange(10) == 0:
+                await getLogChannel.send('栄東ニュースの取得を開始します')
+                try:
+                    await getNewsData()
+                    await getLogChannel.send('栄東ニュースの取得処理が完了しました')
+                except Exception as e:
+                    await getLogChannel.send('【栄東ニュース】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            try:
+                await getNarou()
+                await getLogChannel.send('なろうの更新取得処理が完了しました')
+            except Exception as e:
+                await getLogChannel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
 
 async def getData():
@@ -535,6 +566,17 @@ async def getNewsData():
         embed.set_footer(text="取得: "+result[1])
         await getLogChannel.send(embed=embed)
 
+
+async def getNarou():
+    await client.wait_until_ready()
+    narouChannel = client.get_channel(826094369467138108)
+    getLogChannel = client.get_channel(817400535639916544)
+    try:
+        result = narou.main()
+        for item in result:
+            await narouChannel.send("**"+item[3]+"** 更新通知\n更新日時:"+item[1]+"\n最新ページURL: https://ncode.syosetu.com/"+item[0]+"/"+item[2])
+    except Exception as e:
+        await getLogChannel.send("なろう取得不具合:"+str(e))
 
 loop.start()
 
