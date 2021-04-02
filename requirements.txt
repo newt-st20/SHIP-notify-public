@@ -33,4 +33,3 @@ wikipedia==1.4.0
 python-dotenv==0.15.0
 Pyrebase4==4.4.3
 line-bot-sdk==1.16.0
-billboard.py==6.2.1

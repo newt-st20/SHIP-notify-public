@@ -9,7 +9,6 @@ import requests
 import wikipedia
 from discord.ext import tasks
 from dotenv import load_dotenv
-import billboard
 
 import search
 import shipcheck
@@ -277,21 +276,7 @@ async def on_message(message):
         await message.channel.send(embed=embed)
     # その他どうでもいいコマンド
     if 'op!' in message.content:
-        if message.content == 'op!billboard':
-            chartList = billboard.ChartData('japan-hot-100')
-            body = ''
-            c = 0
-            for song in chartList:
-                body += '\n`' + str(c) + '` **' + \
-                    song.title + '** / '+song.artist
-                if c >= 10:
-                    break
-                else:
-                    c += 1
-            embed = discord.Embed(title='Billboard `japan-hot-100` top 10',
-                                  description=body, color=discord.Colour.from_rgb(50, 168, 82))
-            await message.channel.send(embed=embed)
-        elif message.content == 'op!nhk':
+        if message.content == 'op!nhk':
             def check(msg):
                 return msg.author == message.author
             jsonOpen = open('json/nhk.json', 'r', encoding="utf-8_sig")
@@ -302,7 +287,7 @@ async def on_message(message):
             for i in jsonAreaData:
                 body += '\n`' + str(c+1) + '` **'+i['title']+'**'
                 c += 1
-            await message.channel.send('地域を選択してください'+body)
+            await message.channel.send('🗾地域を選択してください'+body)
             nhkAreaId = await client.wait_for("message", check=check, timeout=60)
             jsonChannelData = jsonLoad["channnels"]
             body = ''
@@ -310,7 +295,7 @@ async def on_message(message):
             for i in jsonChannelData:
                 body += '\n`' + str(c+1) + '` **'+i['title']+'**'
                 c += 1
-            await message.channel.send('チャンネルを選択してください'+body)
+            await message.channel.send('📺チャンネルを選択してください'+body)
             nhkChannnelId = await client.wait_for("message", check=check, timeout=60)
             response = requests.get(
                 "https://api.nhk.or.jp/v2/pg/now/"+jsonAreaData[int(nhkAreaId.content)-1]['id']+"/"+jsonChannelData[int(nhkChannnelId.content)-1]['id']+'.json?key='+os.environ['NHK_ACCESS_KEY'])
@@ -326,18 +311,10 @@ async def on_message(message):
             following = '`title` **'+responseDataFollowing['title']+'**\n`subtitle` '+responseDataFollowing['subtitle'] + \
                 '\n`start` '+responseDataFollowing['start_time'] + \
                 '\n`end` '+responseDataFollowing['end_time']+'\n'
-            embed = discord.Embed(title=jsonChannelData[int(nhkChannnelId.content)-1]['title']+'('+jsonAreaData[int(nhkAreaId.content)-1]['title']+')',
-                                  description='【現在放送中】\n'+present+'\n【次に放送】\n'+following, color=discord.Colour.from_rgb(50, 168, 82))
-            await message.channel.send(embed=embed)
-        elif message.content == 'op!himawari':
-            targetTimeResponse = requests.get(
-                "https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_jp.json")
-            targetTimeList = targetTimeResponse.json()
-            targetTimeData = targetTimeList[0]
-            embed = discord.Embed(
-                title="ひまわりからのトゥルーカラー再現画像", description="basetime:"+targetTimeData["basetime"], color=discord.Colour.from_rgb(255, 0, 0))
-            embed.set_image(
-                url="https://www.jma.go.jp/bosai/himawari/data/satimg/" + targetTimeData["basetime"]+"/jp/" + targetTimeData["validtime"]+"/REP/ETC/6/56/25.jpg")
+            embed = discord.Embed(title='📺'+jsonChannelData[int(nhkChannnelId.content)-1]['title']+'('+jsonAreaData[int(
+                nhkAreaId.content)-1]['title']+')', color=discord.Colour.from_rgb(50, 168, 82))
+            embed.add_field(name="▶現在放送中", value=present, inline=False)
+            embed.add_field(name="🔜次に放送予定", value=following, inline=False)
             await message.channel.send(embed=embed)
         elif message.content == 'op!naroucheck':
             try:
@@ -348,11 +325,17 @@ async def on_message(message):
         elif 'op!narouadd' in message.content:
             ncode = message.content.split()[1]
             resMessage = narou.add(ncode)
-            await message.channel.send(str(resMessage))
+            if resMessage[0] == "success":
+                await message.channel.send('更新通知リストに**'+resMessage[1]+'** ( '+resMessage[2] + ' ) を追加しました。')
+            else:
+                await message.channel.send('エラー: '+resMessage[1])
         elif 'op!narouremove' in message.content:
             ncode = message.content.split()[1]
             resMessage = narou.remove(ncode)
-            await message.channel.send(resMessage)
+            if resMessage[0] == "success":
+                await message.channel.send('更新通知リストから '+resMessage[1] + ' ) を削除しました。')
+            else:
+                await message.channel.send('エラー: '+resMessage[1])
         elif message.content == 'op!naroulist':
             try:
                 data = narou.list()
@@ -421,11 +404,11 @@ async def loop():
                     await getLogChannel.send('栄東ニュースの取得処理が完了しました')
                 except Exception as e:
                     await getLogChannel.send('【栄東ニュース】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-            try:
-                await getNarou()
-                await getLogChannel.send('なろうの更新取得処理が完了しました')
-            except Exception as e:
-                await getLogChannel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        try:
+            await getNarou()
+            await getLogChannel.send('なろうの更新取得処理が完了しました')
+        except Exception as e:
+            await getLogChannel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
 
 async def getData():
@@ -533,7 +516,6 @@ async def getData():
                         value='高校学習教材に更新はありませんでした', inline=False)
         embed.set_footer(text="取得: "+result[4])
         await getLogChannel.send(embed=embed)
-    await getLogChannel.send(str(result))
     if len(result[2]) != 0 or len(result[3]) != 0:
         try:
             log = line.main(result)
@@ -574,7 +556,9 @@ async def getNarou():
     try:
         result = narou.main()
         for item in result:
-            await narouChannel.send("**"+item[3]+"** 更新通知\n更新日時:"+item[1]+"\n最新ページURL: https://ncode.syosetu.com/"+item[0]+"/"+item[2])
+            embed = discord.Embed(
+                title=str(item[3]), description="更新日時:"+str(item[1])+"\n最新ページURL: https://ncode.syosetu.com/"+str(item[0])+"/"+str(item[2]), color=discord.Colour.from_rgb(66, 135, 245))
+            await narouChannel.send(embed=embed)
     except Exception as e:
         await getLogChannel.send("なろう取得不具合:"+str(e))
 
