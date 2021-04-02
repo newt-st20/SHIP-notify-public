@@ -37,6 +37,8 @@ def main():
 
 
 def add(ncode):
+    if 'ncode' in ncode:
+        return ["error", "第2引数にはURLの末尾にある小説のncodeを入れてください。"]
     response = requests.get(
         'https://api.syosetu.com/novelapi/api/?out=json&ncode='+ncode+'&of=t-gl-ga-e')
     try:
@@ -47,6 +49,11 @@ def add(ncode):
         end = responseJson[1]['end']
         with get_connection() as conn:
             with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT ncode, lastup, count, title FROM narou')
+                result = cur.fetchall()
+                if len(result) != 0:
+                    return ["error", "この小説はすでに更新通知リストに追加されています。"]
                 cur.execute('INSERT INTO narou (title, ncode, lastup, count, ended) VALUES (%s, %s, %s, %s, %s)', [
                     title, ncode, lastUpdate, count, end])
             conn.commit()
