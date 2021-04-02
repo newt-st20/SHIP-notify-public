@@ -351,18 +351,24 @@ async def on_message(message):
 @client.event
 async def on_raw_reaction_add(payload):
     await client.wait_until_ready()
+    guild = client.get_guild(payload.guild_id)
+    member = guild.get_member(payload.user_id)
+    user = client.get_user(payload.user_id)
     entranceMessageId = 817952115095109633
+    narouRoleMessageId = 827415329223213066
     roleLogChannel = client.get_channel(817401458244714506)
     if payload.message_id == entranceMessageId:
-        guild = client.get_guild(payload.guild_id)
-        member = guild.get_member(payload.user_id)
         authenticatedRole = guild.get_role(813014134001500170)
         await member.add_roles(authenticatedRole)
         unauthenticatedRole = guild.get_role(813015195881570334)
         await member.remove_roles(unauthenticatedRole)
         user = client.get_user(payload.user_id)
         await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与し、'+unauthenticatedRole.mention+'ロールを剥奪しました。')
-
+    elif payload.message_id == narouRoleMessageId:
+        if payload.emoji.name == '1️⃣':
+            narouRole = guild.get_role(827413046968320040)
+            await member.add_roles(narouRole)
+            await roleLogChannel.send(user.mention+'に'+narouRole.mention+'ロールを付与しました。')
 
 @tasks.loop(seconds=600)
 async def loop():
