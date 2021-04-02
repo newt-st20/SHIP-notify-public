@@ -52,24 +52,28 @@ def add(ncode):
             conn.commit()
     except Exception as e:
         print(str(e))
-        return str(e)
-    return "success"
+        return ["error", str(e)]
+    return ["success", title, "https://ncode.syosetu.com/"+ncode]
 
 
 def remove(ncode):
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                'SELECT ncode, lastup, count, title FROM narou')
-            result = cur.fetchall()
-            if len(result) != 0:
-                try:
-                    cur.execute(
-                        'DELETE FROM narou WHERE ncode = %s', [ncode])
-                except Exception as e:
-                    return str(e)
-        conn.commit()
-    return "success"
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT ncode, lastup, count, title FROM narou')
+                result = cur.fetchall()
+                if len(result) != 0:
+                    try:
+                        cur.execute(
+                            'DELETE FROM narou WHERE ncode = %s', [ncode])
+                    except Exception as e:
+                        return str(e)
+            conn.commit()
+    except Exception as e:
+        print(str(e))
+        return ["error", str(e)]
+    return ["success", "https://ncode.syosetu.com/"+ncode]
 
 
 def list():
