@@ -40,6 +40,8 @@ async def on_ready():
     wakeLogChannel = client.get_channel(817389202161270794)
     wakeMessage = os.environ['STATUS'] + ": 起動しました"
     await wakeLogChannel.send(wakeMessage)
+    game = discord.Game("commands: sh!help")
+    await client.change_presence(activity=game)
 
 
 @client.event
@@ -70,7 +72,15 @@ async def on_message(message):
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
         elif 'help' in message.content:
-            content = '[DM] `sh!info` '
+            content = '※ [S]表記のあるものはDMでは利用不可'
+            content += '\n`sh!info` idからSHIP上のファイル名や投稿日などを取得'
+            content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す'
+            content += '\n`sh!recently` SHIPの最近の更新を一覧表示'
+            content += '\n`sh!wiki` Wikipediaを検索'
+            content += '\n`sh!nhk` NHKで現在放送している番組を取得'
+            content += '\n`sh!naroulist` なろう通知チャンネルで通知する小説のリスト'
+            content += '\n`sh!narouadd` なろう通知チャンネルで通知する小説の追加'
+            content += '\n`sh!narouremove` なろう通知チャンネルで通知する小説の削除'
             embed = discord.Embed(title="コマンド一覧 /lastupdate: 2021-04-03",
                                   description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
@@ -341,6 +351,9 @@ async def on_message(message):
             except Exception as e:
                 await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
         elif 'narouadd' in message.content:
+            if len(message.content.split()) != 2:
+                await message.channel.send('第2引数に小説のURLの末尾にあるncodeを入れてください。')
+                return
             ncode = message.content.split()[1]
             resMessage = narou.add(ncode)
             if resMessage[0] == "success":
@@ -348,6 +361,9 @@ async def on_message(message):
             else:
                 await message.channel.send('エラー: '+resMessage[1])
         elif 'narouremove' in message.content:
+            if len(message.content.split()) != 2:
+                await message.channel.send('第2引数に小説のURLの末尾にあるncodeを入れてください。')
+                return
             ncode = message.content.split()[1]
             resMessage = narou.remove(ncode)
             if resMessage[0] == "success":
