@@ -20,6 +20,16 @@ load_dotenv()
 
 TOKEN = os.environ['DISCORD_TOKEN']
 
+
+def isint(s):  # 整数値を表しているかどうかを判定
+    try:
+        int(s, 10)  # 文字列を実際にint関数で変換してみる
+    except ValueError:
+        return False  # 例外が発生＝変換できないのでFalseを返す
+    else:
+        return True  # 変換できたのでTrueを返す
+
+
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
@@ -30,8 +40,6 @@ async def on_ready():
     wakeLogChannel = client.get_channel(817389202161270794)
     wakeMessage = os.environ['STATUS'] + ": 起動しました"
     await wakeLogChannel.send(wakeMessage)
-    game = discord.Game("prefix: [sh!]")
-    await client.change_presence(activity=game)
 
 
 @client.event
@@ -49,6 +57,9 @@ async def on_member_remove(member):
 
 @client.event
 async def on_message(message):
+    def check(msg):
+        return msg.author == message.author
+
     await client.wait_until_ready()
     dmLogChannel = client.get_channel(817971315138756619)
     conHighChannel = client.get_channel(818066947463053312)
@@ -58,133 +69,176 @@ async def on_message(message):
     if 'sh!' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
-        elif 'info' in message.content or message.content == 'sh!i':
-            def check(msg):
-                return msg.author == message.author
-            try:
-                idMessage = ""
-                embed = discord.Embed(title="情報取得", description="情報を取得したいもののidを入力してください。idは通知チャンネル("+conHighChannel.mention +
-                                      ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(190, 252, 3))
-                await message.channel.send(embed=embed)
-                idMessage = await client.wait_for("message", check=check, timeout=60)
-                try:
-                    idMessageTyped = int(idMessage.content)
-                except:
-                    if 'recently' in idMessage.content or idMessage.content == 'sh!r':
-                        pass
-                    else:
-                        await message.channel.send("入力された文字は数字ではありません。最初からやり直してください。")
-                        pass
-                data = search.info(idMessageTyped)
-                if len(data) == 0:
-                    embed = discord.Embed(
-                        title=idMessage.content, description="指定されたidに該当するファイルがデータベースに見つかりませんでした")
-                else:
-                    body = "`page` "+data[0][4]+"\n"
-                    body += "`id` "+idMessage.content+"\n"
-                    body += "`date` "+str(data[0][1]).replace("-", "/")+"\n"
-                    body += "`folder` "+data[0][2]+"\n"
-                    if data[0][4] == "高校連絡事項" or data[0][4] == "高校学習教材":
-                        linkList = str(data[0][3])[1:-1].split(",")
-                        body += "`file` "+str(len(linkList))+"\n"
-                    if data[0][4] == "高校連絡事項" or data[0][4] == "中学連絡事項":
-                        body += "`link` https://ship.sakae-higashi.jp/sub_window_anke/?obj_id=" + \
-                            idMessage.content+"&t=3\n"
-                    elif data[0][4] == "高校学習教材" or data[0][4] == "中学学習教材":
-                        body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
-                            idMessage.content+"&t=7\n"
-                    body += "※リンクはSHIPにログインした状態でのみ開けます"
-                    embed = discord.Embed(
-                        title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
-                await message.channel.send(embed=embed)
-            except Exception as e:
-                if idMessage != "":
-                    pass
-                else:
-                    await message.channel.send("セッションがタイムアウトしました"+str(e))
-        elif 'file' in message.content or 'download' in message.content or message.content == 'sh!f' or message.content == 'sh!d':
-            def check(msg):
-                return msg.author == message.author
-            try:
-                idMessage = ""
-                embed = discord.Embed(title="ファイル取得", description="ダウンロードリンクを表示したいもののidを入力してください。idは通知チャンネル("+conHighChannel.mention +
-                                      ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(50, 168, 82))
-                await message.channel.send(embed=embed)
-                idMessage = await client.wait_for("message", check=check, timeout=60)
-                try:
-                    idMessageTyped = int(idMessage.content)
-                except:
-                    if 'recently' in idMessage.content or idMessage.content == 'sh!r':
-                        pass
-                    else:
-                        await message.channel.send("入力された文字は数字ではありません。最初からやり直してください。")
-                        pass
-                data = search.file(int(idMessage.content))
-                if len(data) == 0 or str(data[0][1]) == "{}":
-                    embed = discord.Embed(
-                        description="指定されたidに該当するファイルがデータベースに見つかりませんでした")
-                else:
-                    linkList = str(data[0][1])[1:-1].split(",")
-                    body = ""
-                    lc = 1
-                    for link in linkList:
-                        body += "`" + str(lc) + ".` " + link + "\n"
-                        lc += 1
-                    embed = discord.Embed(
-                        title=data[0][0]+" - "+str(data[0][2]).replace("-", "/"), description=body, color=discord.Colour.from_rgb(50, 168, 82))
-                await message.channel.send(embed=embed)
-            except Exception as e:
-                if idMessage != "":
-                    pass
-                else:
-                    await message.channel.send("セッションがタイムアウトしました:"+str(e))
-        elif 'recently' in message.content or message.content == 'sh!r':
-            def check(msg):
-                return msg.author == message.author
-            embed = discord.Embed(title="最近の更新の取得",
-                                  description="高校連絡事項→ `1`\n高校学習教材→ `2`\n中学連絡事項→ `3`\n中学学習教材→ `4`", color=discord.Colour.from_rgb(252, 186, 3))
+        elif 'help' in message.content:
+            content = '[DM] `sh!info` '
+            embed = discord.Embed(title="コマンド一覧 /lastupdate: 2021-04-03",
+                                  description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
-            try:
-                typeMessage = await client.wait_for("message", check=check, timeout=60)
-                data = search.count(int(typeMessage.content))
-                if data == 0:
-                    embed = discord.Embed(
-                        description="指定されたtypeに該当するオブジェクトがデータベースに見つかりませんでした")
+        elif 'info' in message.content or message.content == 'sh!i':
+            flag = False
+            if len(message.content.split()) == 2:
+                if isint(message.content.split()[1]):
+                    idIntMessage = int(message.content.split()[1])
+                    flag = True
+            if flag == False:
+                try:
+                    idMessage = ""
+                    embed = discord.Embed(title="情報取得", description="情報を取得したいファイルのidを入力してください。idは通知チャンネル("+conHighChannel.mention +
+                                          ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(190, 252, 3))
                     await message.channel.send(embed=embed)
-                else:
+                    idMessage = await client.wait_for("message", check=check, timeout=60)
+                    if isint(idMessage.content) == False:
+                        if 'sh!' in idMessage.content:
+                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                        else:
+                            await idMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                        return
+                    idIntMessage = int(idMessage.content)
+                except Exception as e:
+                    if idMessage == "":
+                        await message.reply("セッションがタイムアウトしました"+str(e))
+                    return
+            data = search.info(idIntMessage)
+            if len(data) == 0:
+                await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。")
+                return
+            body = "`page` "+data[0][4]+"\n"
+            body += "`id` "+str(idIntMessage)+"\n"
+            body += "`date` "+str(data[0][1]).replace("-", "/")+"\n"
+            body += "`folder` "+data[0][2]+"\n"
+            if data[0][4] == "高校連絡事項" or data[0][4] == "高校学習教材":
+                linkList = str(data[0][3])[1:-1].split(",")
+                body += "`file` "+str(len(linkList))+"\n"
+            if data[0][4] == "高校連絡事項" or data[0][4] == "中学連絡事項":
+                body += "`link` https://ship.sakae-higashi.jp/sub_window_anke/?obj_id=" + \
+                    str(idIntMessage)+"&t=3\n"
+            elif data[0][4] == "高校学習教材" or data[0][4] == "中学学習教材":
+                body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
+                    str(idIntMessage)+"&t=7\n"
+            body += "※リンクはSHIPにログインした状態でのみ開けます"
+            embed = discord.Embed(
+                title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
+            await message.channel.send(embed=embed)
+        elif 'file' in message.content or message.content == 'sh!f' or 'download' in message.content or message.content == 'sh!d':
+            flag = False
+            if len(message.content.split()) == 2:
+                if isint(message.content.split()[1]):
+                    idIntMessage = int(message.content.split()[1])
+                    flag = True
+            if flag == False:
+                try:
+                    idMessage = ""
+                    embed = discord.Embed(title="ファイル取得", description="ダウンロードリンクを表示したいもののidを入力してください。idは通知チャンネル("+conHighChannel.mention +
+                                          ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(50, 168, 82))
+                    await message.channel.send(embed=embed)
+                    idMessage = await client.wait_for("message", check=check, timeout=60)
+                    if isint(idMessage.content) == False:
+                        if 'sh!' in idMessage.content:
+                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                        else:
+                            await idMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                        return
+                    idIntMessage = int(idMessage.content)
+                except Exception as e:
+                    if idMessage == "":
+                        await message.reply("セッションがタイムアウトしました"+str(e))
+                    return
+            data = search.file(idIntMessage)
+            if len(data) == 0 or str(data[0][1]) == "{}":
+                await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。")
+                return
+            linkList = str(data[0][1])[1:-1].split(",")
+            body = ""
+            lc = 1
+            for link in linkList:
+                body += "`" + str(lc) + ".` " + link + "\n"
+                lc += 1
+            embed = discord.Embed(
+                title=data[0][0]+" - "+str(data[0][2]).replace("-", "/"), description=body, color=discord.Colour.from_rgb(50, 168, 82))
+            await message.channel.send(embed=embed)
+        elif 'recently' in message.content or message.content == 'sh!r':
+            flag = False
+            if len(message.content.split()) == 3:
+                if isint(message.content.split()[1]) and isint(message.content.split()[1]):
+                    typeIntMessage = int(message.content.split()[1])
+                    howmanyIntMessage = int(message.content.split()[2])
+                    flag = True
+            if flag == False:
+                embed = discord.Embed(title="最近の更新の取得",
+                                      description="高校連絡事項→ `1`\n高校学習教材→ `2`\n中学連絡事項→ `3`\n中学学習教材→ `4`", color=discord.Colour.from_rgb(252, 186, 3))
+                await message.channel.send(embed=embed)
+                try:
+                    typeMessage = await client.wait_for("message", check=check, timeout=60)
+                    if isint(typeMessage.content) == False:
+                        if 'sh!' in typeMessage.content:
+                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                        else:
+                            await typeMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                        return
+                    typeIntMessage = int(typeMessage.content)
+                    data = search.count(typeIntMessage)
+                    if data == 0:
+                        await typeMessage.reply("指定されたタイプは存在しません。")
+                        return
                     await message.channel.send(str(data)+"件のデータが見つかりました。何件表示しますか？(最大30件まで)")
                     try:
-                        howmany = await client.wait_for("message", check=check, timeout=60)
-                        mainData = search.recently(
-                            int(typeMessage.content), int(howmany.content))
-                        body = ""
-                        lc = 1
-                        for eachData in mainData:
-                            body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(
-                                eachData[1].strftime('%Y/%m/%d')) + "\n"
-                            if int(howmany.content) == lc or lc == 30:
-                                break
-                            lc += 1
-                        if body == "":
-                            body = "empty"
-                        if int(typeMessage.content) == 1:
-                            titlebody = "最近の高校連絡事項"
-                        elif int(typeMessage.content) == 2:
-                            titlebody = "最近の高校学習教材"
-                        elif int(typeMessage.content) == 3:
-                            titlebody = "最近の中学連絡事項"
-                        elif int(typeMessage.content) == 4:
-                            titlebody = "最近の中学学習教材"
-                        embed = discord.Embed(
-                            title=titlebody, description=body, color=discord.Colour.from_rgb(252, 186, 3))
-                        await message.channel.send(embed=embed)
+                        howmanyMessage = await client.wait_for("message", check=check, timeout=60)
+                        if isint(howmanyMessage.content) == False:
+                            if 'sh!' in howmanyMessage.content:
+                                await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                            else:
+                                await howmanyMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                            return
+                        howmanyIntMessage = int(howmanyMessage.content)
                     except Exception as e:
-                        await message.channel.send("セッションがタイムアウトしました:"+str(e))
-            except Exception as e:
-                await message.channel.send("セッションがタイムアウトしました:"+str(e))
+                        await howmanyMessage.reply("セッションがタイムアウトしました"+str(e))
+                        return
+                except Exception as e:
+                    await typeMessage.reply("セッションがタイムアウトしました"+str(e))
+            mainData = search.recently(typeIntMessage, howmanyIntMessage)
+            body = ""
+            lc = 1
+            for eachData in mainData:
+                body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(
+                    eachData[1].strftime('%Y/%m/%d')) + "\n"
+                if howmanyIntMessage == lc or lc == 30:
+                    break
+                lc += 1
+            if body == "":
+                body = "empty"
+            if typeIntMessage == 1:
+                titlebody = "最近の高校連絡事項"
+            elif typeIntMessage == 2:
+                titlebody = "最近の高校学習教材"
+            elif typeIntMessage == 3:
+                titlebody = "最近の中学連絡事項"
+            elif typeIntMessage == 4:
+                titlebody = "最近の中学学習教材"
+            embed = discord.Embed(
+                title=titlebody, description=body, color=discord.Colour.from_rgb(252, 186, 3))
+            await message.channel.send(embed=embed)
         # Wikipedia検索
         elif 'wiki' in message.content:
-            word = message.content.split()[1]
+            flag = False
+            if len(message.content.split()) == 2:
+                if isint(message.content.split()[1]):
+                    word = int(message.content.split()[1])
+                    flag = True
+            if flag == False:
+                try:
+                    wordMessage = ""
+                    embed = discord.Embed(
+                        title="Wikipedia検索", description="検索したいワードを入力してください。")
+                    await message.channel.send(embed=embed)
+                    wordMessage = await client.wait_for("message", check=check, timeout=60)
+                    if 'sh!' in wordMessage.content:
+                        await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                        return
+                    word = int(wordMessage.content)
+                except Exception as e:
+                    if wordMessage == "":
+                        await message.reply("セッションがタイムアウトしました"+str(e))
+                    return
             await message.channel.send('Wikipediaで`'+word+'`を検索...')
             wikipedia.set_lang("ja")
             response = wikipedia.search(word)
@@ -204,35 +258,136 @@ async def on_message(message):
             except Exception as e:
                 await message.channel.send("エラー:"+str(e))
         elif 'neko' in message.content:
-            def check(msg):
-                return msg.author == message.author
             await message.channel.send('にゃーん')
             wait_message = await client.wait_for("message", check=check)
             await message.channel.send(wait_message.content)
+        elif 'nhk' in message.content:
+            jsonLoad = json.load(
+                open('json/nhk.json', 'r', encoding="utf-8_sig"))
+            jsonAreaData = jsonLoad["areas"]
+            jsonChannelData = jsonLoad["channels"]
+            body = ''
+            idList = []
+            for i in jsonAreaData:
+                body += '\n`' + i['id'] + '` **'+i['title']+'**'
+                idList.append(i['id'])
+            flag = False
+            if len(message.content.split()) == 3:
+                if isint(message.content.split()[1]) and isint(message.content.split()[1]):
+                    nhkAreaId = message.content.split()[1]
+                    nhkChannelId = int(message.content.split()[2]) - 1
+                    if nhkAreaId in idList and nhkChannelId < len(jsonChannelData):
+                        nhkAreaLen = idList.index(nhkAreaId)
+                        flag = True
+            if flag == False:
+                await message.channel.send('🗾地域を選択してください'+body)
+                try:
+                    nhkAreaMessage = await client.wait_for("message", check=check, timeout=60)
+                    if nhkAreaMessage.content not in idList:
+                        if 'sh!' in nhkAreaMessage.content:
+                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                        else:
+                            await nhkAreaMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                        return
+                    nhkAreaId = nhkAreaMessage.content
+                    nhkAreaLen = idList.index(nhkAreaId)
+                    body = ''
+                    c = 0
+                    for i in jsonChannelData:
+                        body += '\n`' + str(c+1) + '` **'+i['title']+'**'
+                        c += 1
+                    await message.channel.send('📺チャンネルを選択してください'+body)
+                    try:
+                        nhkChannelMessage = await client.wait_for("message", check=check, timeout=60)
+                        if isint(nhkChannelMessage.content) == False:
+                            if 'sh!' in nhkChannelMessage.content:
+                                await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                            else:
+                                await nhkChannelMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                            return
+                        nhkChannelId = int(nhkChannelMessage.content) - 1
+                        if nhkChannelId > len(jsonChannelData):
+                            await nhkChannelMessage.reply("入力された数字に対応するチャンネルがありません。最初からやり直してください。")
+                            return
+                    except Exception as e:
+                        await message.reply("セッションがタイムアウトしました"+str(e))
+                except Exception as e:
+                    await message.reply("セッションがタイムアウトしました"+str(e))
+            response = requests.get(
+                "https://api.nhk.or.jp/v2/pg/now/"+nhkAreaId+"/"+jsonChannelData[nhkChannelId]['id']+'.json?key='+os.environ['NHK_ACCESS_KEY'])
+            responseJson = response.json()
+            try:
+                responseDataPresent = responseJson['nowonair_list'][jsonChannelData[nhkChannelId]['id']]['present']
+                responseDataFollowing = responseJson['nowonair_list'][
+                    jsonChannelData[nhkChannelId]['id']]['following']
+                present = '`title` **'+responseDataPresent['title']+'**\n`subtitle` '+responseDataPresent['subtitle'] + \
+                    '\n`start` ' + \
+                    responseDataPresent['start_time']+'\n`end` ' + \
+                    responseDataPresent['end_time']+'\n'
+                following = '`title` **'+responseDataFollowing['title']+'**\n`subtitle` '+responseDataFollowing['subtitle'] + \
+                    '\n`start` '+responseDataFollowing['start_time'] + \
+                    '\n`end` '+responseDataFollowing['end_time']+'\n'
+                embed = discord.Embed(title='📺'+jsonChannelData[nhkChannelId]['title'] +
+                                      '('+jsonAreaData[nhkAreaLen]['title']+')', color=discord.Colour.from_rgb(50, 168, 82))
+                embed.add_field(name="▶現在放送中", value=present, inline=False)
+                embed.add_field(name="▶▶次に放送予定", value=following, inline=False)
+                await message.channel.send(embed=embed)
+            except Exception as e:
+                await message.reply("エラー"+str(e))
+        elif 'naroucheck' in message.content:
+            try:
+                await getNarou()
+                await message.channel.send('なろうの更新取得処理が完了しました')
+            except Exception as e:
+                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif 'narouadd' in message.content:
+            ncode = message.content.split()[1]
+            resMessage = narou.add(ncode)
+            if resMessage[0] == "success":
+                await message.channel.send('更新通知リストに**'+resMessage[1]+'** ( '+resMessage[2] + ' ) を追加しました。')
+            else:
+                await message.channel.send('エラー: '+resMessage[1])
+        elif 'narouremove' in message.content:
+            ncode = message.content.split()[1]
+            resMessage = narou.remove(ncode)
+            if resMessage[0] == "success":
+                await message.channel.send('更新通知リストから '+resMessage[1] + ' ) を削除しました。')
+            else:
+                await message.channel.send('エラー: '+resMessage[1])
+        elif 'naroulist' in message.content:
+            try:
+                data = narou.list()
+                for i in data:
+                    body = ""
+                    body += "**title** " + \
+                        i[1]+" ( https://ncode.syosetu.com/"+i[0]+" )\n"
+                    await message.channel.send(body)
+            except Exception as e:
+                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        if message.author.guild_permissions.administrator:
+            if message.content == 'sa!get':
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getData()
+                    await message.channel.send('処理が完了しました')
+                except Exception as e:
+                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            elif message.content == 'sa!shnews':
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getNewsData()
+                    await message.channel.send('処理が完了しました')
+                except Exception as e:
+                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            elif message.content == 'sa!count':
+                guild = message.guild
+                member_count = guild.member_count
+                user_count = sum(
+                    1 for member in guild.members if not member.bot)
+                bot_count = sum(1 for member in guild.members if member.bot)
+                await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
         else:
             await message.channel.send('このコマンドは用意されていません')
-    # 管理者用コマンド
-    if 'sa!' in message.content and message.author.guild_permissions.administrator:
-        if message.content == 'sa!get':
-            await message.channel.send('データの取得を開始します')
-            try:
-                await getData()
-                await message.channel.send('処理が完了しました')
-            except Exception as e:
-                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif message.content == 'sa!shnews':
-            await message.channel.send('データの取得を開始します')
-            try:
-                await getNewsData()
-                await message.channel.send('処理が完了しました')
-            except Exception as e:
-                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif message.content == 'sa!count':
-            guild = message.guild
-            member_count = guild.member_count
-            user_count = sum(1 for member in guild.members if not member.bot)
-            bot_count = sum(1 for member in guild.members if member.bot)
-            await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
     if isinstance(message.channel, discord.DMChannel):
         embed = discord.Embed(title="DMを受信しました")
         embed.add_field(name="ユーザー名",
@@ -274,78 +429,6 @@ async def on_message(message):
                          icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
-    # その他どうでもいいコマンド
-    if 'op!' in message.content:
-        if message.content == 'op!nhk':
-            def check(msg):
-                return msg.author == message.author
-            jsonOpen = open('json/nhk.json', 'r', encoding="utf-8_sig")
-            jsonLoad = json.load(jsonOpen)
-            jsonAreaData = jsonLoad["areas"]
-            body = ''
-            c = 0
-            for i in jsonAreaData:
-                body += '\n`' + str(c+1) + '` **'+i['title']+'**'
-                c += 1
-            await message.channel.send('🗾地域を選択してください'+body)
-            nhkAreaId = await client.wait_for("message", check=check, timeout=60)
-            jsonChannelData = jsonLoad["channnels"]
-            body = ''
-            c = 0
-            for i in jsonChannelData:
-                body += '\n`' + str(c+1) + '` **'+i['title']+'**'
-                c += 1
-            await message.channel.send('📺チャンネルを選択してください'+body)
-            nhkChannnelId = await client.wait_for("message", check=check, timeout=60)
-            response = requests.get(
-                "https://api.nhk.or.jp/v2/pg/now/"+jsonAreaData[int(nhkAreaId.content)-1]['id']+"/"+jsonChannelData[int(nhkChannnelId.content)-1]['id']+'.json?key='+os.environ['NHK_ACCESS_KEY'])
-            responseJson = response.json()
-            responseDataPresent = responseJson['nowonair_list'][jsonChannelData[int(
-                nhkChannnelId.content)-1]['id']]['present']
-            responseDataFollowing = responseJson['nowonair_list'][jsonChannelData[int(
-                nhkChannnelId.content)-1]['id']]['following']
-            present = '`title` **'+responseDataPresent['title']+'**\n`subtitle` '+responseDataPresent['subtitle'] + \
-                '\n`start` ' + \
-                responseDataPresent['start_time']+'\n`end` ' + \
-                responseDataPresent['end_time']+'\n'
-            following = '`title` **'+responseDataFollowing['title']+'**\n`subtitle` '+responseDataFollowing['subtitle'] + \
-                '\n`start` '+responseDataFollowing['start_time'] + \
-                '\n`end` '+responseDataFollowing['end_time']+'\n'
-            embed = discord.Embed(title='📺'+jsonChannelData[int(nhkChannnelId.content)-1]['title']+'('+jsonAreaData[int(
-                nhkAreaId.content)-1]['title']+')', color=discord.Colour.from_rgb(50, 168, 82))
-            embed.add_field(name="▶現在放送中", value=present, inline=False)
-            embed.add_field(name="🔜次に放送予定", value=following, inline=False)
-            await message.channel.send(embed=embed)
-        elif message.content == 'op!naroucheck':
-            try:
-                await getNarou()
-                await message.channel.send('なろうの更新取得処理が完了しました')
-            except Exception as e:
-                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif 'op!narouadd' in message.content:
-            ncode = message.content.split()[1]
-            resMessage = narou.add(ncode)
-            if resMessage[0] == "success":
-                await message.channel.send('更新通知リストに**'+resMessage[1]+'** ( '+resMessage[2] + ' ) を追加しました。')
-            else:
-                await message.channel.send('エラー: '+resMessage[1])
-        elif 'op!narouremove' in message.content:
-            ncode = message.content.split()[1]
-            resMessage = narou.remove(ncode)
-            if resMessage[0] == "success":
-                await message.channel.send('更新通知リストから '+resMessage[1] + ' ) を削除しました。')
-            else:
-                await message.channel.send('エラー: '+resMessage[1])
-        elif message.content == 'op!naroulist':
-            try:
-                data = narou.list()
-                for i in data:
-                    body = ""
-                    body += "**title** " + \
-                        i[1]+" ( https://ncode.syosetu.com/"+i[0]+" )\n"
-                    await message.channel.send(body)
-            except Exception as e:
-                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
 
 
 @client.event
@@ -369,6 +452,7 @@ async def on_raw_reaction_add(payload):
             narouRole = guild.get_role(827413046968320040)
             await member.add_roles(narouRole)
             await roleLogChannel.send(user.mention+'に'+narouRole.mention+'ロールを付与しました。')
+
 
 @tasks.loop(seconds=600)
 async def loop():
@@ -567,6 +651,7 @@ async def getNarou():
             await narouChannel.send(embed=embed)
     except Exception as e:
         await getLogChannel.send("なろう取得不具合:"+str(e))
+
 
 loop.start()
 
