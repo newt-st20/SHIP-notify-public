@@ -123,8 +123,7 @@ def main():
                         "table")[-2].text.replace("\n", "")
                     eachconList.append(conPageDescription)
                     if schooltype == "high":
-                        conPageLinks = conPageMain.find_all(
-                            "table")[-1].find_all("a")
+                        conPageLinks = conPageMain.find_all("a")
                         conPageLinkList = []
                         for eachConPageLink in conPageLinks:
                             driver.get("https://ship.sakae-higashi.jp" +

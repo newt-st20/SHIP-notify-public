@@ -468,6 +468,10 @@ async def on_raw_reaction_add(payload):
             narouRole = guild.get_role(827413046968320040)
             await member.add_roles(narouRole)
             await roleLogChannel.send(user.mention+'に'+narouRole.mention+'ロールを付与しました。')
+        else:
+            narouRole = guild.get_role(827413046968320040)
+            await member.add_roles(narouRole)
+            await roleLogChannel.send(payload.emoji.name)
 
 
 @tasks.loop(seconds=600)
