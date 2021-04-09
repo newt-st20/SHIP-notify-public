@@ -9,6 +9,7 @@ import requests
 import wikipedia
 from discord.ext import tasks
 from dotenv import load_dotenv
+import urllib.request
 
 import search
 import shipcheck
@@ -161,11 +162,12 @@ async def on_message(message):
             body = ""
             lc = 1
             for link in linkList:
-                body += "`" + str(lc) + ".` " + link + "\n"
+                fileName = link.split(
+                    '%2F')[-1].split('.pdf')[0]+"-"+str(lc)+".pdf"
+                urllib.request.urlretrieve(link, fileName)
+                file = discord.File(fileName, filename=fileName)
+                await message.channel.send(file=file)
                 lc += 1
-            embed = discord.Embed(
-                title=data[0][0]+" - "+str(data[0][2]).replace("-", "/"), description=body, color=discord.Colour.from_rgb(50, 168, 82))
-            await message.channel.send(embed=embed)
         elif 'recently' in message.content or message.content == 'sh!r':
             flag = False
             if len(message.content.split()) == 3:
@@ -380,30 +382,30 @@ async def on_message(message):
                     await message.channel.send(body)
             except Exception as e:
                 await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        if message.author.guild_permissions.administrator:
-            if message.content == 'sa!get':
-                await message.channel.send('データの取得を開始します')
-                try:
-                    await getData()
-                    await message.channel.send('処理が完了しました')
-                except Exception as e:
-                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-            elif message.content == 'sa!shnews':
-                await message.channel.send('データの取得を開始します')
-                try:
-                    await getNewsData()
-                    await message.channel.send('処理が完了しました')
-                except Exception as e:
-                    await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-            elif message.content == 'sa!count':
-                guild = message.guild
-                member_count = guild.member_count
-                user_count = sum(
-                    1 for member in guild.members if not member.bot)
-                bot_count = sum(1 for member in guild.members if member.bot)
-                await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
         else:
             await message.channel.send('このコマンドは用意されていません')
+    if message.author.guild_permissions.administrator:
+        if message.content == 'sa!get':
+            await message.channel.send('データの取得を開始します')
+            try:
+                await getData()
+                await message.channel.send('処理が完了しました')
+            except Exception as e:
+                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif message.content == 'sa!shnews':
+            await message.channel.send('データの取得を開始します')
+            try:
+                await getNewsData()
+                await message.channel.send('処理が完了しました')
+            except Exception as e:
+                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif message.content == 'sa!count':
+            guild = message.guild
+            member_count = guild.member_count
+            user_count = sum(
+                1 for member in guild.members if not member.bot)
+            bot_count = sum(1 for member in guild.members if member.bot)
+            await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
     if isinstance(message.channel, discord.DMChannel):
         embed = discord.Embed(title="DMを受信しました")
         embed.add_field(name="ユーザー名",
@@ -445,6 +447,11 @@ async def on_message(message):
                          icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
+    if message.content == "aaaaa":
+        urllib.request.urlretrieve(
+            "https://firebasestorage.googleapis.com/v0/b/ship-assistant.appspot.com/o/pdf%2Fhigh-study%2F32374%2Fkobun2_202103192119570.pdf?alt=media", "test.pdf")
+        file = discord.File("test.pdf", filename="test.pdf")
+        await message.channel.send(file=file)
 
 
 @client.event
