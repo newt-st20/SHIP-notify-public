@@ -22,13 +22,13 @@ load_dotenv()
 TOKEN = os.environ['DISCORD_TOKEN']
 
 
-def isint(s):  # 整数値を表しているかどうかを判定
+def isint(s):
     try:
-        int(s, 10)  # 文字列を実際にint関数で変換してみる
+        int(s, 10)
     except ValueError:
-        return False  # 例外が発生＝変換できないのでFalseを返す
+        return False
     else:
-        return True  # 変換できたのでTrueを返す
+        return True
 
 
 intents = discord.Intents.all()
@@ -82,7 +82,7 @@ async def on_message(message):
             content += '\n`sh!naroulist` なろう通知チャンネルで通知する小説のリスト'
             content += '\n`sh!narouadd` なろう通知チャンネルで通知する小説の追加'
             content += '\n`sh!narouremove` なろう通知チャンネルで通知する小説の削除'
-            embed = discord.Embed(title="コマンド一覧 /lastupdate: 2021-04-03",
+            embed = discord.Embed(title="コマンド一覧 /lastupdate: 2021-04-10",
                                   description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
@@ -446,11 +446,6 @@ async def on_message(message):
                          icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
-    if "dm" in message.content:
-        userId = int(message.content.split()[1])
-        user = client.get_user(userId)
-        await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバーの参加者に一斉送信されたものです__")
-        await user.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
 
 
 @client.event
