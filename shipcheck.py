@@ -16,8 +16,6 @@ load_dotenv()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
-
-
 config = {
     'apiKey': os.environ['FIREBASE_API_KEY'],
     'authDomain': os.environ['FIREBASE_AUTH_DOMAIN'],
