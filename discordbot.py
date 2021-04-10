@@ -69,14 +69,14 @@ async def on_message(message):
     studyHighChannel = client.get_channel(818066981982830613)
     if message.author.bot:
         return
-    if 'sh!' in message.content:
+    if 'sh!' in message.content or '-' in message.content:
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
         elif 'help' in message.content:
             content = '※ [S]表記のあるものはDMでは利用不可'
-            content += '\n`sh!info` idからSHIP上のファイル名や投稿日などを取得'
-            content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す'
-            content += '\n`sh!recently` SHIPの最近の更新を一覧表示'
+            content += '\n`sh!info` idからSHIP上のファイル名や投稿日などを取得。省略形は`-i`'
+            content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す。省略形は`-f`'
+            content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
             content += '\n`sh!wiki` Wikipediaを検索'
             content += '\n`sh!nhk` NHKで現在放送している番組を取得'
             content += '\n`sh!naroulist` なろう通知チャンネルで通知する小説のリスト'
@@ -85,7 +85,7 @@ async def on_message(message):
             embed = discord.Embed(title="コマンド一覧 /lastupdate: 2021-04-03",
                                   description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
-        elif 'info' in message.content or message.content == 'sh!i':
+        elif 'info' in message.content or '-i' in message.content:
             flag = False
             if len(message.content.split()) == 2:
                 if isint(message.content.split()[1]):
@@ -130,7 +130,7 @@ async def on_message(message):
             embed = discord.Embed(
                 title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
-        elif 'file' in message.content or message.content == 'sh!f' or 'download' in message.content or message.content == 'sh!d':
+        elif 'file' in message.content or '-f' in message.content or 'download' in message.content or '-d' in message.content:
             flag = False
             if len(message.content.split()) == 2:
                 if isint(message.content.split()[1]):
@@ -159,7 +159,7 @@ async def on_message(message):
                 await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。")
                 return
             linkList = str(data[0][1])[1:-1].split(",")
-            body = ""
+            await message.channel.send("**"+str(data[0][0]+"** - "+str(data[0][2])))
             lc = 1
             for link in linkList:
                 fileName = link.split(
@@ -168,7 +168,7 @@ async def on_message(message):
                 file = discord.File(fileName, filename=fileName)
                 await message.channel.send(file=file)
                 lc += 1
-        elif 'recently' in message.content or message.content == 'sh!r':
+        elif 'recently' in message.content or 'sh!r' in message.content or '-r' in message.content:
             flag = False
             if len(message.content.split()) == 3:
                 if isint(message.content.split()[1]) and isint(message.content.split()[1]):
@@ -384,28 +384,27 @@ async def on_message(message):
                 await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
         else:
             await message.channel.send('このコマンドは用意されていません')
-    if message.author.guild_permissions.administrator:
-        if message.content == 'sa!get':
-            await message.channel.send('データの取得を開始します')
-            try:
-                await getData()
-                await message.channel.send('処理が完了しました')
-            except Exception as e:
-                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif message.content == 'sa!shnews':
-            await message.channel.send('データの取得を開始します')
-            try:
-                await getNewsData()
-                await message.channel.send('処理が完了しました')
-            except Exception as e:
-                await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif message.content == 'sa!count':
-            guild = message.guild
-            member_count = guild.member_count
-            user_count = sum(
-                1 for member in guild.members if not member.bot)
-            bot_count = sum(1 for member in guild.members if member.bot)
-            await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
+    if message.content == 'sa!get':
+        await message.channel.send('データの取得を開始します')
+        try:
+            await getData()
+            await message.channel.send('処理が完了しました')
+        except Exception as e:
+            await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+    elif message.content == 'sa!shnews':
+        await message.channel.send('データの取得を開始します')
+        try:
+            await getNewsData()
+            await message.channel.send('処理が完了しました')
+        except Exception as e:
+            await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+    elif message.content == 'sa!count':
+        guild = message.guild
+        member_count = guild.member_count
+        user_count = sum(
+            1 for member in guild.members if not member.bot)
+        bot_count = sum(1 for member in guild.members if member.bot)
+        await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
     if isinstance(message.channel, discord.DMChannel):
         embed = discord.Embed(title="DMを受信しました")
         embed.add_field(name="ユーザー名",
@@ -447,11 +446,11 @@ async def on_message(message):
                          icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
-    if message.content == "aaaaa":
-        urllib.request.urlretrieve(
-            "https://firebasestorage.googleapis.com/v0/b/ship-assistant.appspot.com/o/pdf%2Fhigh-study%2F32374%2Fkobun2_202103192119570.pdf?alt=media", "test.pdf")
-        file = discord.File("test.pdf", filename="test.pdf")
-        await message.channel.send(file=file)
+    if "dm" in message.content:
+        userId = int(message.content.split()[1])
+        user = client.get_user(userId)
+        await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバーの参加者に一斉送信されたものです__")
+        await user.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
 
 
 @client.event
@@ -468,17 +467,14 @@ async def on_raw_reaction_add(payload):
         await member.add_roles(authenticatedRole)
         unauthenticatedRole = guild.get_role(813015195881570334)
         await member.remove_roles(unauthenticatedRole)
-        user = client.get_user(payload.user_id)
         await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与し、'+unauthenticatedRole.mention+'ロールを剥奪しました。')
+        await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバー参加時に全員に送信しています__")
+        await user.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
     elif payload.message_id == narouRoleMessageId:
         if payload.emoji.name == '1️⃣':
             narouRole = guild.get_role(827413046968320040)
             await member.add_roles(narouRole)
             await roleLogChannel.send(user.mention+'に'+narouRole.mention+'ロールを付与しました。')
-        else:
-            narouRole = guild.get_role(827413046968320040)
-            await member.add_roles(narouRole)
-            await roleLogChannel.send(payload.emoji.name)
 
 
 @tasks.loop(seconds=600)
@@ -493,6 +489,11 @@ async def loop():
             whenGetConfigMessage = msg.content.lstrip("GET_HOUR=")
             continue
     hourList = [int(x) for x in whenGetConfigMessage.split()]
+    for msg in messages:
+        if "NAROU_GET_HOUR=" in msg.content:
+            whenNarouGetConfigMessage = msg.content.lstrip("NAROU_GET_HOUR=")
+            continue
+    narouHourList = [int(x) for x in whenNarouGetConfigMessage.split()]
     announceMessage = await ruleChannel.fetch_message(821736777391538206)
     if str(hourList) not in str(announceMessage.embeds[0].to_dict()):
         editDatetime = "更新日時: " + \
@@ -513,19 +514,19 @@ async def loop():
                 await getData()
                 await getLogChannel.send('処理が完了しました')
             except Exception as e:
-                await getLogChannel.send('【SHIP】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+                await getLogChannel.send('**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             if random.randrange(10) == 0:
-                await getLogChannel.send('栄東ニュースの取得を開始します')
                 try:
                     await getNewsData()
                     await getLogChannel.send('栄東ニュースの取得処理が完了しました')
                 except Exception as e:
-                    await getLogChannel.send('【栄東ニュース】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        try:
-            await getNarou()
-            await getLogChannel.send('なろうの更新取得処理が完了しました')
-        except Exception as e:
-            await getLogChannel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+                    await getLogChannel.send('**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+        if nowHour in narouHourList:
+            try:
+                await getNarou()
+                await getLogChannel.send('小説家になろうの更新取得処理が完了しました')
+            except Exception as e:
+                await getLogChannel.send('**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
 
 
 async def getData():
