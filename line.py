@@ -11,6 +11,7 @@ load_dotenv()
 if os.environ['STATUS'] == "remote":
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
+    LINE_SUB_CHANNNEL_ACCESS_TOKEN = os.environ["LINE_SUB_CHANNNEL_ACCESS_TOKEN"]
 else:
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
@@ -47,6 +48,10 @@ def main(data):
         'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
+    subheaders = {
+        'Authorization': 'Bearer ' + LINE_SUB_CHANNNEL_ACCESS_TOKEN,
+        'Content-type': 'application/json'
+    }
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     mail = "【" + getTime.replace("-", "/") + "】\n" + message1 + message2
@@ -56,6 +61,7 @@ def main(data):
     print(jsonData)
     if message1 != "" or message2 != "":
         requests.post(broadcastEndPoint, json=jsonData, headers=headers)
+        requests.post(broadcastEndPoint, json=jsonData, headers=subheaders)
         logMessage = "send message:" + \
             str(mail)+" send for all followed user."
         return logMessage

@@ -382,6 +382,8 @@ async def on_message(message):
                     await message.channel.send(body)
             except Exception as e:
                 await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif 'anime' in message.content:
+            return
         else:
             await message.channel.send('このコマンドは用意されていません')
     if message.content == 'sa!get':
