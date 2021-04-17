@@ -5,10 +5,8 @@ import re
 import time
 
 import psycopg2
-import pyrebase
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from psycopg2.extras import DictCursor
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
