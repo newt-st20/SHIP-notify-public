@@ -5,13 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-if os.environ['STATUS'] == "remote":
-    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
-    YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
-    LINE_SUB_CHANNNEL_ACCESS_TOKEN = os.environ["LINE_SUB_CHANNNEL_ACCESS_TOKEN"]
-else:
-    YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
-    YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
+LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
+LINE_SUB_CHANNEL_ACCESS_TOKEN = os.environ["LINE_SUB_CHANNEL_ACCESS_TOKEN"]
 
 
 def main(data):
@@ -40,11 +35,11 @@ def main(data):
         return str(e)
 
     headers = {
-        'Authorization': 'Bearer ' + YOUR_CHANNEL_ACCESS_TOKEN,
+        'Authorization': 'Bearer ' + LINE_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
     subheaders = {
-        'Authorization': 'Bearer ' + LINE_SUB_CHANNNEL_ACCESS_TOKEN,
+        'Authorization': 'Bearer ' + LINE_SUB_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")

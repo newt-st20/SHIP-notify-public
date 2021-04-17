@@ -1,7 +1,6 @@
 import datetime
 import os
 import random
-import re
 import time
 
 import psycopg2
@@ -13,9 +12,6 @@ from selenium.webdriver.chrome.options import Options
 load_dotenv()
 
 DATABASE_URL = os.environ['DATABASE_URL']
-
-
-
 
 def main():
     now = datetime.datetime.now()
