@@ -1,6 +1,3 @@
-from linebot.models import TextSendMessage
-from linebot import LineBotApi
-import datetime
 import json
 import requests
 import os
@@ -15,8 +12,6 @@ if os.environ['STATUS'] == "remote":
 else:
     YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_DEV_CHANNEL_ACCESS_TOKEN"]
     YOUR_CHANNEL_SECRET = os.environ["YOUR_DEV_CHANNEL_SECRET"]
-
-line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 
 
 def main(data):
