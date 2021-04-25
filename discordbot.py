@@ -2,7 +2,6 @@ import datetime
 import json
 import os
 import random
-import re
 
 import discord
 import requests
@@ -16,8 +15,6 @@ import shipcheck
 import shnews
 import line
 import narou
-from pathlib import Path
-from pdf2image import convert_from_path
 
 load_dotenv()
 
