@@ -115,8 +115,7 @@ def main():
                         "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId[0]+"&t=3")
                     conEachPageSoup = BeautifulSoup(
                         driver.page_source, 'html.parser')
-                    conPageMain = conEachPageSoup.find_all(
-                        class_='ac')[0].find_all("table")[1]
+                    conPageMain = conEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
                     conPageDescription = conPageMain.find_all(
                         "table")[-2].text.replace("\n", "")
                     eachconList.append(conPageDescription)
@@ -124,10 +123,8 @@ def main():
                         conPageLinks = conPageMain.find_all("a")
                         conPageLinkList = []
                         for eachConPageLink in conPageLinks:
-                            driver.get("https://ship.sakae-higashi.jp" +
-                                       eachConPageLink.get("href"))
-                            result = re.match(".*name=(.*)&size.*",
-                                              eachConPageLink.get("href"))
+                            driver.get("https://ship.sakae-higashi.jp" + eachConPageLink.get("href"))
+                            result = re.match(".*name=(.*)&size.*", eachConPageLink.get("href"))
                             print(result.group(1))
                             time.sleep(5)
                             if os.environ['STATUS'] == "local":
@@ -189,10 +186,8 @@ def main():
                             print(str(e))
                         studyPageLinkList = []
                         for eachstudyPageLink in studyPageLinks:
-                            driver.get("https://ship.sakae-higashi.jp" +
-                                       eachstudyPageLink.get("href"))
-                            result = re.match(".*name=(.*)&size.*",
-                                              eachstudyPageLink.get("href"))
+                            driver.get("https://ship.sakae-higashi.jp" + eachstudyPageLink.get("href"))
+                            result = re.match(".*name=(.*)&size.*", eachstudyPageLink.get("href"))
                             print(result.group(1))
                             time.sleep(4)
                             if os.environ['STATUS'] == "local":
