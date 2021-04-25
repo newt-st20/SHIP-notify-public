@@ -16,6 +16,8 @@ import shipcheck
 import shnews
 import line
 import narou
+from pathlib import Path
+from pdf2image import convert_from_path
 
 load_dotenv()
 
@@ -156,7 +158,7 @@ async def on_message(message):
                     return
             data = search.file(idIntMessage)
             if len(data) == 0 or str(data[0][1]) == "{}":
-                await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。")
+                await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
                 return
             linkList = str(data[0][1])[1:-1].split(",")
             await message.channel.send("**"+str(data[0][0]+"** - "+str(data[0][2])))
@@ -166,6 +168,47 @@ async def on_message(message):
                     '%2F')[-1].split('.pdf')[0]+"-"+str(lc)+".pdf"
                 urllib.request.urlretrieve(link, fileName)
                 file = discord.File(fileName, filename=fileName)
+                await message.channel.send(file=file)
+                lc += 1
+        elif 'preview' in message.content or '-p' in message.content:
+            flag = False
+            if len(message.content.split()) == 2:
+                if isint(message.content.split()[1]):
+                    idIntMessage = int(message.content.split()[1])
+                    flag = True
+            if flag == False:
+                try:
+                    idMessage = ""
+                    embed = discord.Embed(title="プレビュー取得", description="1ページ目を表示したいもののidを入力してください。idは通知チャンネル("+conHighChannel.mention +
+                                          ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(50, 168, 82))
+                    await message.channel.send(embed=embed)
+                    idMessage = await client.wait_for("message", check=check, timeout=60)
+                    if isint(idMessage.content) == False:
+                        if 'sh!' in idMessage.content:
+                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                        else:
+                            await idMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                        return
+                    idIntMessage = int(idMessage.content)
+                except Exception as e:
+                    if idMessage == "":
+                        await message.reply("セッションがタイムアウトしました"+str(e))
+                    return
+            data = search.file(idIntMessage)
+            if len(data) == 0 or str(data[0][1]) == "{}":
+                await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
+                return
+            linkList = str(data[0][1])[1:-1].split(",")
+            await message.channel.send("**"+str(data[0][0]+"** - "+str(data[0][2])))
+            lc = 1
+            for link in linkList:
+                fileName = link.split(
+                    '%2F')[-1].split('.pdf')[0]+"-"+str(lc)+".pdf"
+                imageFileName = link.split(
+                    '%2F')[-1].split('.pdf')[0]+"-"+str(lc)+"-01.jpg"
+                urllib.request.urlretrieve(link, fileName)
+                convert_from_path(Path(fileName), output_folder=Path("./image"),fmt='jpeg',output_file=Path("./image").stem)
+                file = discord.File("./image/"+imageFileName, filename=imageFileName)
                 await message.channel.send(file=file)
                 lc += 1
         elif 'recently' in message.content or 'sh!r' in message.content or '-r' in message.content:
