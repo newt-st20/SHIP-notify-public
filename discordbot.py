@@ -170,7 +170,7 @@ async def on_message(message):
                 file = discord.File(fileName, filename=fileName)
                 await message.channel.send(file=file)
                 lc += 1
-        elif 'preview' in message.content or '-p' in message.content:
+        elif 'preview' in message.content or '-p' in message.content: #テスト中
             flag = False
             if len(message.content.split()) == 2:
                 if isint(message.content.split()[1]):
