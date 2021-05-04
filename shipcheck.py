@@ -11,6 +11,9 @@ from dotenv import load_dotenv
 from psycopg2.extras import DictCursor
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
 load_dotenv()
 
@@ -228,6 +231,16 @@ def main():
         count += 1
     driver.quit()
 
+    CREDENTIALS = credentials.Certificate({
+    "type": "service_account",
+    'token_uri': 'https://oauth2.googleapis.com/token',
+    'project_id': os.environ['FIREBASE_PROJECT_ID'],
+    'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
+    'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
+    })
+    firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
+    db = firestore.client()
+
     with get_connection() as conn:
         with conn.cursor() as cur:
             juniorConSendData = []
@@ -244,6 +257,14 @@ def main():
                                     i[0][0], date, i[3], i[4], i[1]])
                         juniorConSendData.append(
                             [i[0][0], date, i[3], i[4], i[1]])
+
+                        doc_ref = db.collection('juniorCon').document(i[0][0])
+                        doc_ref.set({
+                            'date': date,
+                            'folder': i[3],
+                            'title': i[4],
+                            'description': i[1]
+                        })
             for i in juniorStudyList:
                 if i[0][0] != 0:
                     cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
@@ -256,6 +277,13 @@ def main():
                                     i[0][0], date, i[2], i[3]])
                         juniorStudySendData.append(
                             [i[0][0], date, i[2], i[3]])
+
+                        doc_ref = db.collection('juniorStudy').document(i[0][0])
+                        doc_ref.set({
+                            'date': date,
+                            'folder': i[2],
+                            'title': i[3]
+                        })
             highConSendData = []
             for i in highConList:
                 if i[0][0] != 0:
@@ -269,6 +297,15 @@ def main():
                                     i[0][0], date, i[4], i[5], i[1], i[2]])
                         highConSendData.append(
                             [i[0][0], date, i[4], i[5], i[1]])
+
+                        doc_ref = db.collection('highCon').document(i[0][0])
+                        doc_ref.set({
+                            'date': date,
+                            'folder': i[4],
+                            'title': i[5],
+                            'description': i[1],
+                            'link': i[2]
+                        })
             highStudySendData = []
             for i in highStudyList:
                 if i[0][0] != 0:
@@ -282,7 +319,16 @@ def main():
                                     i[0][0], date, i[3], i[4], i[1]])
                         highStudySendData.append(
                             [i[0][0], date, i[3], i[4]])
+
+                        doc_ref = db.collection('highStudy').document(i[0][0])
+                        doc_ref.set({
+                            'date': date,
+                            'folder': i[3],
+                            'title': i[4],
+                            'link': i[1]
+                        })
         conn.commit()
+
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):
         sortedJuniorConSendData.append(value)
