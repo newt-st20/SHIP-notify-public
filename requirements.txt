@@ -32,4 +32,4 @@ Werkzeug==1.0.1
 wikipedia==1.4.0
 python-dotenv==0.15.0
 Pyrebase4==4.4.3
-firebase-admin==9.7.0
+firebase-admin==5.0.0
