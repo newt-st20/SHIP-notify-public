@@ -51,6 +51,25 @@ def main():
             for item in result:
                 getedList.append(item[0])
         conn.commit()
+
+    if not firebase_admin._apps:
+        CREDENTIALS = credentials.Certificate({
+        'type': 'service_account',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'project_id': os.environ['FIREBASE_PROJECT_ID'],
+        'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
+        'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
+        })
+        firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
+    db = firestore.client()
+    shoolNewsGotList = []
+    docs = db.collection('juniorSchoolNews').stream()
+    juniorShoolNewsGotList = [int(doc.id) for doc in docs]
+    docs = db.collection('highSchoolNews').stream()
+    highShoolNewsGotList = [int(doc.id) for doc in docs]
+    shoolNewsGotList.extend(juniorShoolNewsGotList)
+    shoolNewsGotList.extend(highShoolNewsGotList)
+
     if os.environ['STATUS'] == "local":
         CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
         DOWNLOAD_DIR = 'D:\Downloads'
@@ -233,7 +252,7 @@ def main():
                 schoolNewsId = re.findall("'([^']*)'", stage)
             except Exception as e:
                 print(str(e))
-            if int(schoolNewsId[0]) not in getedList:
+            if int(schoolNewsId[0]) not in shoolNewsGotList:
                 try:
                     eachSchoolNewsList.append(schoolNewsId)
                     driver.get(
@@ -289,16 +308,6 @@ def main():
             highSchoolNewsList = schoolNewsList
         count += 1
     driver.quit()
-    if not firebase_admin._apps:
-        CREDENTIALS = credentials.Certificate({
-        'type': 'service_account',
-        'token_uri': 'https://oauth2.googleapis.com/token',
-        'project_id': os.environ['FIREBASE_PROJECT_ID'],
-        'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
-        'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
-        })
-        firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
-    db = firestore.client()
 
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -388,26 +397,23 @@ def main():
                         })
         conn.commit()
 
-        docs = db.collection('juniorSchoolNews').stream()
-        gettedList = [doc.id for doc in docs]
+
         for i in juniorSchoolNewsList:
-            if i[0][0] != 0 and i[0][0] not in gettedList:
+            if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
                 db.collection('juniorSchoolNews').document(str(i[0][0])).set({
                     'date': i[2].replace(
                             "年", "/").replace("月", "/").replace("日", ""),
                     'folder': i[3],
                     'title': i[4]
                 },merge=True)
-
-        docs = db.collection('highSchoolNews').stream()
-        gettedList = [doc.id for doc in docs]
         for i in highSchoolNewsList:
-            if i[0][0] != 0 and i[0][0] not in gettedList:
+            if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
                 db.collection('highSchoolNews').document(str(i[0][0])).set({
                     'date': i[3].replace(
                             "年", "/").replace("月", "/").replace("日", ""),
                     'folder': i[4],
-                    'title': i[5]
+                    'title': i[5],
+                    'link': i[2]
                 },merge=True)
 
     sortedJuniorConSendData = []
