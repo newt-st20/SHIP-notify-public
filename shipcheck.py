@@ -267,10 +267,8 @@ def main():
                         schoolNewsPageLinks = schoolNewsPageMain.find_all("a")
                         schoolNewsPageLinkList = []
                         for eachSchoolNewsPageLink in schoolNewsPageLinks:
-                            print("https://ship.sakae-higashi.jp" + eachSchoolNewsPageLink.get("href"))
                             driver.get("https://ship.sakae-higashi.jp" + eachSchoolNewsPageLink.get("href"))
                             result = re.match(".*name=(.*)&size.*", eachSchoolNewsPageLink.get("href"))
-                            print(result.group(1))
                             time.sleep(5)
                             if os.environ['STATUS'] == "local":
                                 filepath = 'D:\Downloads/' + result.group(1)
@@ -397,15 +395,17 @@ def main():
                         })
         conn.commit()
 
-
+        juniorSchoolNewsSendData = []
         for i in juniorSchoolNewsList:
             if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
+                date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
                 db.collection('juniorSchoolNews').document(str(i[0][0])).set({
-                    'date': i[2].replace(
-                            "年", "/").replace("月", "/").replace("日", ""),
+                    'date': date,
                     'folder': i[3],
                     'title': i[4]
                 },merge=True)
+                juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
+        highSchoolNewsSendData = []
         for i in highSchoolNewsList:
             if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
                 db.collection('highSchoolNews').document(str(i[0][0])).set({
@@ -415,6 +415,7 @@ def main():
                     'title': i[5],
                     'link': i[2]
                 },merge=True)
+                highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
 
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):
@@ -428,11 +429,14 @@ def main():
     sortedHighStudySendData = []
     for value in reversed(highStudySendData):
         sortedHighStudySendData.append(value)
-    print(sortedJuniorConSendData)
-    print(sortedJuniorStudySendData)
-    print(sortedHighConSendData)
-    print(sortedHighStudySendData)
-    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime
+    print("sortedJuniorConSendData:",sortedJuniorConSendData)
+    print("sortedJuniorStudySendData:", sortedJuniorStudySendData)
+    print("sortedHighConSendData:", sortedHighConSendData)
+    print("sortedHighStudySendData:", sortedHighStudySendData)
+    print("getTime:", str(getTime))
+    print("juniorSchoolNewsSendData:",juniorSchoolNewsSendData)
+    print("highSchoolNewsSendData:", highSchoolNewsSendData)
+    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime, juniorSchoolNewsSendData, highSchoolNewsSendData
 
 
 def get_connection():
