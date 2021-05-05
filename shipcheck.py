@@ -63,16 +63,11 @@ def main():
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    prefs = {'download.default_directory': DOWNLOAD_DIR,
-             'download.prompt_for_download': False}
+    prefs = {'download.default_directory': DOWNLOAD_DIR,'download.prompt_for_download': False}
     options.add_experimental_option('prefs', prefs)
-    driver = webdriver.Chrome(executable_path=CHROME_DRIVER_PATH,
-                              options=options)
-    driver.command_executor._commands['send_command'] = ('POST',
-                                                         '/session/$sessionId/chromium/send_command')
-    params = {'cmd': 'Page.setDownloadBehavior',
-              'params': {'behavior': 'allow',
-                         'downloadPath': DOWNLOAD_DIR}}
+    driver = webdriver.Chrome(executable_path=CHROME_DRIVER_PATH,options=options)
+    driver.command_executor._commands['send_command'] = ('POST','/session/$sessionId/chromium/send_command')
+    params = {'cmd': 'Page.setDownloadBehavior','params': {'behavior': 'allow','downloadPath': DOWNLOAD_DIR}}
     driver.execute('send_command', params)
     driver.get('https://ship.sakae-higashi.jp/')
     ship_id = driver.find_element_by_name("ship_id")
@@ -222,23 +217,87 @@ def main():
                 studyList.append(eachstudyList)
         print(studyList)
 
+        driver.get(
+            "https://ship.sakae-higashi.jp/school_news/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
+        schoolNews = driver.page_source
+        schoolNewsSoup = BeautifulSoup(schoolNews, 'html.parser')
+        schoolNewsTrs = schoolNewsSoup.find_all(class_='allc')[0].find_all('tr')
+        schoolNewsTrs.pop(0)
+        schoolNewsList = []
+        for schoolNewsTr in schoolNewsTrs:
+            time.sleep(1)
+            eachSchoolNewsList = []
+            schoolNewsTrTds = schoolNewsTr.find_all('td')
+            try:
+                stage = schoolNewsTrTds[2].find('a').get('onclick')
+                schoolNewsId = re.findall("'([^']*)'", stage)
+            except Exception as e:
+                print(str(e))
+            if int(schoolNewsId[0]) not in getedList:
+                try:
+                    eachSchoolNewsList.append(schoolNewsId)
+                    driver.get(
+                        "https://ship.sakae-higashi.jp/sub_window/?obj_id="+schoolNewsId[0]+"&t=4")
+                    schoolNewsEachPageSoup = BeautifulSoup(
+                        driver.page_source, 'html.parser')
+                    schoolNewsPageMain = schoolNewsEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
+                    schoolNewsPageDescription = schoolNewsPageMain.find_all(
+                        "table")[-2].text.replace("\n", "")
+                    eachSchoolNewsList.append(schoolNewsPageDescription)
+                    if schooltype == "high":
+                        schoolNewsPageLinks = schoolNewsPageMain.find_all("a")
+                        schoolNewsPageLinkList = []
+                        for eachSchoolNewsPageLink in schoolNewsPageLinks:
+                            print("https://ship.sakae-higashi.jp" + eachSchoolNewsPageLink.get("href"))
+                            driver.get("https://ship.sakae-higashi.jp" + eachSchoolNewsPageLink.get("href"))
+                            result = re.match(".*name=(.*)&size.*", eachSchoolNewsPageLink.get("href"))
+                            print(result.group(1))
+                            time.sleep(5)
+                            if os.environ['STATUS'] == "local":
+                                filepath = 'D:\Downloads/' + result.group(1)
+                            else:
+                                filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                            storage = firebase.storage()
+                            try:
+                                storage.child(
+                                    'pdf/high-schoolNews/'+str(eachSchoolNewsList[0][0])+'/'+result.group(1)).put(filepath)
+                                schoolNewsPageLinkList.append(storage.child(
+                                    'pdf/high-schoolNews/'+str(eachSchoolNewsList[0][0])+'/'+result.group(1)).get_url(token=None))
+                            except Exception as e:
+                                print(str(e))
+                        eachSchoolNewsList.append(schoolNewsPageLinkList)
+                except Exception as e:
+                    print(str(e))
+                    eachSchoolNewsList.append([0, 0])
+                    eachSchoolNewsList.append("")
+                eachSchoolNewsList.append(schoolNewsTrTds[0].text)
+                try:
+                    eachSchoolNewsList.append(schoolNewsTrTds[1].find('span').get('title'))
+                except:
+                    eachSchoolNewsList.append("")
+                eachSchoolNewsList.append(schoolNewsTrTds[2].text.replace("\n", ""))
+                schoolNewsList.append(eachSchoolNewsList)
+        print(schoolNewsList)
+
         if schooltype == "junior":
             juniorConList = conList
             juniorStudyList = studyList
+            juniorSchoolNewsList = schoolNewsList
         elif schooltype == "high":
             highConList = conList
             highStudyList = studyList
+            highSchoolNewsList = schoolNewsList
         count += 1
     driver.quit()
-
-    CREDENTIALS = credentials.Certificate({
-    "type": "service_account",
-    'token_uri': 'https://oauth2.googleapis.com/token',
-    'project_id': os.environ['FIREBASE_PROJECT_ID'],
-    'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
-    'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
-    })
-    firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
+    if not firebase_admin._apps:
+        CREDENTIALS = credentials.Certificate({
+        'type': 'service_account',
+        'token_uri': 'https://oauth2.googleapis.com/token',
+        'project_id': os.environ['FIREBASE_PROJECT_ID'],
+        'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
+        'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
+        })
+        firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
     db = firestore.client()
 
     with get_connection() as conn:
@@ -328,6 +387,28 @@ def main():
                             'link': i[1]
                         })
         conn.commit()
+
+        docs = db.collection('juniorSchoolNews').stream()
+        gettedList = [doc.id for doc in docs]
+        for i in juniorSchoolNewsList:
+            if i[0][0] != 0 and i[0][0] not in gettedList:
+                db.collection('juniorSchoolNews').document(str(i[0][0])).set({
+                    'date': i[2].replace(
+                            "年", "/").replace("月", "/").replace("日", ""),
+                    'folder': i[3],
+                    'title': i[4]
+                },merge=True)
+
+        docs = db.collection('highSchoolNews').stream()
+        gettedList = [doc.id for doc in docs]
+        for i in highSchoolNewsList:
+            if i[0][0] != 0 and i[0][0] not in gettedList:
+                db.collection('highSchoolNews').document(str(i[0][0])).set({
+                    'date': i[3].replace(
+                            "年", "/").replace("月", "/").replace("日", ""),
+                    'folder': i[4],
+                    'title': i[5]
+                },merge=True)
 
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):
