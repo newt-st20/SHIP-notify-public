@@ -529,8 +529,10 @@ async def getData():
     await client.wait_until_ready()
     conJuniorChannel = client.get_channel(812592878194262026)
     studyJuniorChannel = client.get_channel(814791146966220841)
+    schoolNewsJuniorChannel = client.get_channel(841936448878018560)
     conHighChannel = client.get_channel(818066947463053312)
     studyHighChannel = client.get_channel(818066981982830613)
+    schoolNewsHighChannel = client.get_channel(841936546772156426)
     getLogChannel = client.get_channel(817400535639916544)
     result = shipcheck.main()
     if len(result[0]) != 0:
@@ -628,6 +630,29 @@ async def getData():
             title="高校学習教材更新通知", color=discord.Colour.from_rgb(52, 235, 79))
         embed.add_field(name="system-log",
                         value='高校学習教材に更新はありませんでした', inline=False)
+        embed.set_footer(text="取得: "+result[4])
+        await getLogChannel.send(embed=embed)
+    if len(result[5]) != 0:
+        for schoolNewsData in result[5]:
+            try:
+                if schoolNewsData[3] != '':
+                    embed = discord.Embed(
+                        title=schoolNewsData[3], description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                else:
+                    embed = discord.Embed(
+                        title="高校学校通信更新通知", description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                embed.add_field(name="id", value=schoolNewsData[0])
+                if schoolNewsData[2] != '':
+                    embed.add_field(name="path", value=schoolNewsData[2])
+                embed.set_footer(text="取得: "+result[4])
+                await schoolNewsHighChannel.send(embed=embed)
+            except Exception as e:
+                await schoolNewsHighChannel.send(str(e))
+    else:
+        embed = discord.Embed(
+            title="高校学校通信更新通知", color=discord.Colour.from_rgb(52, 235, 79))
+        embed.add_field(name="system-log",
+                        value='高校学校通信に更新はありませんでした', inline=False)
         embed.set_footer(text="取得: "+result[4])
         await getLogChannel.send(embed=embed)
     if len(result[2]) != 0 or len(result[3]) != 0:
