@@ -655,6 +655,29 @@ async def getData():
                         value='高校学校通信に更新はありませんでした', inline=False)
         embed.set_footer(text="取得: "+result[4])
         await getLogChannel.send(embed=embed)
+    if len(result[6]) != 0:
+        for schoolNewsData in result[5]:
+            try:
+                if schoolNewsData[3] != '':
+                    embed = discord.Embed(
+                        title=schoolNewsData[3], description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                else:
+                    embed = discord.Embed(
+                        title="中学学校通信更新通知", description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                embed.add_field(name="id", value=schoolNewsData[0])
+                if schoolNewsData[2] != '':
+                    embed.add_field(name="path", value=schoolNewsData[2])
+                embed.set_footer(text="取得: "+result[4])
+                await schoolNewsJuniorChannel.send(embed=embed)
+            except Exception as e:
+                await schoolNewsJuniorChannel.send(str(e))
+    else:
+        embed = discord.Embed(
+            title="中学学校通信更新通知", color=discord.Colour.from_rgb(52, 235, 79))
+        embed.add_field(name="system-log",
+                        value='中学学校通信に更新はありませんでした', inline=False)
+        embed.set_footer(text="取得: "+result[4])
+        await getLogChannel.send(embed=embed)
     if len(result[2]) != 0 or len(result[3]) != 0:
         try:
             log = line.main(result)

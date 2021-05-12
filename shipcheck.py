@@ -436,7 +436,7 @@ def main():
     print("getTime:", str(getTime))
     print("juniorSchoolNewsSendData:",juniorSchoolNewsSendData)
     print("highSchoolNewsSendData:", highSchoolNewsSendData)
-    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime, juniorSchoolNewsSendData, highSchoolNewsSendData
+    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime, highSchoolNewsSendData, juniorSchoolNewsSendData
 
 
 def get_connection():
