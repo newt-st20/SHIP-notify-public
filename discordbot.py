@@ -68,7 +68,7 @@ async def on_message(message):
     studyHighChannel = client.get_channel(818066981982830613)
     if message.author.bot:
         return
-    if 'sh!' in message.content or '-' in message.content:
+    if 'sh!' in message.content or message.content.startswith('-'):
         if message.content == 'sh!':
             await message.channel.send('`sh!`はコマンドです。')
         elif 'help' in message.content:
