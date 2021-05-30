@@ -126,7 +126,8 @@ async def on_message(message):
                 body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
                     str(idIntMessage)+"&t=7\n"
             elif data[0][4] == "高校学校通信" or data[0][4] == "中学学校通信":
-                body += "`link` https://ship.sakae-higashi.jp/sub_window/?obj_id="+str(idIntMessage)+"&t=7"
+                body += "`link` https://ship.sakae-higashi.jp/sub_window/?obj_id="+str(idIntMessage)+"&t=7\n"
+                body += "`original id` "+ data[0][5] + "\n"
             body += "\n※リンクはSHIPにログインした状態でのみ開けます"
             embed = discord.Embed(
                 title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
