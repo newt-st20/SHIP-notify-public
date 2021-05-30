@@ -1,6 +1,7 @@
 .vscode/
 test/
 test.py
+local.py
 .env
 discordlocal.py
 vetur.config.js
