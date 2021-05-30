@@ -413,6 +413,9 @@ def main():
                 'title': i[4]
             })
             juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
+    doc = db.collection('count').document('juniorShoolNews').get()
+    howManyData = int(doc.to_dict().count) + len(juniorSchoolNewsSendData)
+    db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'timestamp': firestore.SERVER_TIMESTAMP})
     highSchoolNewsSendData = []
     for i in sortedHighSchoolNewsList:
         if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
@@ -425,6 +428,9 @@ def main():
                 'link': i[2]
             })
             highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
+    doc = db.collection('count').document('highShoolNews').get()
+    howManyData = int(doc.to_dict().count) + len(highSchoolNewsSendData)
+    db.collection('count').document('highSchoolNews').update({'count': howManyData, 'timestamp': firestore.SERVER_TIMESTAMP})
 
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):

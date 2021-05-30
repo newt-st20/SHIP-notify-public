@@ -385,8 +385,6 @@ async def on_message(message):
                     await message.channel.send(body)
             except Exception as e:
                 await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif 'anime' in message.content:
-            return
         else:
             await message.channel.send('このコマンドは用意されていません')
     if message.content == 'sa!get':
@@ -410,6 +408,8 @@ async def on_message(message):
             1 for member in guild.members if not member.bot)
         bot_count = sum(1 for member in guild.members if member.bot)
         await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
+    elif message.content == 'sa!delete-all-message':
+        await message.channel.purge(limit=None)
     if isinstance(message.channel, discord.DMChannel):
         embed = discord.Embed(title="DMを受信しました")
         embed.add_field(name="ユーザー名",
