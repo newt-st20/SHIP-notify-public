@@ -70,11 +70,11 @@ def info(id):
             result = cur.fetchall()
             for item in result:
                 data.append([item[0], item[1], item[2], "", "中学学習教材"])
-            docs = db.collection('juniorShoolNews').where('id', '==', int(id)).stream()
+            docs = db.collection('juniorSchoolNews').where('id', '==', int(id)).stream()
             for doc in docs:
                 eachDoc = doc.to_dict()
                 data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", "中学学校通信"])
-            docs = db.collection('highShoolNews').where('id', '==', int(id)).stream()
+            docs = db.collection('highSchoolNews').where('id', '==', int(id)).stream()
             for doc in docs:
                 eachDoc = doc.to_dict()
                 data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], "高校学校通信"])
@@ -111,12 +111,12 @@ def recently(type, howmany):
                 for item in result:
                     data.append([item[0], item[1], item[2]])
             elif type == 5:
-                docs = db.collection('juniorShoolNews').order_by(firestore.FieldPath.documentId()).limit(int(howmany)).stream()
+                docs = db.collection('juniorSchoolNews').order_by(firestore.FieldPath.documentId()).limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
                     data.append([eachDoc['date'], eachDoc['title'], doc['id']])
             elif type == 6:
-                docs = db.collection('highShoolNews').order_by(firestore.FieldPath.documentId()).limit(int(howmany)).stream()
+                docs = db.collection('highSchoolNews').order_by(firestore.FieldPath.documentId()).limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
                     data.append([eachDoc['date'], eachDoc['title'], doc['id']])
@@ -152,11 +152,11 @@ def count(type):
                 for item in result:
                     data = item[0]
             elif type == 5:
-                docDict = db.collection('count').document('juniorShoolNews').get().to_dict()
+                docDict = db.collection('count').document('juniorSchoolNews').get().to_dict()
                 print(docDict)
                 data = docDict['count']
             elif type == 6:
-                docDict = db.collection('count').document('highShoolNews').get().to_dict()
+                docDict = db.collection('count').document('highSchoolNews').get().to_dict()
                 data = docDict['count']
             else:
                 data = 0

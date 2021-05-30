@@ -62,13 +62,13 @@ def main():
         })
         firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
     db = firestore.client()
-    shoolNewsGotList = []
+    schoolNewsGotList = []
     docs = db.collection('juniorSchoolNews').stream()
-    juniorShoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
+    juniorSchoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
     docs = db.collection('highSchoolNews').stream()
-    highShoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
-    shoolNewsGotList.extend(juniorShoolNewsGotList)
-    shoolNewsGotList.extend(highShoolNewsGotList)
+    highSchoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
+    schoolNewsGotList.extend(juniorSchoolNewsGotList)
+    schoolNewsGotList.extend(highSchoolNewsGotList)
 
     if os.environ['STATUS'] == "local":
         CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
@@ -252,7 +252,7 @@ def main():
                 schoolNewsId = re.findall("'([^']*)'", stage)
             except Exception as e:
                 print(str(e))
-            if int(schoolNewsId[0]) not in shoolNewsGotList:
+            if int(schoolNewsId[0]) not in schoolNewsGotList:
                 try:
                     eachSchoolNewsList.append(schoolNewsId)
                     driver.get(
@@ -404,7 +404,7 @@ def main():
 
     juniorSchoolNewsSendData = []
     for i in sortedJuniorSchoolNewsList:
-        if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
+        if i[0][0] != 0 and i[0][0] not in schoolNewsGotList:
             date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
             db.collection('juniorSchoolNews').add({
                 'id': int(i[0][0]),
@@ -418,7 +418,7 @@ def main():
     db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'timestamp': firestore.SERVER_TIMESTAMP})
     highSchoolNewsSendData = []
     for i in sortedHighSchoolNewsList:
-        if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
+        if i[0][0] != 0 and i[0][0] not in schoolNewsGotList:
             date = i[3].replace("年", "/").replace("月", "/").replace("日", "")
             db.collection('highSchoolNews').add({
                 'id': int(i[0][0]),
