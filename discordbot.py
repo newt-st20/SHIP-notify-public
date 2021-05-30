@@ -116,7 +116,7 @@ async def on_message(message):
             body += "`id` "+str(idIntMessage)+"\n"
             body += "`date` "+str(data[0][1]).replace("-", "/")+"\n"
             body += "`folder` "+data[0][2]+"\n"
-            if data[0][4] == "高校連絡事項" or data[0][4] == "高校学習教材":
+            if data[0][4] == "高校連絡事項" or data[0][4] == "高校学習教材" or data[0][4] == "高校学校通信":
                 linkList = str(data[0][3])[1:-1].split(",")
                 body += "`file` "+str(len(linkList))+"\n"
             if data[0][4] == "高校連絡事項" or data[0][4] == "中学連絡事項":
@@ -125,6 +125,8 @@ async def on_message(message):
             elif data[0][4] == "高校学習教材" or data[0][4] == "中学学習教材":
                 body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
                     str(idIntMessage)+"&t=7\n"
+            elif data[0][4] == "高校学校通信" or data[0][4] == "中学学校通信":
+                body += "`link` https://ship.sakae-higashi.jp/sub_window/?obj_id="+str(idIntMessage)+"&t=7"
             body += "※リンクはSHIPにログインした状態でのみ開けます"
             embed = discord.Embed(
                 title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
@@ -157,7 +159,10 @@ async def on_message(message):
             if len(data) == 0 or str(data[0][1]) == "{}":
                 await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
                 return
-            linkList = str(data[0][1])[1:-1].split(",")
+            if str(data[0][1]).startswith('{'):
+                linkList = str(data[0][1])[1:-1].split(",")
+            else:
+                linkList = data[0][1]
             await message.channel.send("**"+str(data[0][0]+"** - "+str(data[0][2])))
             lc = 1
             for link in linkList:
