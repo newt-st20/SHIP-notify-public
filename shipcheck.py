@@ -413,7 +413,7 @@ def main():
                 'title': i[4]
             })
             juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
-    docDict = db.collection('count').document('juniorShoolNews').get().to_dict()
+    docDict = db.collection('count').document('juniorSchoolNews').get().to_dict()
     howManyData = int(docDict['count']) + len(juniorSchoolNewsSendData)
     db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'timestamp': firestore.SERVER_TIMESTAMP})
     highSchoolNewsSendData = []
@@ -428,7 +428,7 @@ def main():
                 'link': i[2]
             })
             highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
-    docDict = db.collection('count').document('highShoolNews').get().to_dict()
+    docDict = db.collection('count').document('highSchoolNews').get().to_dict()
     howManyData = int(docDict['count']) + len(highSchoolNewsSendData)
     db.collection('count').document('highSchoolNews').update({'count': howManyData, 'timestamp': firestore.SERVER_TIMESTAMP})
 
