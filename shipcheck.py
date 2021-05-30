@@ -64,9 +64,9 @@ def main():
     db = firestore.client()
     schoolNewsGotList = []
     docs = db.collection('juniorSchoolNews').stream()
-    juniorSchoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
+    juniorSchoolNewsGotList = [int(doc.to_dict()['id']) for doc in docs]
     docs = db.collection('highSchoolNews').stream()
-    highSchoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
+    highSchoolNewsGotList = [int(doc.to_dict()['id']) for doc in docs]
     schoolNewsGotList.extend(juniorSchoolNewsGotList)
     schoolNewsGotList.extend(highSchoolNewsGotList)
 
