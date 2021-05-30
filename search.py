@@ -39,6 +39,10 @@ def file(id):
             for item in result:
                 data.append([item[0], item[1], item[2]])
         conn.commit()
+    docs = db.collection('highSchoolNews').where('id', '==', int(id)).stream()
+    for doc in docs:
+        eachDoc = doc.to_dict()
+        data.append([eachDoc.title, eachDoc.link, eachDoc.date])
     return data
 
 
@@ -66,6 +70,14 @@ def info(id):
             result = cur.fetchall()
             for item in result:
                 data.append([item[0], item[1], item[2], "", "中学学習教材"])
+            docs = db.collection('juniorShoolNews').where('id', '==', int(id)).stream()
+            for doc in docs:
+                eachDoc = doc.to_dict()
+                data.append([eachDoc.title, eachDoc.date, eachDoc.folder, "", "中学学校通信"])
+            docs = db.collection('highShoolNews').where('id', '==', int(id)).stream()
+            for doc in docs:
+                eachDoc = doc.to_dict()
+                data.append([eachDoc.title, eachDoc.date, eachDoc.folder, eachDoc.link, "高校学校通信"])
         conn.commit()
     return data
 
@@ -103,7 +115,12 @@ def recently(type, howmany):
                 for doc in docs:
                     eachDoc = doc.to_dict()
                     data.append([eachDoc.date, eachDoc.title, doc.id])
-                print(data)
+            elif type == 6:
+                docs = db.collection('highShoolNews').order_by(firestore.FieldPath.documentId()).limit(int(howmany)).stream()
+                for doc in docs:
+                    eachDoc = doc.to_dict()
+                    data.append([eachDoc.date, eachDoc.title, doc.id])
+            print(data)
         conn.commit()
     return data
 
@@ -134,6 +151,12 @@ def count(type):
                 result = cur.fetchall()
                 for item in result:
                     data = item[0]
+            elif type == 5:
+                doc = db.collection('count').document('juniorShoolNews').get()
+                data = doc.to_dict().count
+            elif type == 6:
+                doc = db.collection('count').document('highShoolNews').get()
+                data = doc.to_dict().count
             else:
                 data = 0
         conn.commit()

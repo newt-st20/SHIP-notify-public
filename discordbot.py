@@ -225,6 +225,10 @@ async def on_message(message):
                 titlebody = "最近の中学連絡事項"
             elif typeIntMessage == 4:
                 titlebody = "最近の中学学習教材"
+            elif typeIntMessage == 5:
+                titlebody = "最近の中学学校通信"
+            elif typeIntMessage == 6:
+                titlebody = "最近の高校学校通信"
             embed = discord.Embed(
                 title=titlebody, description=body, color=discord.Colour.from_rgb(252, 186, 3))
             await message.channel.send(embed=embed)

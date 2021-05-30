@@ -64,9 +64,9 @@ def main():
     db = firestore.client()
     shoolNewsGotList = []
     docs = db.collection('juniorSchoolNews').stream()
-    juniorShoolNewsGotList = [int(doc.id) for doc in docs]
+    juniorShoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
     docs = db.collection('highSchoolNews').stream()
-    highShoolNewsGotList = [int(doc.id) for doc in docs]
+    highShoolNewsGotList = [int(doc.to_dict().id) for doc in docs]
     shoolNewsGotList.extend(juniorShoolNewsGotList)
     shoolNewsGotList.extend(highShoolNewsGotList)
 
@@ -324,8 +324,8 @@ def main():
                         juniorConSendData.append(
                             [i[0][0], date, i[3], i[4], i[1]])
 
-                        doc_ref = db.collection('juniorCon').document(i[0][0])
-                        doc_ref.set({
+                        db.collection('juniorCon').add({
+                            'id': int(i[0][0]),
                             'date': date,
                             'folder': i[3],
                             'title': i[4],
@@ -344,8 +344,8 @@ def main():
                         juniorStudySendData.append(
                             [i[0][0], date, i[2], i[3]])
 
-                        doc_ref = db.collection('juniorStudy').document(i[0][0])
-                        doc_ref.set({
+                        db.collection('juniorStudy').add({
+                            'id': int(i[0][0]),
                             'date': date,
                             'folder': i[2],
                             'title': i[3]
@@ -364,8 +364,8 @@ def main():
                         highConSendData.append(
                             [i[0][0], date, i[4], i[5], i[1]])
 
-                        doc_ref = db.collection('highCon').document(i[0][0])
-                        doc_ref.set({
+                        db.collection('highCon').add({
+                            'id': int(i[0][0]),
                             'date': date,
                             'folder': i[4],
                             'title': i[5],
@@ -386,8 +386,8 @@ def main():
                         highStudySendData.append(
                             [i[0][0], date, i[3], i[4]])
 
-                        doc_ref = db.collection('highStudy').document(i[0][0])
-                        doc_ref.set({
+                        db.collection('highStudy').add({
+                            'id': int(i[0][0]),
                             'date': date,
                             'folder': i[3],
                             'title': i[4],
@@ -399,22 +399,24 @@ def main():
         for i in juniorSchoolNewsList:
             if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
                 date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
-                db.collection('juniorSchoolNews').document(str(i[0][0])).set({
+                db.collection('juniorSchoolNews').add({
+                    'id': int(i[0][0]),
                     'date': date,
                     'folder': i[3],
                     'title': i[4]
-                },merge=True)
+                })
                 juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
         highSchoolNewsSendData = []
         for i in highSchoolNewsList:
             if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
-                db.collection('highSchoolNews').document(str(i[0][0])).set({
+                db.collection('highSchoolNews').add({
+                    'id': int(i[0][0]),
                     'date': i[3].replace(
                             "年", "/").replace("月", "/").replace("日", ""),
                     'folder': i[4],
                     'title': i[5],
                     'link': i[2]
-                },merge=True)
+                })
                 highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
 
     sortedJuniorConSendData = []
