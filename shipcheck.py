@@ -329,7 +329,8 @@ def main():
                             'date': date,
                             'folder': i[3],
                             'title': i[4],
-                            'description': i[1]
+                            'description': i[1],
+                            'timestamp': firestore.SERVER_TIMESTAMP
                         })
             for i in juniorStudyList:
                 if i[0][0] != 0:
@@ -348,7 +349,8 @@ def main():
                             'id': int(i[0][0]),
                             'date': date,
                             'folder': i[2],
-                            'title': i[3]
+                            'title': i[3],
+                            'timestamp': firestore.SERVER_TIMESTAMP
                         })
             highConSendData = []
             for i in highConList:
@@ -370,7 +372,8 @@ def main():
                             'folder': i[4],
                             'title': i[5],
                             'description': i[1],
-                            'link': i[2]
+                            'link': i[2],
+                            'timestamp': firestore.SERVER_TIMESTAMP
                         })
             highStudySendData = []
             for i in highStudyList:
@@ -391,7 +394,8 @@ def main():
                             'date': date,
                             'folder': i[3],
                             'title': i[4],
-                            'link': i[1]
+                            'link': i[1],
+                            'timestamp': firestore.SERVER_TIMESTAMP
                         })
         conn.commit()
 
@@ -410,12 +414,13 @@ def main():
                 'id': int(i[0][0]),
                 'date': date,
                 'folder': i[3],
-                'title': i[4]
+                'title': i[4],
+                'timestamp': firestore.SERVER_TIMESTAMP
             })
             juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
     docDict = db.collection('count').document('juniorSchoolNews').get().to_dict()
     howManyData = int(docDict['count']) + len(juniorSchoolNewsSendData)
-    db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'timestamp': firestore.SERVER_TIMESTAMP})
+    db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
     highSchoolNewsSendData = []
     for i in sortedHighSchoolNewsList:
         if i[0][0] != 0 and i[0][0] not in schoolNewsGotList:
@@ -425,12 +430,13 @@ def main():
                 'date': date,
                 'folder': i[4],
                 'title': i[5],
-                'link': i[2]
+                'link': i[2],
+                'timestamp': firestore.SERVER_TIMESTAMP
             })
             highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
     docDict = db.collection('count').document('highSchoolNews').get().to_dict()
     howManyData = int(docDict['count']) + len(highSchoolNewsSendData)
-    db.collection('count').document('highSchoolNews').update({'count': howManyData, 'timestamp': firestore.SERVER_TIMESTAMP})
+    db.collection('count').document('highSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
 
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):
