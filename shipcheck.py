@@ -395,29 +395,36 @@ def main():
                         })
         conn.commit()
 
-        juniorSchoolNewsSendData = []
-        for i in juniorSchoolNewsList:
-            if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
-                date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
-                db.collection('juniorSchoolNews').add({
-                    'id': int(i[0][0]),
-                    'date': date,
-                    'folder': i[3],
-                    'title': i[4]
-                })
-                juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
-        highSchoolNewsSendData = []
-        for i in highSchoolNewsList:
-            if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
-                db.collection('highSchoolNews').add({
-                    'id': int(i[0][0]),
-                    'date': i[3].replace(
-                            "年", "/").replace("月", "/").replace("日", ""),
-                    'folder': i[4],
-                    'title': i[5],
-                    'link': i[2]
-                })
-                highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
+    sortedJuniorSchoolNewsList = []
+    for value in reversed(juniorSchoolNewsList):
+        sortedJuniorSchoolNewsList.append(value)
+    sortedHighSchoolNewsList = []
+    for value in reversed(highSchoolNewsList):
+        sortedHighSchoolNewsList.append(value)
+
+    juniorSchoolNewsSendData = []
+    for i in sortedJuniorSchoolNewsList:
+        if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
+            date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
+            db.collection('juniorSchoolNews').add({
+                'id': int(i[0][0]),
+                'date': date,
+                'folder': i[3],
+                'title': i[4]
+            })
+            juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
+    highSchoolNewsSendData = []
+    for i in sortedHighSchoolNewsList:
+        if i[0][0] != 0 and i[0][0] not in shoolNewsGotList:
+            date = i[3].replace("年", "/").replace("月", "/").replace("日", "")
+            db.collection('highSchoolNews').add({
+                'id': int(i[0][0]),
+                'date': date,
+                'folder': i[4],
+                'title': i[5],
+                'link': i[2]
+            })
+            highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
 
     sortedJuniorConSendData = []
     for value in reversed(juniorConSendData):
