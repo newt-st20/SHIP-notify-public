@@ -50,7 +50,7 @@ async def on_member_join(member):
     unauthenticatedRole = guild.get_role(813015195881570334)
     await member.add_roles(unauthenticatedRole)
 
-
+@client.event
 async def on_member_remove(member):
     await client.wait_until_ready()
     joinLeaveLogChannel = client.get_channel(810813680618831906)

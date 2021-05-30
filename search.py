@@ -111,15 +111,15 @@ def recently(type, howmany):
                 for item in result:
                     data.append([item[0], item[1], item[2]])
             elif type == 5:
-                docs = db.collection('juniorSchoolNews').order_by('id').limit(int(howmany)).stream()
+                docs = db.collection('juniorSchoolNews').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
-                    data.append([eachDoc['date'], eachDoc['title'], eachDoc['id']])
+                    data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
             elif type == 6:
-                docs = db.collection('highSchoolNews').order_by('id').limit(int(howmany)).stream()
+                docs = db.collection('highSchoolNews').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
-                    data.append([eachDoc['date'], eachDoc['title'], eachDoc['id']])
+                    data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
             print(data)
         conn.commit()
     return data
