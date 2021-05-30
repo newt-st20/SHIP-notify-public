@@ -182,7 +182,7 @@ async def on_message(message):
                     flag = True
             if flag == False:
                 embed = discord.Embed(title="最近の更新の取得",
-                                      description="高校連絡事項→ `1`\n高校学習教材→ `2`\n中学連絡事項→ `3`\n中学学習教材→ `4`", color=discord.Colour.from_rgb(252, 186, 3))
+                                      description="高校連絡事項→ `1`\n高校学習教材→ `2`\n中学連絡事項→ `3`\n中学学習教材→ `4`\n中学学校通信→ `3`\n高校学校通信→ `4`", color=discord.Colour.from_rgb(252, 186, 3))
                 await message.channel.send(embed=embed)
                 try:
                     typeMessage = await client.wait_for("message", check=check, timeout=60)
@@ -216,8 +216,10 @@ async def on_message(message):
             body = ""
             lc = 1
             for eachData in mainData:
-                body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(
-                    eachData[1].strftime('%Y/%m/%d')) + "\n"
+                try:
+                    body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(eachData[1].strftime('%Y/%m/%d')) + "\n"
+                except:
+                    body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(eachData[1]) + "\n"
                 if howmanyIntMessage == lc or lc == 30:
                     break
                 lc += 1
@@ -691,9 +693,9 @@ async def getData():
     if len(result[2]) != 0 or len(result[3]) != 0:
         try:
             log = line.main(result)
-            await getLogChannel.send("LINE版処理完了" + log)
+            await getLogChannel.send("LINE版処理完了\n" + log)
         except Exception as e:
-            await getLogChannel.send("LINE版での不具合:"+str(e))
+            await getLogChannel.send("LINE版での不具合:\n"+str(e))
 
 
 async def getNewsData():
