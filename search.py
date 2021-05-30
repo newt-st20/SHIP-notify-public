@@ -73,11 +73,11 @@ def info(id):
             docs = db.collection('juniorSchoolNews').where('id', '==', int(id)).stream()
             for doc in docs:
                 eachDoc = doc.to_dict()
-                data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", "中学学校通信"])
+                data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", "中学学校通信", doc.id])
             docs = db.collection('highSchoolNews').where('id', '==', int(id)).stream()
             for doc in docs:
                 eachDoc = doc.to_dict()
-                data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], "高校学校通信"])
+                data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], "高校学校通信", doc.id])
         conn.commit()
     return data
 
@@ -114,12 +114,12 @@ def recently(type, howmany):
                 docs = db.collection('juniorSchoolNews').order_by('id').limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
-                    data.append([eachDoc['date'], eachDoc['title'], doc['id']])
+                    data.append([eachDoc['date'], eachDoc['title'], eachDoc['id']])
             elif type == 6:
                 docs = db.collection('highSchoolNews').order_by('id').limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
-                    data.append([eachDoc['date'], eachDoc['title'], doc['id']])
+                    data.append([eachDoc['date'], eachDoc['title'], eachDoc['id']])
             print(data)
         conn.commit()
     return data
