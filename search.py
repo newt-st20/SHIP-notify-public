@@ -111,12 +111,12 @@ def recently(type, howmany):
                 for item in result:
                     data.append([item[0], item[1], item[2]])
             elif type == 5:
-                docs = db.collection('juniorSchoolNews').order_by('id').limit_to_last(int(howmany)).stream()
+                docs = db.collection('juniorSchoolNews').order_by('id').limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
                     data.append([eachDoc['date'], eachDoc['title'], doc['id']])
             elif type == 6:
-                docs = db.collection('highSchoolNews').order_by('id').limit_to_last(int(howmany)).stream()
+                docs = db.collection('highSchoolNews').order_by('id').limit(int(howmany)).stream()
                 for doc in docs:
                     eachDoc = doc.to_dict()
                     data.append([eachDoc['date'], eachDoc['title'], doc['id']])
