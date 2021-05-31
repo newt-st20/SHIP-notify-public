@@ -31,25 +31,25 @@ firebase = pyrebase.initialize_app(config)
 def main():
     now = datetime.datetime.now()
     getTime = now.strftime('%H:%M:%S')
-    getedList = []
+    gotList = []
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute('SELECT id FROM con_high')
             result = cur.fetchall()
             for item in result:
-                getedList.append(item[0])
+                gotList.append(item[0])
             cur.execute('SELECT id FROM study_high')
             result = cur.fetchall()
             for item in result:
-                getedList.append(item[0])
+                gotList.append(item[0])
             cur.execute('SELECT id FROM con_junior')
             result = cur.fetchall()
             for item in result:
-                getedList.append(item[0])
+                gotList.append(item[0])
             cur.execute('SELECT id FROM study_junior')
             result = cur.fetchall()
             for item in result:
-                getedList.append(item[0])
+                gotList.append(item[0])
         conn.commit()
 
     if not firebase_admin._apps:
@@ -62,11 +62,12 @@ def main():
         })
         firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
     db = firestore.client()
-    schoolNewsGotList = []
+
     docs = db.collection('juniorSchoolNews').stream()
     juniorSchoolNewsGotList = [int(doc.to_dict()['id']) for doc in docs]
     docs = db.collection('highSchoolNews').stream()
     highSchoolNewsGotList = [int(doc.to_dict()['id']) for doc in docs]
+    schoolNewsGotList = []
     schoolNewsGotList.extend(juniorSchoolNewsGotList)
     schoolNewsGotList.extend(highSchoolNewsGotList)
 
@@ -125,7 +126,7 @@ def main():
                 conId = re.findall("'([^']*)'", stage)
             except Exception as e:
                 print(str(e))
-            if int(conId[0]) not in getedList:
+            if int(conId[0]) not in gotList:
                 try:
                     eachconList.append(conId)
                     driver.get(
@@ -186,7 +187,7 @@ def main():
                 studyId = re.findall("'([^']*)'", stage)
             except Exception as e:
                 pass
-            if int(studyId[0]) not in getedList:
+            if int(studyId[0]) not in gotList:
                 try:
                     eachstudyList.append(studyId)
                     driver.get(
@@ -307,107 +308,45 @@ def main():
         count += 1
     driver.quit()
 
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            juniorConSendData = []
-            juniorStudySendData = []
-            for i in juniorConList:
-                if i[0][0] != 0:
-                    cur.execute('SELECT EXISTS (SELECT * FROM con_junior WHERE id = %s)',
-                                [int(i[0][0])])
-                    (b,) = cur.fetchone()
-                    if b == False:
-                        date = i[2].replace(
-                            "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO con_junior (id, date, folder, title, description) VALUES (%s, %s, %s, %s, %s)', [
-                                    i[0][0], date, i[3], i[4], i[1]])
-                        juniorConSendData.append(
-                            [i[0][0], date, i[3], i[4], i[1]])
-
-                        db.collection('juniorCon').add({
-                            'id': int(i[0][0]),
-                            'date': date,
-                            'folder': i[3],
-                            'title': i[4],
-                            'description': i[1],
-                            'timestamp': firestore.SERVER_TIMESTAMP
-                        })
-            for i in juniorStudyList:
-                if i[0][0] != 0:
-                    cur.execute('SELECT EXISTS (SELECT * FROM study_junior WHERE id = %s)',
-                                [int(i[0][0])])
-                    (b,) = cur.fetchone()
-                    if b == False:
-                        date = i[1].replace(
-                            "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO study_junior (id, date, folder, title) VALUES (%s, %s, %s, %s)', [
-                                    i[0][0], date, i[2], i[3]])
-                        juniorStudySendData.append(
-                            [i[0][0], date, i[2], i[3]])
-
-                        db.collection('juniorStudy').add({
-                            'id': int(i[0][0]),
-                            'date': date,
-                            'folder': i[2],
-                            'title': i[3],
-                            'timestamp': firestore.SERVER_TIMESTAMP
-                        })
-            highConSendData = []
-            for i in highConList:
-                if i[0][0] != 0:
-                    cur.execute('SELECT EXISTS (SELECT * FROM con_high WHERE id = %s)',
-                                [int(i[0][0])])
-                    (b,) = cur.fetchone()
-                    if b == False:
-                        date = i[3].replace(
-                            "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO con_high (id, date, folder, title, description, link) VALUES (%s, %s, %s, %s, %s, %s)', [
-                                    i[0][0], date, i[4], i[5], i[1], i[2]])
-                        highConSendData.append(
-                            [i[0][0], date, i[4], i[5], i[1]])
-
-                        db.collection('highCon').add({
-                            'id': int(i[0][0]),
-                            'date': date,
-                            'folder': i[4],
-                            'title': i[5],
-                            'description': i[1],
-                            'link': i[2],
-                            'timestamp': firestore.SERVER_TIMESTAMP
-                        })
-            highStudySendData = []
-            for i in highStudyList:
-                if i[0][0] != 0:
-                    cur.execute('SELECT EXISTS (SELECT * FROM study_high WHERE id = %s)',
-                                [int(i[0][0])])
-                    (b,) = cur.fetchone()
-                    if b == False:
-                        date = i[2].replace(
-                            "年", "/").replace("月", "/").replace("日", "")
-                        cur.execute('INSERT INTO study_high (id, date, folder, title, link) VALUES (%s, %s, %s, %s, %s)', [
-                                    i[0][0], date, i[3], i[4], i[1]])
-                        highStudySendData.append(
-                            [i[0][0], date, i[3], i[4]])
-
-                        db.collection('highStudy').add({
-                            'id': int(i[0][0]),
-                            'date': date,
-                            'folder': i[3],
-                            'title': i[4],
-                            'link': i[1],
-                            'timestamp': firestore.SERVER_TIMESTAMP
-                        })
-        conn.commit()
-
-    sortedJuniorSchoolNewsList = []
-    for value in reversed(juniorSchoolNewsList):
-        sortedJuniorSchoolNewsList.append(value)
-    sortedHighSchoolNewsList = []
-    for value in reversed(highSchoolNewsList):
-        sortedHighSchoolNewsList.append(value)
-
+    juniorConSendData = []
+    for i in reversed(juniorConList):
+        if i[0][0] != 0:
+            date = i[2].replace(
+                "年", "/").replace("月", "/").replace("日", "")
+            juniorConSendData.append(
+                [i[0][0], date, i[3], i[4], i[1]])
+            db.collection('juniorCon').add({
+                'id': int(i[0][0]),
+                'date': date,
+                'folder': i[3],
+                'title': i[4],
+                'description': i[1],
+                'timestamp': firestore.SERVER_TIMESTAMP
+            })
+    docDict = db.collection('count').document('juniorCon').get().to_dict()
+    howManyData = int(docDict['count']) + len(juniorConSendData)
+    db.collection('count').document('juniorCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    
+    juniorStudySendData = []
+    for i in reversed(juniorStudyList):
+        if i[0][0] != 0:
+            date = i[1].replace(
+                "年", "/").replace("月", "/").replace("日", "")
+            juniorStudySendData.append(
+                [i[0][0], date, i[2], i[3]])
+            db.collection('juniorStudy').add({
+                'id': int(i[0][0]),
+                'date': date,
+                'folder': i[2],
+                'title': i[3],
+                'timestamp': firestore.SERVER_TIMESTAMP
+            })
+    docDict = db.collection('count').document('JuniorStudy').get().to_dict()
+    howManyData = int(docDict['count']) + len(juniorStudySendData)
+    db.collection('count').document('juniorStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    
     juniorSchoolNewsSendData = []
-    for i in sortedJuniorSchoolNewsList:
+    for i in reversed(juniorSchoolNewsList):
         if i[0][0] != 0 and i[0][0] not in schoolNewsGotList:
             date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
             db.collection('juniorSchoolNews').add({
@@ -421,8 +360,48 @@ def main():
     docDict = db.collection('count').document('juniorSchoolNews').get().to_dict()
     howManyData = int(docDict['count']) + len(juniorSchoolNewsSendData)
     db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    
+    highConSendData = []
+    for i in reversed(highConList):
+        if i[0][0] != 0:
+            date = i[3].replace(
+                "年", "/").replace("月", "/").replace("日", "")
+            highConSendData.append(
+                [i[0][0], date, i[4], i[5], i[1]])
+            db.collection('highCon').add({
+                'id': int(i[0][0]),
+                'date': date,
+                'folder': i[4],
+                'title': i[5],
+                'description': i[1],
+                'link': i[2],
+                'timestamp': firestore.SERVER_TIMESTAMP
+            })
+    docDict = db.collection('count').document('highCon').get().to_dict()
+    howManyData = int(docDict['count']) + len(highConSendData)
+    db.collection('count').document('highCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    
+    highStudySendData = []
+    for i in reversed(highStudyList):
+        if i[0][0] != 0:
+            date = i[2].replace(
+                "年", "/").replace("月", "/").replace("日", "")
+            highStudySendData.append(
+                [i[0][0], date, i[3], i[4]])
+            db.collection('highStudy').add({
+                'id': int(i[0][0]),
+                'date': date,
+                'folder': i[3],
+                'title': i[4],
+                'link': i[1],
+                'timestamp': firestore.SERVER_TIMESTAMP
+            })
+    docDict = db.collection('count').document('highStudy').get().to_dict()
+    howManyData = int(docDict['count']) + len(highStudySendData)
+    db.collection('count').document('highStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    
     highSchoolNewsSendData = []
-    for i in sortedHighSchoolNewsList:
+    for i in reversed(highSchoolNewsList):
         if i[0][0] != 0 and i[0][0] not in schoolNewsGotList:
             date = i[3].replace("年", "/").replace("月", "/").replace("日", "")
             db.collection('highSchoolNews').add({
@@ -438,26 +417,14 @@ def main():
     howManyData = int(docDict['count']) + len(highSchoolNewsSendData)
     db.collection('count').document('highSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
 
-    sortedJuniorConSendData = []
-    for value in reversed(juniorConSendData):
-        sortedJuniorConSendData.append(value)
-    sortedJuniorStudySendData = []
-    for value in reversed(juniorStudySendData):
-        sortedJuniorStudySendData.append(value)
-    sortedHighConSendData = []
-    for value in reversed(highConSendData):
-        sortedHighConSendData.append(value)
-    sortedHighStudySendData = []
-    for value in reversed(highStudySendData):
-        sortedHighStudySendData.append(value)
-    print("sortedJuniorConSendData:",sortedJuniorConSendData)
-    print("sortedJuniorStudySendData:", sortedJuniorStudySendData)
-    print("sortedHighConSendData:", sortedHighConSendData)
-    print("sortedHighStudySendData:", sortedHighStudySendData)
+    print("sortedJuniorConSendData:",juniorConSendData)
+    print("sortedJuniorStudySendData:", juniorStudySendData)
+    print("sortedHighConSendData:", highConSendData)
+    print("sortedHighStudySendData:", highStudySendData)
     print("getTime:", str(getTime))
     print("juniorSchoolNewsSendData:",juniorSchoolNewsSendData)
     print("highSchoolNewsSendData:", highSchoolNewsSendData)
-    return sortedJuniorConSendData, sortedJuniorStudySendData, sortedHighConSendData, sortedHighStudySendData, getTime, highSchoolNewsSendData, juniorSchoolNewsSendData
+    return juniorConSendData, juniorStudySendData, juniorSchoolNewsSendData, highConSendData, highStudySendData, highSchoolNewsSendData, getTime
 
 
 def get_connection():
