@@ -6,7 +6,7 @@
 環境変数 <code>CHROMEDRIVER_VERSION</code> に[ここ](https://chromedriver.chromium.org/downloads)に記載されているバージョンをセットする。
 
 ## Git
-コミットメッセージは極力以下の要項で統一する。
+コミットメッセージは極力以下で統一する。
 - fix：バグ修正
 - add：新規（ファイル）機能追加
 - update：機能修正（バグではない）

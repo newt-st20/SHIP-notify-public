@@ -31,26 +31,6 @@ firebase = pyrebase.initialize_app(config)
 def main():
     now = datetime.datetime.now()
     getTime = now.strftime('%H:%M:%S')
-    gotList = []
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute('SELECT id FROM con_high')
-            result = cur.fetchall()
-            for item in result:
-                gotList.append(item[0])
-            cur.execute('SELECT id FROM study_high')
-            result = cur.fetchall()
-            for item in result:
-                gotList.append(item[0])
-            cur.execute('SELECT id FROM con_junior')
-            result = cur.fetchall()
-            for item in result:
-                gotList.append(item[0])
-            cur.execute('SELECT id FROM study_junior')
-            result = cur.fetchall()
-            for item in result:
-                gotList.append(item[0])
-        conn.commit()
 
     if not firebase_admin._apps:
         CREDENTIALS = credentials.Certificate({
@@ -63,13 +43,19 @@ def main():
         firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
     db = firestore.client()
 
+    gotList = []
+    docs = db.collection('juniorCon').stream()
+    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    docs = db.collection('juniorStudy').stream()
+    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
     docs = db.collection('juniorSchoolNews').stream()
-    juniorSchoolNewsGotList = [int(doc.to_dict()['id']) for doc in docs]
+    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    docs = db.collection('highCon').stream()
+    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    docs = db.collection('highStudy').stream()
+    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
     docs = db.collection('highSchoolNews').stream()
-    highSchoolNewsGotList = [int(doc.to_dict()['id']) for doc in docs]
-    schoolNewsGotList = []
-    schoolNewsGotList.extend(juniorSchoolNewsGotList)
-    schoolNewsGotList.extend(highSchoolNewsGotList)
+    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
 
     if os.environ['STATUS'] == "local":
         CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
@@ -253,7 +239,7 @@ def main():
                 schoolNewsId = re.findall("'([^']*)'", stage)
             except Exception as e:
                 print(str(e))
-            if int(schoolNewsId[0]) not in schoolNewsGotList:
+            if int(schoolNewsId[0]) not in gotList:
                 try:
                     eachSchoolNewsList.append(schoolNewsId)
                     driver.get(
@@ -347,7 +333,7 @@ def main():
     
     juniorSchoolNewsSendData = []
     for i in reversed(juniorSchoolNewsList):
-        if i[0][0] != 0 and i[0][0] not in schoolNewsGotList:
+        if i[0][0] != 0 and i[0][0] not in gotList:
             date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
             db.collection('juniorSchoolNews').add({
                 'id': int(i[0][0]),
@@ -402,7 +388,7 @@ def main():
     
     highSchoolNewsSendData = []
     for i in reversed(highSchoolNewsList):
-        if i[0][0] != 0 and i[0][0] not in schoolNewsGotList:
+        if i[0][0] != 0 and i[0][0] not in gotList:
             date = i[3].replace("年", "/").replace("月", "/").replace("日", "")
             db.collection('highSchoolNews').add({
                 'id': int(i[0][0]),
