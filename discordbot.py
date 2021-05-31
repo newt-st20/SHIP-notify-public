@@ -595,10 +595,10 @@ async def getData():
             try:
                 if schoolNewsData[3] != '':
                     embed = discord.Embed(
-                        title=schoolNewsData[3], description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                        title=schoolNewsData[3], description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(242, 245, 66))
                 else:
                     embed = discord.Embed(
-                        title="中学学校通信更新通知", description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                        title="中学学校通信更新通知", description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(242, 245, 66))
                 embed.add_field(name="id", value=schoolNewsData[0])
                 if schoolNewsData[2] != '':
                     embed.add_field(name="path", value=schoolNewsData[2])
@@ -667,10 +667,10 @@ async def getData():
             try:
                 if schoolNewsData[3] != '':
                     embed = discord.Embed(
-                        title=schoolNewsData[3], description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                        title=schoolNewsData[3], description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(242, 245, 66))
                 else:
                     embed = discord.Embed(
-                        title="高校学校通信更新通知", description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(52, 229, 235))
+                        title="高校学校通信更新通知", description="投稿: "+schoolNewsData[1], color=discord.Colour.from_rgb(242, 245, 66))
                 embed.add_field(name="id", value=schoolNewsData[0])
                 if schoolNewsData[2] != '':
                     embed.add_field(name="path", value=schoolNewsData[2])
