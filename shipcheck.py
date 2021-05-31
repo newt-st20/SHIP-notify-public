@@ -44,18 +44,36 @@ def main():
     db = firestore.client()
 
     gotList = []
-    docs = db.collection('juniorCon').stream()
-    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    docs = db.collection('juniorStudy').stream()
-    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    docs = db.collection('juniorSchoolNews').stream()
-    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    docs = db.collection('highCon').stream()
-    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    docs = db.collection('highStudy').stream()
-    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    docs = db.collection('highSchoolNews').stream()
-    gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    try:
+        docs = db.collection('juniorCon').stream()
+        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    except Exception as e:
+        print(str(e))
+    try:
+        docs = db.collection('juniorStudy').stream()
+        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    except Exception as e:
+        print(str(e))
+    try:
+        docs = db.collection('juniorSchoolNews').stream()
+        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    except Exception as e:
+        print(str(e))
+    try:
+        docs = db.collection('highCon').stream()
+        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    except Exception as e:
+        print(str(e))
+    try:
+        docs = db.collection('highStudy').stream()
+        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    except Exception as e:
+        print(str(e))
+    try:
+        docs = db.collection('highSchoolNews').stream()
+        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+    except Exception as e:
+        print(str(e))
 
     if os.environ['STATUS'] == "local":
         CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
