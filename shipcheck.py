@@ -296,11 +296,9 @@ def main():
 
     juniorConSendData = []
     for i in reversed(juniorConList):
-        if i[0][0] != 0:
-            date = i[2].replace(
-                "年", "/").replace("月", "/").replace("日", "")
-            juniorConSendData.append(
-                [i[0][0], date, i[3], i[4], i[1]])
+        if i[0][0] != 0 and i[0][0] not in gotList:
+            date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
+            juniorConSendData.append([i[0][0], date, i[3], i[4], i[1]])
             db.collection('juniorCon').add({
                 'id': int(i[0][0]),
                 'date': date,
@@ -315,11 +313,9 @@ def main():
     
     juniorStudySendData = []
     for i in reversed(juniorStudyList):
-        if i[0][0] != 0:
-            date = i[1].replace(
-                "年", "/").replace("月", "/").replace("日", "")
-            juniorStudySendData.append(
-                [i[0][0], date, i[2], i[3]])
+        if i[0][0] != 0 and i[0][0] not in gotList:
+            date = i[1].replace("年", "/").replace("月", "/").replace("日", "")
+            juniorStudySendData.append([i[0][0], date, i[2], i[3]])
             db.collection('juniorStudy').add({
                 'id': int(i[0][0]),
                 'date': date,
@@ -327,7 +323,7 @@ def main():
                 'title': i[3],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-    docDict = db.collection('count').document('JuniorStudy').get().to_dict()
+    docDict = db.collection('count').document('juniorStudy').get().to_dict()
     howManyData = int(docDict['count']) + len(juniorStudySendData)
     db.collection('count').document('juniorStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
     
@@ -349,11 +345,9 @@ def main():
     
     highConSendData = []
     for i in reversed(highConList):
-        if i[0][0] != 0:
-            date = i[3].replace(
-                "年", "/").replace("月", "/").replace("日", "")
-            highConSendData.append(
-                [i[0][0], date, i[4], i[5], i[1]])
+        if i[0][0] != 0 and i[0][0] not in gotList:
+            date = i[3].replace("年", "/").replace("月", "/").replace("日", "")
+            highConSendData.append([i[0][0], date, i[4], i[5], i[1]])
             db.collection('highCon').add({
                 'id': int(i[0][0]),
                 'date': date,
@@ -369,11 +363,9 @@ def main():
     
     highStudySendData = []
     for i in reversed(highStudyList):
-        if i[0][0] != 0:
-            date = i[2].replace(
-                "年", "/").replace("月", "/").replace("日", "")
-            highStudySendData.append(
-                [i[0][0], date, i[3], i[4]])
+        if i[0][0] != 0 and i[0][0] not in gotList:
+            date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
+            highStudySendData.append([i[0][0], date, i[3], i[4]])
             db.collection('highStudy').add({
                 'id': int(i[0][0]),
                 'date': date,
