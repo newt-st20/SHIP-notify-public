@@ -326,8 +326,9 @@ def main():
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
     docDict = db.collection('count').document('juniorCon').get().to_dict()
-    howManyData = int(docDict['count']) + len(juniorConSendData)
-    db.collection('count').document('juniorCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    if len(juniorConSendData) != 0:
+        howManyData = int(docDict['count']) + len(juniorConSendData)
+        db.collection('count').document('juniorCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
     
     juniorStudySendData = []
     for i in reversed(juniorStudyList):
@@ -342,13 +343,15 @@ def main():
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
     docDict = db.collection('count').document('juniorStudy').get().to_dict()
-    howManyData = int(docDict['count']) + len(juniorStudySendData)
-    db.collection('count').document('juniorStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    if len(juniorStudySendData) != 0:
+        howManyData = int(docDict['count']) + len(juniorStudySendData)
+        db.collection('count').document('juniorStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
     
     juniorSchoolNewsSendData = []
     for i in reversed(juniorSchoolNewsList):
         if i[0][0] != 0 and i[0][0] not in gotList:
             date = i[2].replace("年", "/").replace("月", "/").replace("日", "")
+            juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
             db.collection('juniorSchoolNews').add({
                 'id': int(i[0][0]),
                 'date': date,
@@ -356,10 +359,10 @@ def main():
                 'title': i[4],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-            juniorSchoolNewsSendData.append([i[0][0], date, i[3], i[4]])
     docDict = db.collection('count').document('juniorSchoolNews').get().to_dict()
-    howManyData = int(docDict['count']) + len(juniorSchoolNewsSendData)
-    db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    if len(juniorSchoolNewsSendData) != 0:
+        howManyData = int(docDict['count']) + len(juniorSchoolNewsSendData)
+        db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
     
     highConSendData = []
     for i in reversed(highConList):
@@ -376,8 +379,9 @@ def main():
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
     docDict = db.collection('count').document('highCon').get().to_dict()
-    howManyData = int(docDict['count']) + len(highConSendData)
-    db.collection('count').document('highCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    if len(highConSendData) != 0:
+        howManyData = int(docDict['count']) + len(highConSendData)
+        db.collection('count').document('highCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
     
     highStudySendData = []
     for i in reversed(highStudyList):
@@ -393,13 +397,15 @@ def main():
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
     docDict = db.collection('count').document('highStudy').get().to_dict()
-    howManyData = int(docDict['count']) + len(highStudySendData)
-    db.collection('count').document('highStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    if len(highStudySendData) != 0:
+        howManyData = int(docDict['count']) + len(highStudySendData)
+        db.collection('count').document('highStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
     
     highSchoolNewsSendData = []
     for i in reversed(highSchoolNewsList):
         if i[0][0] != 0 and i[0][0] not in gotList:
             date = i[3].replace("年", "/").replace("月", "/").replace("日", "")
+            highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
             db.collection('highSchoolNews').add({
                 'id': int(i[0][0]),
                 'date': date,
@@ -408,16 +414,16 @@ def main():
                 'link': i[2],
                 'timestamp': firestore.SERVER_TIMESTAMP
             })
-            highSchoolNewsSendData.append([i[0][0], date, i[4], i[5], i[2]])
     docDict = db.collection('count').document('highSchoolNews').get().to_dict()
-    howManyData = int(docDict['count']) + len(highSchoolNewsSendData)
-    db.collection('count').document('highSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+    if len(highSchoolNewsSendData) != 0:
+        howManyData = int(docDict['count']) + len(highSchoolNewsSendData)
+        db.collection('count').document('highSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
 
+    print("getTime:", str(getTime))
     print("sortedJuniorConSendData:",juniorConSendData)
     print("sortedJuniorStudySendData:", juniorStudySendData)
     print("sortedHighConSendData:", highConSendData)
     print("sortedHighStudySendData:", highStudySendData)
-    print("getTime:", str(getTime))
     print("juniorSchoolNewsSendData:",juniorSchoolNewsSendData)
     print("highSchoolNewsSendData:", highSchoolNewsSendData)
     return juniorConSendData, juniorStudySendData, juniorSchoolNewsSendData, highConSendData, highStudySendData, highSchoolNewsSendData, getTime
