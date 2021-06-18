@@ -75,12 +75,10 @@ async def on_message(message):
             content = '`sh!info` idからSHIP上のファイル名や投稿日などを取得。省略形は`-i`'
             content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す。省略形は`-f`'
             content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
+            content += '_n`sh!when` SHIPの更新を取得する日時を表示'
             content += '\n`sh!wiki` Wikipediaを検索'
             content += '\n`sh!nhk` NHKで現在放送している番組を取得'
-            content += '\n`sh!naroulist` なろう通知チャンネルで通知する小説のリスト'
-            content += '\n`sh!narouadd` なろう通知チャンネルで通知する小説の追加'
-            content += '\n`sh!narouremove` なろう通知チャンネルで通知する小説の削除'
-            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/05/31", description=content, color=discord.Colour.from_rgb(190, 252, 3))
+            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/06/18", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
             flag = False
@@ -352,42 +350,15 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             except Exception as e:
                 await message.reply("エラー"+str(e))
-        elif 'naroucheck' in message.content:
-            try:
-                await getNarou()
-                await message.channel.send('なろうの更新取得処理が完了しました')
-            except Exception as e:
-                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-        elif 'narouadd' in message.content:
-            if len(message.content.split()) != 2:
-                await message.channel.send('第2引数に小説のURLの末尾にあるncodeを入れてください。')
-                return
-            ncode = message.content.split()[1]
-            resMessage = narou.add(ncode)
-            if resMessage[0] == "success":
-                await message.channel.send('更新通知リストに**'+resMessage[1]+'** ( '+resMessage[2] + ' ) を追加しました。')
-            else:
-                await message.channel.send('エラー: '+resMessage[1])
-        elif 'narouremove' in message.content:
-            if len(message.content.split()) != 2:
-                await message.channel.send('第2引数に小説のURLの末尾にあるncodeを入れてください。')
-                return
-            ncode = message.content.split()[1]
-            resMessage = narou.remove(ncode)
-            if resMessage[0] == "success":
-                await message.channel.send('更新通知リストから '+resMessage[1] + ' ) を削除しました。')
-            else:
-                await message.channel.send('エラー: '+resMessage[1])
-        elif 'naroulist' in message.content:
-            try:
-                data = narou.list()
-                for i in data:
-                    body = ""
-                    body += "**title** " + \
-                        i[1]+" ( https://ncode.syosetu.com/"+i[0]+" )\n"
-                    await message.channel.send(body)
-            except Exception as e:
-                await message.channel.send('【なろう】\nエラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+        elif 'when' in message.content:
+            configChannel = client.get_channel(820242721330561044)
+            messages = await configChannel.history().flatten()
+            for msg in messages:
+                if "GET_HOUR=" in msg.content:
+                    whenGetConfigMessage = msg.content.lstrip("GET_HOUR=")
+                    continue
+            hourList = [int(x) for x in whenGetConfigMessage.split()]
+            await message.channel.send('現在毎日'+str(hourList)+'時にSHIPデータを取得しています')
         else:
             await message.channel.send('このコマンドは用意されていません')
     if message.content == 'sa!get':
@@ -396,23 +367,14 @@ async def on_message(message):
             await getData()
             await message.channel.send('処理が完了しました')
         except Exception as e:
-            await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
+            await message.channel.send(str(type(e)) + str(e))
     elif message.content == 'sa!shnews':
         await message.channel.send('データの取得を開始します')
         try:
             await getNewsData()
             await message.channel.send('処理が完了しました')
         except Exception as e:
-            await message.channel.send('エラータイプ:' + str(type(e))+'\nエラーメッセージ:' + str(e))
-    elif message.content == 'sa!count':
-        guild = message.guild
-        member_count = guild.member_count
-        user_count = sum(
-            1 for member in guild.members if not member.bot)
-        bot_count = sum(1 for member in guild.members if member.bot)
-        await message.channel.send(f'メンバー数：{member_count}\nユーザ数：{user_count}\nBOT数：{bot_count}')
-    elif message.content == 'sa!delete-all-message':
-        await message.channel.purge(limit=None)
+            await message.channel.send(str(type(e)) + str(e))
     if isinstance(message.channel, discord.DMChannel):
         embed = discord.Embed(title="DMを受信しました")
         embed.add_field(name="ユーザー名",
@@ -438,18 +400,14 @@ async def on_message(message):
                 else:
                     body = oldmessage.content+"," + \
                         oldmessage.attachments[0].filename
-                embed = discord.Embed(timestamp=oldmessage.created_at,
-                                      description=body)
+                embed = discord.Embed(timestamp=oldmessage.created_at,description=body)
                 embed.set_image(url=str(oldmessage.attachments[0].url))
             elif oldmessage.content != "":
-                embed = discord.Embed(timestamp=oldmessage.created_at,
-                                      description=oldmessage.content)
+                embed = discord.Embed(timestamp=oldmessage.created_at,description=oldmessage.content)
             elif oldmessage.embeds:
-                embed = discord.Embed(timestamp=oldmessage.created_at,
-                                      description="リッチメッセージ")
+                embed = discord.Embed(timestamp=oldmessage.created_at,description="リッチメッセージ")
             else:
-                embed = discord.Embed(timestamp=oldmessage.created_at,
-                                      description="システムメッセージ")
+                embed = discord.Embed(timestamp=oldmessage.created_at,description="システムメッセージ")
         embed.set_author(name=oldmessage.author.name,
                          icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
@@ -524,12 +482,6 @@ async def loop():
                     await getLogChannel.send('栄東ニュースの取得処理が完了しました')
                 except Exception as e:
                     await getLogChannel.send('**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
-        if nowHour in narouHourList:
-            try:
-                await getNarou()
-                await getLogChannel.send('小説家になろうの更新取得処理が完了しました')
-            except Exception as e:
-                await getLogChannel.send('**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
 
 
 async def getData():
@@ -716,20 +668,6 @@ async def getNewsData():
                         value='栄東ニュースに更新はありませんでした')
         embed.set_footer(text="取得: "+result[1])
         await getLogChannel.send(embed=embed)
-
-
-async def getNarou():
-    await client.wait_until_ready()
-    narouChannel = client.get_channel(826094369467138108)
-    getLogChannel = client.get_channel(817400535639916544)
-    try:
-        result = narou.main()
-        for item in result:
-            embed = discord.Embed(
-                title=str(item[3]), description="更新日時:"+str(item[1])+"\n最新ページURL: https://ncode.syosetu.com/"+str(item[0])+"/"+str(item[2]), color=discord.Colour.from_rgb(66, 135, 245))
-            await narouChannel.send(embed=embed)
-    except Exception as e:
-        await getLogChannel.send("なろう取得不具合:"+str(e))
 
 
 loop.start()
