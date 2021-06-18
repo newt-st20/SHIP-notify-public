@@ -4,31 +4,60 @@ import requests
 import psycopg2
 from dotenv import load_dotenv
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
 load_dotenv()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
+if not firebase_admin._apps:
+    CREDENTIALS = credentials.Certificate({
+    'type': 'service_account',
+    'token_uri': 'https://oauth2.googleapis.com/token',
+    'project_id': os.environ['FIREBASE_PROJECT_ID'],
+    'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
+    'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
+    })
+    firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
+db = firestore.client()
 
 def main():
     data = []
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                'SELECT ncode, lastup, count, title FROM narou WHERE ended = 1')
-            result = cur.fetchall()
-            for item in result:
-                response = requests.get(
-                    'https://api.syosetu.com/novelapi/api/?out=json&ncode='+item[0]+'&of=t-gl-ga-e')
-                responseJson = response.json()
-                lastUpdate = responseJson[1]['general_lastup']
-                count = responseJson[1]['general_all_no']
-                end = responseJson[1]['end']
-                if item[1] != lastUpdate:
-                    data.append([item[0], lastUpdate, count, item[3]])
-                    cur.execute(
-                        'UPDATE narou SET lastup = (%s), count = (%s), ended = (%s) WHERE ncode = (%s)', [lastUpdate, count, end, item[0]])
-        conn.commit()
-    return data
+    docs = db.collection('narou').stream()
+    for doc in docs:
+        eachDoc = doc.to_dict()
+        data.append({
+            'ncode': doc.id,
+            'title': eachDoc['title'],
+            'count': eachDoc['count'],
+            'lastup': eachDoc['lastup'],
+            'channels': eachDoc['channels']
+        })
+    newData = []
+    for eachData in data:
+        response = requests.get(
+                    'https://api.syosetu.com/novelapi/api/?out=json&ncode='+eachData['ncode']+'&of=t-gl-ga-e')
+        responseJson = response.json()
+        lastUpdate = responseJson[1]['general_lastup']
+        count = responseJson[1]['general_all_no']
+        end = responseJson[1]['end']
+        if eachData['lastup'] != lastUpdate:
+            db.collection('narou').document(eachData['ncode']).update({
+                'count': count,
+                'lastup': lastUpdate,
+                'ended': end
+            })
+            newData.append({
+                'ncode': eachData['ncode'],
+                'title': eachData['title'],
+                'count': count,
+                'lastup': lastUpdate,
+                'ended': end,
+                'channels': eachData['channels']
+            })
+    return newData
 
 
 def add(ncode):
