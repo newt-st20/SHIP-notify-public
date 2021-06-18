@@ -1,16 +1,12 @@
 import os
 
-import psycopg2
 from dotenv import load_dotenv
-from psycopg2.extras import DictCursor
 
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
 load_dotenv()
-
-DATABASE_URL = os.environ['DATABASE_URL']
 
 if not firebase_admin._apps:
     CREDENTIALS = credentials.Certificate({
@@ -67,7 +63,6 @@ def info(id):
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", "中学学校通信", doc.id])
-
     return data
 
 
@@ -103,37 +98,33 @@ def recently(type, howmany):
         for doc in docs:
             eachDoc = doc.to_dict()
             data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
-    print(data)
     return data
 
 
 def count(type):
     data = []
+    dbc = db.collection('count')
     if type == 1:
-        docDict = db.collection('count').document('highCon').get().to_dict()
+        docDict = dbc.document('highCon').get().to_dict()
         data = docDict['count']
     elif type == 2:
-        docDict = db.collection('count').document('highStudy').get().to_dict()
+        docDict = dbc.document('highStudy').get().to_dict()
         data = docDict['count']
     elif type == 3:
-        docDict = db.collection('count').document('juniorCon').get().to_dict()
+        docDict = dbc.document('juniorCon').get().to_dict()
         data = docDict['count']
     elif type == 4:
-        docDict = db.collection('count').document('juniorStudy').get().to_dict()
+        docDict = dbc.document('juniorStudy').get().to_dict()
         data = docDict['count']
     elif type == 5:
-        docDict = db.collection('count').document('juniorSchoolNews').get().to_dict()
+        docDict = dbc.document('juniorSchoolNews').get().to_dict()
         data = docDict['count']
     elif type == 6:
-        docDict = db.collection('count').document('highSchoolNews').get().to_dict()
+        docDict = dbc.document('highSchoolNews').get().to_dict()
         data = docDict['count']
     else:
         data = 0
     return data
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 
 if __name__ == "__main__":
