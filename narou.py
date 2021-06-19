@@ -60,63 +60,54 @@ def main():
     return newData
 
 
-def add(ncode):
+def add(ncode, channel):
     if 'ncode' in ncode:
         return ["error", "第2引数にはURLの末尾にある小説のncodeを入れてください。"]
-    response = requests.get(
-        'https://api.syosetu.com/novelapi/api/?out=json&ncode='+ncode+'&of=t-gl-ga-e')
-    try:
-        responseJson = response.json()
-        title = responseJson[1]['title']
-        lastUpdate = responseJson[1]['general_lastup']
-        count = responseJson[1]['general_all_no']
-        end = responseJson[1]['end']
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    'SELECT ncode, lastup, count, title FROM narou')
-                result = cur.fetchall()
-                if len(result) != 0:
-                    return ["error", "この小説はすでに更新通知リストに追加されています。"]
-                cur.execute('INSERT INTO narou (title, ncode, lastup, count, ended) VALUES (%s, %s, %s, %s, %s)', [
-                    title, ncode, lastUpdate, count, end])
-            conn.commit()
-    except Exception as e:
-        print(str(e))
-        return ["error", str(e)]
-    return ["success", title, "https://ncode.syosetu.com/"+ncode]
+    if db.collection('narou').document(ncode).get().exists:
+        db.collection('narou').document(ncode).update({
+            'channels' : firestore.arrayUnion([channel])
+        })
+    else:
+        try:
+            response = requests.get(
+                'https://api.syosetu.com/novelapi/api/?out=json&ncode='+ncode+'&of=t-gl-ga-e')
+            responseJson = response.json()
+            db.collection('narou').document(ncode).set({
+                'title': responseJson[1]['title'],
+                'lastup': responseJson[1]['general_lastup'],
+                'count': responseJson[1]['general_all_no'],
+                'ended': responseJson[1]['end'],
+                'channels': [channel]
+                })
+        except:
+            return "error"
+    return "success"
 
 
-def remove(ncode):
-    try:
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    'SELECT ncode, lastup, count, title FROM narou')
-                result = cur.fetchall()
-                if len(result) != 0:
-                    try:
-                        cur.execute(
-                            'DELETE FROM narou WHERE ncode = %s', [ncode])
-                    except Exception as e:
-                        return str(e)
-            conn.commit()
-    except Exception as e:
-        print(str(e))
-        return ["error", str(e)]
-    return ["success", "https://ncode.syosetu.com/"+ncode]
+def add(ncode, channel):
+    if 'ncode' in ncode:
+        return ["error", "第2引数にはURLの末尾にある小説のncodeを入れてください。"]
+    if db.collection('narou').document(ncode).get().exists:
+        try:
+            db.collection('narou').document(ncode).update({
+                'channels' : firestore.arrayRemove([channel])
+            })
+        except:
+            return "error"
+    else:
+        return "error"
+    return "success"
 
 
-def list():
+def list(channel):
     data = []
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                'SELECT ncode, title FROM narou WHERE ended = 1')
-            result = cur.fetchall()
-            for item in result:
-                data.append([item[0], item[1]])
-        conn.commit()
+    docs = db.collection('narou').where('channels', 'array_contains', channel).stream()
+    for doc in docs:
+        eachDoc = doc.to_dict()
+        data.append({
+            'ncode': doc.id,
+            'title': eachDoc['title']
+        })
     return data
 
 
