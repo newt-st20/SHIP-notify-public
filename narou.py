@@ -59,8 +59,8 @@ def add(ncode, channel):
         doc = db.collection('narou').document(str(ncode)).get()
         if doc.exists:
             channels = doc.to_dict()['channels']
-            if channel not in channels:
-                channels.append(channel)
+            if str(channel) not in channels:
+                channels.append(str(channel))
                 db.collection('narou').document(str(ncode)).update({
                     'channels' : channels
                 })
@@ -73,7 +73,7 @@ def add(ncode, channel):
                 'lastup': responseJson[1]['general_lastup'],
                 'count': responseJson[1]['general_all_no'],
                 'ended': responseJson[1]['end'],
-                'channels': [channel]
+                'channels': [str(channel)]
                 })
         return "success"
     except Exception as e:
@@ -85,8 +85,8 @@ def remove(ncode, channel):
         doc = db.collection('narou').document(str(ncode)).get()
         if doc.exists:
             channels = doc.to_dict()['channels']
-            if channel in channels:
-                channels.remove(channel)
+            if str(channel) in channels:
+                channels.remove(str(channel))
                 db.collection('narou').document(str(ncode)).update({
                     'channels' : channels
                 })
@@ -99,7 +99,7 @@ def remove(ncode, channel):
 
 def list(channel):
     data = []
-    docs = db.collection('narou').where('channels', 'array_contains', channel).stream()
+    docs = db.collection('narou').where('channels', 'array_contains', str(channel)).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({
