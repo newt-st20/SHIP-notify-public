@@ -80,7 +80,7 @@ async def on_message(message):
             content += '\n`sh!nhk` NHKで現在放送している番組を取得'
             content += '＜「小説家になろう」関連コマンド＞ ※DMチャンネルでのみ利用可能'
             content += '\n`n!add` 更新を通知する小説の追加'
-            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/06/18", description=content, color=discord.Colour.from_rgb(190, 252, 3))
+            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/06/19", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
             flag = False
@@ -363,20 +363,31 @@ async def on_message(message):
             await message.channel.send('現在毎日'+str(hourList)+'時にSHIPデータを取得しています')
         else:
             await message.channel.send('このコマンドは用意されていません')
-    if message.content == 'sa!get':
-        await message.channel.send('データの取得を開始します')
-        try:
-            await getData()
-            await message.channel.send('処理が完了しました')
-        except Exception as e:
-            await message.channel.send(str(type(e)) + str(e))
-    elif message.content == 'sa!shnews':
-        await message.channel.send('データの取得を開始します')
-        try:
-            await getNewsData()
-            await message.channel.send('処理が完了しました')
-        except Exception as e:
-            await message.channel.send(str(type(e)) + str(e))
+    if 'sa!' in message.content:
+        if message.author.guild_permissions.administrator:
+            if message.content == 'sa!get':
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getData()
+                    await message.channel.send('処理が完了しました')
+                except Exception as e:
+                    await message.channel.send(str(type(e)) + str(e))
+            elif message.content == 'sa!shnews':
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getNewsData()
+                    await message.channel.send('処理が完了しました')
+                except Exception as e:
+                    await message.channel.send(str(type(e)) + str(e))
+            elif message.content == 'sa!narou':
+                await message.channel.send('データの取得を開始します')
+                try:
+                    await getNarouData()
+                    await message.channel.send('処理が完了しました')
+                except Exception as e:
+                    await message.channel.send(str(type(e)) + str(e))
+        else:
+            await message.channel.send('このコマンドは管理者のみ利用可能です')
     if isinstance(message.channel, discord.DMChannel):
         embed = discord.Embed(title="DMを受信しました")
         embed.add_field(name="ユーザー名",
@@ -401,7 +412,7 @@ async def on_message(message):
                 if result == "success":
                     await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
                 else:
-                    await message.channel.send("この小説はまだ更新通知登録がされていないか、存在しません"+result)
+                    await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
         elif 'n!list' in message.content:
             result = narou.list(message.channel.id)
             body = ""
