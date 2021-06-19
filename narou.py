@@ -59,12 +59,16 @@ def main():
 
 
 def add(ncode, channel):
-    if db.collection('narou').document(str(ncode)).get().exists:
-        db.collection('narou').document(str(ncode)).update({
-            'channels' : firestore.arrayUnion([str(channel)])
-        })
-    else:
-        try:
+    try:
+        doc = db.collection('narou').document(str(ncode)).get()
+        if doc.exists:
+            channels = doc.to_dict()['channels']
+            if channel not in channels:
+                channels.append(channel)
+                db.collection('narou').document(str(ncode)).update({
+                    'channels' : channels
+                })
+        else:
             response = requests.get(
                 'https://api.syosetu.com/novelapi/api/?out=json&ncode='+str(ncode)+'&of=t-gl-ga-e')
             responseJson = response.json()
@@ -75,22 +79,26 @@ def add(ncode, channel):
                 'ended': responseJson[1]['end'],
                 'channels': [str(channel)]
                 })
-        except Exception as e:
-            return str(e)
-    return "success"
+        return "success"
+    except Exception as e:
+        return str(e)
 
 
 def remove(ncode, channel):
-    if db.collection('narou').document(str(ncode)).get().exists:
-        try:
-            db.collection('narou').document(str(ncode)).update({
-                'channels' : firestore.arrayRemove([str(channel)])
-            })
-        except Exception as e:
-            return str(e)
-    else:
-        return "error"
-    return "success"
+    try:
+        doc = db.collection('narou').document(str(ncode)).get()
+        if doc.exists:
+            channels = doc.to_dict()['channels']
+            if channel in channels:
+                channels.remove(channel)
+                db.collection('narou').document(str(ncode)).update({
+                    'channels' : channels
+                })
+        else:
+            return "error"
+        return "success"
+    except Exception as e:
+        return str(e)
 
 
 def list(channel):
