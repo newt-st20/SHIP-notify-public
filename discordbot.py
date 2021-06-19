@@ -384,6 +384,28 @@ async def on_message(message):
         embed.add_field(name="チャンネルID",
                         value=str(message.channel.id), inline=False)
         await dmLogChannel.send(embed=embed)
+        if 'nadd' in message.content:
+            if len(message.content.split()) == 2:
+                ncode = message.content.split()[1]
+                result = narou.add(ncode, message.channel.id)
+                if result == "success":
+                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+"の小説の更新を通知します")
+                else:
+                    await message.channel.send("https://ncode.syosetu.com/"+ncode+"の小説は存在しません")
+        elif 'nremove' in message.content:
+            if len(message.content.split()) == 2:
+                ncode = message.content.split()[1]
+                result = narou.remove(ncode, message.channel.id)
+                if result == "success":
+                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+"の小説の更新通知を解除します")
+                else:
+                    await message.channel.send("この小説はまだ更新通知登録がされていないか、存在しません")
+        elif 'nlist' in message.content:
+            result = narou.list(message.channel.id)
+            body = ""
+            for eachData in result:
+                body += "`title` "+eachData['title']+" ( https://ncode.syosetu.com/" + eachData['ncode'] + " )"
+            await message.channel.send(body)
     if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'reply!' in message.content:
         replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
         sendMessage = str(message.content.split('!')[2])
@@ -421,7 +443,6 @@ async def on_raw_reaction_add(payload):
     member = guild.get_member(payload.user_id)
     user = client.get_user(payload.user_id)
     entranceMessageId = 817952115095109633
-    narouRoleMessageId = 827415329223213066
     roleLogChannel = client.get_channel(817401458244714506)
     if payload.message_id == entranceMessageId:
         authenticatedRole = guild.get_role(813014134001500170)
@@ -431,11 +452,6 @@ async def on_raw_reaction_add(payload):
         await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与し、'+unauthenticatedRole.mention+'ロールを剥奪しました。')
         await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバー参加時に全員に送信しています__")
         await user.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
-    elif payload.message_id == narouRoleMessageId:
-        if payload.emoji.name == '1️⃣':
-            narouRole = guild.get_role(827413046968320040)
-            await member.add_roles(narouRole)
-            await roleLogChannel.send(user.mention+'に'+narouRole.mention+'ロールを付与しました。')
 
 
 @tasks.loop(seconds=600)
@@ -482,7 +498,8 @@ async def loop():
                     await getLogChannel.send('栄東ニュースの取得処理が完了しました')
                 except Exception as e:
                     await getLogChannel.send('**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
-
+        if nowHour in narouHourList:
+            await getNarouData()
 
 async def getData():
     await client.wait_until_ready()
@@ -668,6 +685,16 @@ async def getNewsData():
                         value='栄東ニュースに更新はありませんでした')
         embed.set_footer(text="取得: "+result[1])
         await getLogChannel.send(embed=embed)
+
+async def getNarouData():
+    await client.wait_until_ready()
+    result = narou.main()
+    if len(result) != 0:
+        for eachData in result:
+            embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+eachData['count'], color=discord.Colour.from_rgb(52, 235, 79))
+            for channel in eachData['channels']:
+                sendChannel = client.get_channel(channel)
+                await sendChannel.send(embed=embed)
 
 
 loop.start()

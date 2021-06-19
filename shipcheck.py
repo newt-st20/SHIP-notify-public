@@ -4,18 +4,13 @@ import random
 import re
 import time
 
-import psycopg2
 import pyrebase
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
-from psycopg2.extras import DictCursor
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-load_dotenv()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -28,20 +23,20 @@ config = {
 firebase = pyrebase.initialize_app(config)
 
 
+if not firebase_admin._apps:
+    CREDENTIALS = credentials.Certificate({
+    'type': 'service_account',
+    'token_uri': 'https://oauth2.googleapis.com/token',
+    'project_id': os.environ['FIREBASE_PROJECT_ID'],
+    'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
+    'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
+    })
+    firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
+db = firestore.client()
+
 def main():
     now = datetime.datetime.now()
     getTime = now.strftime('%H:%M:%S')
-
-    if not firebase_admin._apps:
-        CREDENTIALS = credentials.Certificate({
-        'type': 'service_account',
-        'token_uri': 'https://oauth2.googleapis.com/token',
-        'project_id': os.environ['FIREBASE_PROJECT_ID'],
-        'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
-        'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
-        })
-        firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
-    db = firestore.client()
 
     gotList = []
     try:
@@ -427,10 +422,6 @@ def main():
     print("juniorSchoolNewsSendData:",juniorSchoolNewsSendData)
     print("highSchoolNewsSendData:", highSchoolNewsSendData)
     return juniorConSendData, juniorStudySendData, juniorSchoolNewsSendData, highConSendData, highStudySendData, highSchoolNewsSendData, getTime
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 
 def getWaitSecs():
