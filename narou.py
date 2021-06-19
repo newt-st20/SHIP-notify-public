@@ -61,7 +61,7 @@ def main():
 def add(ncode, channel):
     if db.collection('narou').document(str(ncode)).get().exists:
         db.collection('narou').document(str(ncode)).update({
-            'channels' : firestore.arrayUnion([channel])
+            'channels' : firestore.arrayUnion([str(channel)])
         })
     else:
         try:
@@ -73,7 +73,7 @@ def add(ncode, channel):
                 'lastup': responseJson[1]['general_lastup'],
                 'count': responseJson[1]['general_all_no'],
                 'ended': responseJson[1]['end'],
-                'channels': [channel]
+                'channels': [str(channel)]
                 })
         except Exception as e:
             return str(e)
@@ -84,7 +84,7 @@ def remove(ncode, channel):
     if db.collection('narou').document(str(ncode)).get().exists:
         try:
             db.collection('narou').document(str(ncode)).update({
-                'channels' : firestore.arrayRemove([channel])
+                'channels' : firestore.arrayRemove([str(channel)])
             })
         except Exception as e:
             return str(e)
@@ -95,7 +95,7 @@ def remove(ncode, channel):
 
 def list(channel):
     data = []
-    docs = db.collection('narou').where('channels', 'array_contains', channel).stream()
+    docs = db.collection('narou').where('channels', 'array_contains', str(channel)).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({
