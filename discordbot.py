@@ -384,7 +384,7 @@ async def on_message(message):
         embed.add_field(name="チャンネルID",
                         value=str(message.channel.id), inline=False)
         await dmLogChannel.send(embed=embed)
-        if 'nadd' in message.content:
+        if 'n!add' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 result = narou.add(ncode, message.channel.id)
@@ -392,7 +392,7 @@ async def on_message(message):
                     await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+"の小説の更新を通知します")
                 else:
                     await message.channel.send("https://ncode.syosetu.com/"+ncode+"の小説は存在しません")
-        elif 'nremove' in message.content:
+        elif 'n!remove' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 result = narou.remove(ncode, message.channel.id)
@@ -400,7 +400,7 @@ async def on_message(message):
                     await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+"の小説の更新通知を解除します")
                 else:
                     await message.channel.send("この小説はまだ更新通知登録がされていないか、存在しません")
-        elif 'nlist' in message.content:
+        elif 'n!list' in message.content:
             result = narou.list(message.channel.id)
             body = ""
             for eachData in result:
@@ -495,11 +495,15 @@ async def loop():
             if random.randrange(10) == 0:
                 try:
                     await getNewsData()
-                    await getLogChannel.send('栄東ニュースの取得処理が完了しました')
+                    await getLogChannel.send('栄東ニュースの更新取得処理が完了しました')
                 except Exception as e:
                     await getLogChannel.send('**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
         if nowHour in narouHourList:
-            await getNarouData()
+            try:
+                await getNarouData()
+                await getLogChannel.send('小説家になろうの取更新得処理が完了しました')
+            except Exception as e:
+                await getLogChannel.send('**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
 
 async def getData():
     await client.wait_until_ready()

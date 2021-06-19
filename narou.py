@@ -61,23 +61,21 @@ def main():
 
 
 def add(ncode, channel):
-    if 'ncode' in ncode:
-        return ["error", "第2引数にはURLの末尾にある小説のncodeを入れてください。"]
-    if db.collection('narou').document(ncode).get().exists:
-        db.collection('narou').document(ncode).update({
-            'channels' : firestore.arrayUnion([channel])
+    if db.collection('narou').document(str(ncode)).get().exists:
+        db.collection('narou').document(str(ncode)).update({
+            'channels' : firestore.arrayUnion([str(channel)])
         })
     else:
         try:
             response = requests.get(
-                'https://api.syosetu.com/novelapi/api/?out=json&ncode='+ncode+'&of=t-gl-ga-e')
+                'https://api.syosetu.com/novelapi/api/?out=json&ncode='+str(ncode)+'&of=t-gl-ga-e')
             responseJson = response.json()
-            db.collection('narou').document(ncode).set({
+            db.collection('narou').document(str(ncode)).set({
                 'title': responseJson[1]['title'],
                 'lastup': responseJson[1]['general_lastup'],
                 'count': responseJson[1]['general_all_no'],
                 'ended': responseJson[1]['end'],
-                'channels': [channel]
+                'channels': [str(channel)]
                 })
         except:
             return "error"
@@ -85,12 +83,10 @@ def add(ncode, channel):
 
 
 def add(ncode, channel):
-    if 'ncode' in ncode:
-        return ["error", "第2引数にはURLの末尾にある小説のncodeを入れてください。"]
-    if db.collection('narou').document(ncode).get().exists:
+    if db.collection('narou').document(str(ncode)).get().exists:
         try:
-            db.collection('narou').document(ncode).update({
-                'channels' : firestore.arrayRemove([channel])
+            db.collection('narou').document(str(ncode)).update({
+                'channels' : firestore.arrayRemove([str(channel)])
             })
         except:
             return "error"
@@ -101,7 +97,7 @@ def add(ncode, channel):
 
 def list(channel):
     data = []
-    docs = db.collection('narou').where('channels', 'array_contains', channel).stream()
+    docs = db.collection('narou').where('channels', 'array_contains', str(channel)).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({
