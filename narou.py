@@ -82,7 +82,7 @@ def add(ncode, channel):
     return "success"
 
 
-def add(ncode, channel):
+def remove(ncode, channel):
     if db.collection('narou').document(str(ncode)).get().exists:
         try:
             db.collection('narou').document(str(ncode)).update({
