@@ -77,8 +77,8 @@ def add(ncode, channel):
                 'ended': responseJson[1]['end'],
                 'channels': [str(channel)]
                 })
-        except:
-            return "error"
+        except Exception as e:
+            return str(e)
     return "success"
 
 
@@ -88,8 +88,8 @@ def add(ncode, channel):
             db.collection('narou').document(str(ncode)).update({
                 'channels' : firestore.arrayRemove([str(channel)])
             })
-        except:
-            return "error"
+        except Exception as e:
+            return str(e)
     else:
         return "error"
     return "success"
