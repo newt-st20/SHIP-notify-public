@@ -75,9 +75,11 @@ async def on_message(message):
             content = '`sh!info` idからSHIP上のファイル名や投稿日などを取得。省略形は`-i`'
             content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す。省略形は`-f`'
             content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
-            content += '_n`sh!when` SHIPの更新を取得する日時を表示'
+            content += '\n`sh!when` SHIPの更新を取得する日時を表示'
             content += '\n`sh!wiki` Wikipediaを検索'
             content += '\n`sh!nhk` NHKで現在放送している番組を取得'
+            content += '＜「小説家になろう」関連コマンド＞ ※DMチャンネルでのみ利用可能'
+            content += '\n`n!add` 更新を通知する小説の追加'
             embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/06/18", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
@@ -391,21 +393,24 @@ async def on_message(message):
                 if result == "success":
                     await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+"の小説の更新を通知します")
                 else:
-                    await message.channel.send("https://ncode.syosetu.com/"+ncode+"の小説は存在しません")
+                    await message.channel.send("https://ncode.syosetu.com/"+ncode+" の小説は存在しません"+result)
         elif 'n!remove' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 result = narou.remove(ncode, message.channel.id)
                 if result == "success":
-                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+"の小説の更新通知を解除します")
+                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
                 else:
-                    await message.channel.send("この小説はまだ更新通知登録がされていないか、存在しません")
+                    await message.channel.send("この小説はまだ更新通知登録がされていないか、存在しません"+result)
         elif 'n!list' in message.content:
             result = narou.list(message.channel.id)
             body = ""
             for eachData in result:
                 body += "`title` "+eachData['title']+" ( https://ncode.syosetu.com/" + eachData['ncode'] + " )"
-            await message.channel.send(body)
+            if body == "":
+                await message.channel.send("このチャンネルでフォローされている小説はありません")
+            else:
+                await message.channel.send(body)
     if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'reply!' in message.content:
         replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
         sendMessage = str(message.content.split('!')[2])
