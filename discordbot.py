@@ -713,7 +713,7 @@ async def getNarouData():
         for eachData in result:
             embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+eachData['count'], color=discord.Colour.from_rgb(52, 235, 79))
             for channel in eachData['channels']:
-                sendChannel = client.get_channel(channel)
+                sendChannel = client.get_channel(int(channel))
                 await sendChannel.send(embed=embed)
 
 

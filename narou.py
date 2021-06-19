@@ -1,7 +1,6 @@
 import os
 import requests
 
-import psycopg2
 from dotenv import load_dotenv
 
 import firebase_admin
@@ -10,7 +9,6 @@ from firebase_admin import firestore
 
 load_dotenv()
 
-DATABASE_URL = os.environ['DATABASE_URL']
 
 if not firebase_admin._apps:
     CREDENTIALS = credentials.Certificate({
@@ -63,7 +61,7 @@ def main():
 def add(ncode, channel):
     if db.collection('narou').document(str(ncode)).get().exists:
         db.collection('narou').document(str(ncode)).update({
-            'channels' : firestore.arrayUnion([str(channel)])
+            'channels' : firestore.arrayUnion([channel])
         })
     else:
         try:
@@ -75,7 +73,7 @@ def add(ncode, channel):
                 'lastup': responseJson[1]['general_lastup'],
                 'count': responseJson[1]['general_all_no'],
                 'ended': responseJson[1]['end'],
-                'channels': [str(channel)]
+                'channels': [channel]
                 })
         except Exception as e:
             return str(e)
@@ -86,7 +84,7 @@ def remove(ncode, channel):
     if db.collection('narou').document(str(ncode)).get().exists:
         try:
             db.collection('narou').document(str(ncode)).update({
-                'channels' : firestore.arrayRemove([str(channel)])
+                'channels' : firestore.arrayRemove([channel])
             })
         except Exception as e:
             return str(e)
@@ -97,7 +95,7 @@ def remove(ncode, channel):
 
 def list(channel):
     data = []
-    docs = db.collection('narou').where('channels', 'array_contains', str(channel)).stream()
+    docs = db.collection('narou').where('channels', 'array_contains', channel).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({
@@ -105,10 +103,6 @@ def list(channel):
             'title': eachDoc['title']
         })
     return data
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 
 if __name__ == "__main__":
