@@ -79,7 +79,10 @@ async def on_message(message):
             content += '\n`sh!wiki` Wikipediaを検索'
             content += '\n`sh!nhk` NHKで現在放送している番組を取得'
             content += '＜「小説家になろう」関連コマンド＞ ※DMチャンネルでのみ利用可能'
+            content += '\n`n!when` 更新を取得している日時の取得'
             content += '\n`n!add` 更新を通知する小説の追加'
+            content += '\n`n!remove` 更新を通知する小説の削除'
+            content += '\n`n!list` 更新を通知している小説一覧を表示'
             embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/06/19", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
@@ -398,22 +401,41 @@ async def on_message(message):
         embed.add_field(name="チャンネルID",
                         value=str(message.channel.id), inline=False)
         await dmLogChannel.send(embed=embed)
-        if 'n!add' in message.content:
+        if 'n!when' in message.content:
+            configChannel = client.get_channel(820242721330561044)
+            messages = await configChannel.history().flatten()
+            for msg in messages:
+                if "GET_NAROU_HOUR=" in msg.content:
+                    whenGetConfigMessage = msg.content.lstrip("GET_NAROU_HOUR=")
+                    continue
+            hourList = [int(x) for x in whenGetConfigMessage.split()]
+            await message.channel.send('現在毎日'+str(hourList)+'時に「小説家になろう」の更新を取得しています')
+        elif 'n!add' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
-                result = narou.add(ncode, message.channel.id)
-                if result == "success":
-                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新を通知します")
+                if len(ncode) == 7 and ncode[0] == 'n':
+                    result = narou.add(ncode, message.channel.id)
+                    if result == "success":
+                        await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新を通知します")
+                    else:
+                        await message.channel.send("https://ncode.syosetu.com/"+ncode+" の小説は存在しません"+result)
                 else:
-                    await message.channel.send("https://ncode.syosetu.com/"+ncode+" の小説は存在しません"+result)
+                    await message.channel.send("これはncodeではありません。")
+            else:
+                await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
         elif 'n!remove' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
-                result = narou.remove(ncode, message.channel.id)
-                if result == "success":
-                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
+                if len(ncode) == 7 and ncode[0] == 'n':
+                    result = narou.remove(ncode, message.channel.id)
+                    if result == "success":
+                        await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
+                    else:
+                        await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
                 else:
-                    await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
+                    await message.channel.send("これはncodeではありません。")
+            else:
+                await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
         elif 'n!list' in message.content:
             result = narou.list(message.channel.id)
             body = ""
