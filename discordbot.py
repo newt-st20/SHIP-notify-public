@@ -389,9 +389,10 @@ async def on_message(message):
         else:
             await message.channel.send('このコマンドは管理者のみ利用可能です')
     if isinstance(message.channel, discord.DMChannel):
-        embed = discord.Embed(title="DMを受信しました")
+        userId = str(message.author.id)
+        embed = discord.Embed(title="DMを受信しました", color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
         embed.add_field(name="ユーザー名",
-                        value=message.author.mention+" ("+str(message.author.id)+")", inline=False)
+                        value=message.author.mention+" ("+userId+")", inline=False)
         embed.add_field(name="本文",
                         value=message.content, inline=False)
         embed.add_field(name="チャンネルID",
@@ -432,20 +433,21 @@ async def on_message(message):
         oldchannel = client.get_channel(int(messageChannel))
         oldmessage = await oldchannel.fetch_message(int(messageId))
         if str(message.type) == "MessageType.default":
+            userId = str(oldmessage.author.id)
             if len(oldmessage.attachments) != 0:
                 if oldmessage.content == "":
                     body = oldmessage.attachments[0].filename
                 else:
                     body = oldmessage.content+"," + \
                         oldmessage.attachments[0].filename
-                embed = discord.Embed(timestamp=oldmessage.created_at,description=body)
+                embed = discord.Embed(timestamp=oldmessage.created_at,description=body,color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
                 embed.set_image(url=str(oldmessage.attachments[0].url))
             elif oldmessage.content != "":
-                embed = discord.Embed(timestamp=oldmessage.created_at,description=oldmessage.content)
+                embed = discord.Embed(timestamp=oldmessage.created_at,description=oldmessage.content,color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
             elif oldmessage.embeds:
-                embed = discord.Embed(timestamp=oldmessage.created_at,description="リッチメッセージ")
+                embed = discord.Embed(timestamp=oldmessage.created_at,description="リッチメッセージ",color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
             else:
-                embed = discord.Embed(timestamp=oldmessage.created_at,description="システムメッセージ")
+                embed = discord.Embed(timestamp=oldmessage.created_at,description="システムメッセージ",color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
         embed.set_author(name=oldmessage.author.name,
                          icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
@@ -711,7 +713,7 @@ async def getNarouData():
     result = narou.main()
     if len(result) != 0:
         for eachData in result:
-            embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+str(eachData['count']), color=discord.Colour.from_rgb(52, 235, 79))
+            embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+str(eachData['count']), color=discord.Colour.from_rgb(256-int(eachData['ncode'][1:2])*2, 256-int(eachData['ncode'][2:3])*2, 256-int(eachData['ncode'][3:4])*2))
             for channel in eachData['channels']:
                 sendChannel = client.get_channel(int(channel))
                 await sendChannel.send(embed=embed)
