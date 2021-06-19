@@ -711,10 +711,9 @@ async def getNarouData():
     result = narou.main()
     if len(result) != 0:
         for eachData in result:
-            embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+eachData['count'], color=discord.Colour.from_rgb(52, 235, 79))
+            embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+str(eachData['count']), color=discord.Colour.from_rgb(52, 235, 79))
             for channel in eachData['channels']:
-                print(channel)
-                sendChannel = client.get_channel(channel)
+                sendChannel = client.get_channel(int(channel))
                 await sendChannel.send(embed=embed)
 
 
