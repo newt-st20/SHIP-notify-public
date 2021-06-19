@@ -402,7 +402,7 @@ async def on_message(message):
                 ncode = message.content.split()[1]
                 result = narou.add(ncode, message.channel.id)
                 if result == "success":
-                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+"の小説の更新を通知します")
+                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新を通知します")
                 else:
                     await message.channel.send("https://ncode.syosetu.com/"+ncode+" の小説は存在しません"+result)
         elif 'n!remove' in message.content:
