@@ -38,21 +38,17 @@ def main():
         response = requests.get(
                     'https://api.syosetu.com/novelapi/api/?out=json&ncode='+eachData['ncode']+'&of=t-gl-ga-e')
         responseJson = response.json()
-        lastUpdate = responseJson[1]['general_lastup']
-        count = responseJson[1]['general_all_no']
-        end = responseJson[1]['end']
-        if eachData['lastup'] != lastUpdate:
+        if eachData['lastup'] != responseJson[1]['general_lastup']:
             db.collection('narou').document(eachData['ncode']).update({
-                'count': count,
-                'lastup': lastUpdate,
-                'ended': end
+                'count': responseJson[1]['general_all_no'],
+                'lastup': responseJson[1]['general_lastup'],
+                'ended': responseJson[1]['end']
             })
             newData.append({
                 'ncode': eachData['ncode'],
                 'title': eachData['title'],
-                'count': count,
-                'lastup': lastUpdate,
-                'ended': end,
+                'count': responseJson[1]['general_all_no'],
+                'lastup': responseJson[1]['general_lastup'],
                 'channels': eachData['channels']
             })
     return newData
@@ -77,7 +73,7 @@ def add(ncode, channel):
                 'lastup': responseJson[1]['general_lastup'],
                 'count': responseJson[1]['general_all_no'],
                 'ended': responseJson[1]['end'],
-                'channels': [str(channel)]
+                'channels': [channel]
                 })
         return "success"
     except Exception as e:
@@ -103,7 +99,7 @@ def remove(ncode, channel):
 
 def list(channel):
     data = []
-    docs = db.collection('narou').where('channels', 'array_contains', str(channel)).stream()
+    docs = db.collection('narou').where('channels', 'array_contains', channel).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({
