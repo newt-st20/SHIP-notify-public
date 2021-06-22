@@ -123,51 +123,51 @@ def main():
             try:
                 stage = conTrTds[2].find('a').get('onclick')
                 conId = re.findall("'([^']*)'", stage)
+                if int(conId[0]) not in gotList:
+                    try:
+                        eachconList.append(conId)
+                        driver.get(
+                            "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId[0]+"&t=3")
+                        conEachPageSoup = BeautifulSoup(
+                            driver.page_source, 'html.parser')
+                        conPageMain = conEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
+                        conPageDescription = conPageMain.find_all(
+                            "table")[-2].text.replace("\n", "")
+                        eachconList.append(conPageDescription)
+                        if schooltype == "high":
+                            conPageLinks = conPageMain.find_all("a")
+                            conPageLinkList = []
+                            for eachConPageLink in conPageLinks:
+                                driver.get("https://ship.sakae-higashi.jp" + eachConPageLink.get("href"))
+                                result = re.match(".*name=(.*)&size.*", eachConPageLink.get("href"))
+                                print(result.group(1))
+                                time.sleep(5)
+                                if os.environ['STATUS'] == "local":
+                                    filepath = 'D:\Downloads/' + result.group(1)
+                                else:
+                                    filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                                storage = firebase.storage()
+                                try:
+                                    storage.child(
+                                        'pdf/high-con/'+str(eachconList[0][0])+'/'+result.group(1)).put(filepath)
+                                    conPageLinkList.append(storage.child(
+                                        'pdf/high-con/'+str(eachconList[0][0])+'/'+result.group(1)).get_url(token=None))
+                                except Exception as e:
+                                    print(str(e))
+                            eachconList.append(conPageLinkList)
+                    except Exception as e:
+                        print(str(e))
+                        eachconList.append([0, 0])
+                        eachconList.append("")
+                    eachconList.append(conTrTds[0].text)
+                    try:
+                        eachconList.append(conTrTds[1].find('span').get('title'))
+                    except:
+                        eachconList.append("")
+                    eachconList.append(conTrTds[2].text.replace("\n", ""))
+                    conList.append(eachconList)
             except Exception as e:
                 print(str(e))
-            if int(conId[0]) not in gotList:
-                try:
-                    eachconList.append(conId)
-                    driver.get(
-                        "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId[0]+"&t=3")
-                    conEachPageSoup = BeautifulSoup(
-                        driver.page_source, 'html.parser')
-                    conPageMain = conEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
-                    conPageDescription = conPageMain.find_all(
-                        "table")[-2].text.replace("\n", "")
-                    eachconList.append(conPageDescription)
-                    if schooltype == "high":
-                        conPageLinks = conPageMain.find_all("a")
-                        conPageLinkList = []
-                        for eachConPageLink in conPageLinks:
-                            driver.get("https://ship.sakae-higashi.jp" + eachConPageLink.get("href"))
-                            result = re.match(".*name=(.*)&size.*", eachConPageLink.get("href"))
-                            print(result.group(1))
-                            time.sleep(5)
-                            if os.environ['STATUS'] == "local":
-                                filepath = 'D:\Downloads/' + result.group(1)
-                            else:
-                                filepath = DOWNLOAD_DIR + '/' + result.group(1)
-                            storage = firebase.storage()
-                            try:
-                                storage.child(
-                                    'pdf/high-con/'+str(eachconList[0][0])+'/'+result.group(1)).put(filepath)
-                                conPageLinkList.append(storage.child(
-                                    'pdf/high-con/'+str(eachconList[0][0])+'/'+result.group(1)).get_url(token=None))
-                            except Exception as e:
-                                print(str(e))
-                        eachconList.append(conPageLinkList)
-                except Exception as e:
-                    print(str(e))
-                    eachconList.append([0, 0])
-                    eachconList.append("")
-                eachconList.append(conTrTds[0].text)
-                try:
-                    eachconList.append(conTrTds[1].find('span').get('title'))
-                except:
-                    eachconList.append("")
-                eachconList.append(conTrTds[2].text.replace("\n", ""))
-                conList.append(eachconList)
         print(conList)
 
         driver.get(
@@ -184,56 +184,56 @@ def main():
             try:
                 stage = studyTrTds[2].find('a').get('onclick')
                 studyId = re.findall("'([^']*)'", stage)
-            except Exception as e:
-                pass
-            if int(studyId[0]) not in gotList:
-                try:
-                    eachstudyList.append(studyId)
-                    driver.get(
-                        "https://ship.sakae-higashi.jp/sub_window_study/?obj_id="+studyId[0]+"&t=7")
-                    studyEachPageSoup = BeautifulSoup(
-                        driver.page_source, 'html.parser')
-                    if schooltype == "high":
-                        try:
-                            studyPageMain = studyEachPageSoup.find_all(
-                                class_='ac')[0].find_all("table")[1]
-                            studyPageLinks = studyPageMain.find_all(
-                                "table")[-1].find_all("a")
-                        except Exception as e:
-                            print(str(e))
-                        studyPageLinkList = []
-                        for eachstudyPageLink in studyPageLinks:
-                            driver.get("https://ship.sakae-higashi.jp" + eachstudyPageLink.get("href"))
-                            result = re.match(".*name=(.*)&size.*", eachstudyPageLink.get("href"))
-                            print(result.group(1))
-                            time.sleep(4)
-                            if os.environ['STATUS'] == "local":
-                                filepath = 'D:\Downloads/' + result.group(1)
-                            else:
-                                filepath = DOWNLOAD_DIR + '/' + result.group(1)
-                            storage = firebase.storage()
+                if int(studyId[0]) not in gotList:
+                    try:
+                        eachstudyList.append(studyId)
+                        driver.get(
+                            "https://ship.sakae-higashi.jp/sub_window_study/?obj_id="+studyId[0]+"&t=7")
+                        studyEachPageSoup = BeautifulSoup(
+                            driver.page_source, 'html.parser')
+                        if schooltype == "high":
                             try:
-                                storage.child(
-                                    'pdf/high-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).put(filepath)
-                                studyPageLinkList.append(storage.child(
-                                    'pdf/high-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).get_url(token=None))
+                                studyPageMain = studyEachPageSoup.find_all(
+                                    class_='ac')[0].find_all("table")[1]
+                                studyPageLinks = studyPageMain.find_all(
+                                    "table")[-1].find_all("a")
                             except Exception as e:
                                 print(str(e))
-                        eachstudyList.append(studyPageLinkList)
-                except Exception as e:
-                    print(str(e))
-                    eachstudyList.append([0, 0])
-                eachstudyList.append(studyTrTds[0].text)
-                try:
-                    eachstudyList.append(
-                        studyTrTds[1].find('span').get('title'))
-                except:
-                    eachstudyList.append("")
-                try:
-                    eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
-                except:
-                    eachstudyList.append("")
-                studyList.append(eachstudyList)
+                            studyPageLinkList = []
+                            for eachstudyPageLink in studyPageLinks:
+                                driver.get("https://ship.sakae-higashi.jp" + eachstudyPageLink.get("href"))
+                                result = re.match(".*name=(.*)&size.*", eachstudyPageLink.get("href"))
+                                print(result.group(1))
+                                time.sleep(4)
+                                if os.environ['STATUS'] == "local":
+                                    filepath = 'D:\Downloads/' + result.group(1)
+                                else:
+                                    filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                                storage = firebase.storage()
+                                try:
+                                    storage.child(
+                                        'pdf/high-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).put(filepath)
+                                    studyPageLinkList.append(storage.child(
+                                        'pdf/high-study/'+str(eachstudyList[0][0])+'/'+result.group(1)).get_url(token=None))
+                                except Exception as e:
+                                    print(str(e))
+                            eachstudyList.append(studyPageLinkList)
+                    except Exception as e:
+                        print(str(e))
+                        eachstudyList.append([0, 0])
+                    eachstudyList.append(studyTrTds[0].text)
+                    try:
+                        eachstudyList.append(
+                            studyTrTds[1].find('span').get('title'))
+                    except:
+                        eachstudyList.append("")
+                    try:
+                        eachstudyList.append(studyTrTds[2].text.replace("\n", ""))
+                    except:
+                        eachstudyList.append("")
+                    studyList.append(eachstudyList)
+            except Exception as e:
+                print(str(e))
         print(studyList)
 
         driver.get(
@@ -250,50 +250,50 @@ def main():
             try:
                 stage = schoolNewsTrTds[2].find('a').get('onclick')
                 schoolNewsId = re.findall("'([^']*)'", stage)
+                if int(schoolNewsId[0]) not in gotList:
+                    try:
+                        eachSchoolNewsList.append(schoolNewsId)
+                        driver.get(
+                            "https://ship.sakae-higashi.jp/sub_window/?obj_id="+schoolNewsId[0]+"&t=4")
+                        schoolNewsEachPageSoup = BeautifulSoup(
+                            driver.page_source, 'html.parser')
+                        schoolNewsPageMain = schoolNewsEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
+                        schoolNewsPageDescription = schoolNewsPageMain.find_all(
+                            "table")[-2].text.replace("\n", "")
+                        eachSchoolNewsList.append(schoolNewsPageDescription)
+                        if schooltype == "high":
+                            schoolNewsPageLinks = schoolNewsPageMain.find_all("a")
+                            schoolNewsPageLinkList = []
+                            for eachSchoolNewsPageLink in schoolNewsPageLinks:
+                                driver.get("https://ship.sakae-higashi.jp" + eachSchoolNewsPageLink.get("href"))
+                                result = re.match(".*name=(.*)&size.*", eachSchoolNewsPageLink.get("href"))
+                                time.sleep(5)
+                                if os.environ['STATUS'] == "local":
+                                    filepath = 'D:\Downloads/' + result.group(1)
+                                else:
+                                    filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                                storage = firebase.storage()
+                                try:
+                                    storage.child(
+                                        'pdf/high-schoolNews/'+str(eachSchoolNewsList[0][0])+'/'+result.group(1)).put(filepath)
+                                    schoolNewsPageLinkList.append(storage.child(
+                                        'pdf/high-schoolNews/'+str(eachSchoolNewsList[0][0])+'/'+result.group(1)).get_url(token=None))
+                                except Exception as e:
+                                    print(str(e))
+                            eachSchoolNewsList.append(schoolNewsPageLinkList)
+                    except Exception as e:
+                        print(str(e))
+                        eachSchoolNewsList.append([0, 0])
+                        eachSchoolNewsList.append("")
+                    eachSchoolNewsList.append(schoolNewsTrTds[0].text)
+                    try:
+                        eachSchoolNewsList.append(schoolNewsTrTds[1].find('span').get('title'))
+                    except:
+                        eachSchoolNewsList.append("")
+                    eachSchoolNewsList.append(schoolNewsTrTds[2].text.replace("\n", ""))
+                    schoolNewsList.append(eachSchoolNewsList)
             except Exception as e:
                 print(str(e))
-            if int(schoolNewsId[0]) not in gotList:
-                try:
-                    eachSchoolNewsList.append(schoolNewsId)
-                    driver.get(
-                        "https://ship.sakae-higashi.jp/sub_window/?obj_id="+schoolNewsId[0]+"&t=4")
-                    schoolNewsEachPageSoup = BeautifulSoup(
-                        driver.page_source, 'html.parser')
-                    schoolNewsPageMain = schoolNewsEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
-                    schoolNewsPageDescription = schoolNewsPageMain.find_all(
-                        "table")[-2].text.replace("\n", "")
-                    eachSchoolNewsList.append(schoolNewsPageDescription)
-                    if schooltype == "high":
-                        schoolNewsPageLinks = schoolNewsPageMain.find_all("a")
-                        schoolNewsPageLinkList = []
-                        for eachSchoolNewsPageLink in schoolNewsPageLinks:
-                            driver.get("https://ship.sakae-higashi.jp" + eachSchoolNewsPageLink.get("href"))
-                            result = re.match(".*name=(.*)&size.*", eachSchoolNewsPageLink.get("href"))
-                            time.sleep(5)
-                            if os.environ['STATUS'] == "local":
-                                filepath = 'D:\Downloads/' + result.group(1)
-                            else:
-                                filepath = DOWNLOAD_DIR + '/' + result.group(1)
-                            storage = firebase.storage()
-                            try:
-                                storage.child(
-                                    'pdf/high-schoolNews/'+str(eachSchoolNewsList[0][0])+'/'+result.group(1)).put(filepath)
-                                schoolNewsPageLinkList.append(storage.child(
-                                    'pdf/high-schoolNews/'+str(eachSchoolNewsList[0][0])+'/'+result.group(1)).get_url(token=None))
-                            except Exception as e:
-                                print(str(e))
-                        eachSchoolNewsList.append(schoolNewsPageLinkList)
-                except Exception as e:
-                    print(str(e))
-                    eachSchoolNewsList.append([0, 0])
-                    eachSchoolNewsList.append("")
-                eachSchoolNewsList.append(schoolNewsTrTds[0].text)
-                try:
-                    eachSchoolNewsList.append(schoolNewsTrTds[1].find('span').get('title'))
-                except:
-                    eachSchoolNewsList.append("")
-                eachSchoolNewsList.append(schoolNewsTrTds[2].text.replace("\n", ""))
-                schoolNewsList.append(eachSchoolNewsList)
         print(schoolNewsList)
 
         if schooltype == "junior":
