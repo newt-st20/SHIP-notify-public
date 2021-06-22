@@ -419,12 +419,13 @@ async def on_message(message):
         if 'n!when' in message.content:
             configChannel = client.get_channel(820242721330561044)
             messages = await configChannel.history().flatten()
+            whenGetNarouConfigMessage = ""
             for msg in messages:
                 if "GET_NAROU_HOUR=" in msg.content:
-                    whenGetConfigMessage = msg.content.lstrip("GET_NAROU_HOUR=")
+                    whenGetNarouConfigMessage = msg.content.lstrip("GET_NAROU_HOUR=")
                     continue
-            hourList = [int(x) for x in whenGetConfigMessage.split()]
-            await message.channel.send('現在毎日'+str(hourList)+'時に「小説家になろう」の更新を取得しています')
+            hourList = [int(x) for x in whenGetNarouConfigMessage.split()]
+            await message.channel.send('現在毎日'+str(hourList)+'時に「小説家になろう」の更新を取得しています。')
         elif 'n!add' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
@@ -521,9 +522,10 @@ async def loop():
             whenGetConfigMessage = msg.content.lstrip("GET_HOUR=")
             continue
     hourList = [int(x) for x in whenGetConfigMessage.split()]
+    whenNarouGetConfigMessage = ""
     for msg in messages:
-        if "NAROU_GET_HOUR=" in msg.content:
-            whenNarouGetConfigMessage = msg.content.lstrip("NAROU_GET_HOUR=")
+        if "GET_NAROU_HOUR=" in msg.content:
+            whenNarouGetConfigMessage = msg.content.lstrip("GET_NAROU_HOUR=")
             continue
     narouHourList = [int(x) for x in whenNarouGetConfigMessage.split()]
     announceMessage = await ruleChannel.fetch_message(821736777391538206)
