@@ -173,6 +173,7 @@ async def on_message(message):
                 await message.channel.send(file=file)
                 lc += 1
         elif 'recently' in message.content or 'sh!r' in message.content or '-r' in message.content:
+            itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["recently"]
             flag = False
             if len(message.content.split()) == 3:
                 if isint(message.content.split()[1]) and isint(message.content.split()[1]):
@@ -180,7 +181,10 @@ async def on_message(message):
                     howmanyIntMessage = int(message.content.split()[2])
                     flag = True
             if flag == False:
-                embed = discord.Embed(title="最近の更新の取得", description="高校連絡事項→ `1`\n高校学習教材→ `2`\n中学連絡事項→ `3`\n中学学習教材→ `4`\n中学学校通信→ `3`\n高校学校通信→ `4`", color=discord.Colour.from_rgb(252, 186, 3))
+                description = ""
+                for i in range(4):
+                    description += "`" + i + "` " + itemNameList[i]["name"] + "\n"
+                embed = discord.Embed(title="最近の更新の取得", description=description, color=discord.Colour.from_rgb(252, 186, 3))
                 await message.channel.send(embed=embed)
                 try:
                     typeMessage = await client.wait_for("message", check=check, timeout=60)
@@ -215,28 +219,16 @@ async def on_message(message):
             lc = 1
             for eachData in mainData:
                 try:
-                    body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(eachData[1].strftime('%Y/%m/%d')) + "\n"
+                    body += "`" + str(eachData['id']) + "` __**" + eachData['title'] + "**__ - " + str(eachData['date'].strftime('%Y/%m/%d')) + "\n"
                 except:
-                    body += "`" + str(eachData[2]) + "` __**" + eachData[0] + "**__ - " + str(eachData[1]) + "\n"
+                    body += "`" + str(eachData['id']) + "` __**" + eachData['title'] + "**__ - " + str(eachData['date']) + "\n"
                 if howmanyIntMessage == lc or lc == 30:
                     break
                 lc += 1
             if body == "":
                 body = "empty"
-            if typeIntMessage == 1:
-                titlebody = "最近の高校連絡事項"
-            elif typeIntMessage == 2:
-                titlebody = "最近の高校学習教材"
-            elif typeIntMessage == 3:
-                titlebody = "最近の中学連絡事項"
-            elif typeIntMessage == 4:
-                titlebody = "最近の中学学習教材"
-            elif typeIntMessage == 5:
-                titlebody = "最近の中学学校通信"
-            elif typeIntMessage == 6:
-                titlebody = "最近の高校学校通信"
             embed = discord.Embed(
-                title=titlebody, description=body, color=discord.Colour.from_rgb(252, 186, 3))
+                title="最近の"+itemNameList[typeIntMessage]["name"], description=body, color=discord.Colour.from_rgb(252, 186, 3))
             await message.channel.send(embed=embed)
         # Wikipedia検索
         elif 'wiki' in message.content:
@@ -486,8 +478,7 @@ async def on_message(message):
                 embed = discord.Embed(timestamp=oldmessage.created_at,description="リッチメッセージ",color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
             else:
                 embed = discord.Embed(timestamp=oldmessage.created_at,description="システムメッセージ",color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
-        embed.set_author(name=oldmessage.author.name,
-                         icon_url=oldmessage.author.avatar_url)
+        embed.set_author(name=oldmessage.author.name, icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
 
@@ -530,14 +521,10 @@ async def loop():
     narouHourList = [int(x) for x in whenNarouGetConfigMessage.split()]
     announceMessage = await ruleChannel.fetch_message(821736777391538206)
     if str(hourList) not in str(announceMessage.embeds[0].to_dict()):
-        editDatetime = "更新日時: " + \
-            str(announceMessage.edited_at.strftime("%Y/%m/%d %H:%M:%S"))
-        editedBody = "現在は"+str(hourList) + \
-            "時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
-        embed = discord.Embed(
-            title="データ取得タイミング", description=editDatetime, color=discord.Colour.from_rgb(245, 236, 66))
-        embed.add_field(name="SHIPデータを取得する時間",
-                        value=editedBody, inline=False)
+        editDatetime = "更新日時: " + str(announceMessage.edited_at.strftime("%Y/%m/%d %H:%M:%S"))
+        editedBody = "現在は"+str(hourList) + "時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
+        embed = discord.Embed(title="データ取得タイミング", description=editDatetime, color=discord.Colour.from_rgb(245, 236, 66))
+        embed.add_field(name="SHIPデータを取得する時間", value=editedBody, inline=False)
         await announceMessage.edit(embed=embed)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
