@@ -74,7 +74,7 @@ def recently(type, howmany):
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({
-            "titile":  eachDoc['title'],
+            "title":  eachDoc['title'],
             "date": eachDoc['date'],
             "id": eachDoc['id']
         })
@@ -82,29 +82,13 @@ def recently(type, howmany):
 
 
 def count(type):
-    data = []
+    itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["recently"]
     dbc = db.collection('count')
-    if type == 1:
-        docDict = dbc.document('highCon').get().to_dict()
-        data = docDict['count']
-    elif type == 2:
-        docDict = dbc.document('highStudy').get().to_dict()
-        data = docDict['count']
-    elif type == 3:
-        docDict = dbc.document('juniorCon').get().to_dict()
-        data = docDict['count']
-    elif type == 4:
-        docDict = dbc.document('juniorStudy').get().to_dict()
-        data = docDict['count']
-    elif type == 5:
-        docDict = dbc.document('juniorSchoolNews').get().to_dict()
-        data = docDict['count']
-    elif type == 6:
-        docDict = dbc.document('highSchoolNews').get().to_dict()
-        data = docDict['count']
-    else:
-        data = 0
-    return data
+    try:
+        docDict = dbc.document(itemNameList[type]["collectionName"]).get().to_dict()
+        return docDict['count']
+    except Exception as e:
+        return 0
 
 
 if __name__ == "__main__":

@@ -183,7 +183,7 @@ async def on_message(message):
             if flag == False:
                 description = ""
                 for i in range(4):
-                    description += "`" + i + "` " + itemNameList[i]["name"] + "\n"
+                    description += "`" + str(i) + "` " + itemNameList[i]["name"] + "\n"
                 embed = discord.Embed(title="最近の更新の取得", description=description, color=discord.Colour.from_rgb(252, 186, 3))
                 await message.channel.send(embed=embed)
                 try:
@@ -214,6 +214,7 @@ async def on_message(message):
                         return
                 except Exception as e:
                     await typeMessage.reply("セッションがタイムアウトしました"+str(e))
+                    return
             mainData = search.recently(typeIntMessage, howmanyIntMessage)
             body = ""
             lc = 1
