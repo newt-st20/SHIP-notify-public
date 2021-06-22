@@ -10,9 +10,9 @@ LINE_SUB_CHANNEL_ACCESS_TOKEN = os.environ["LINE_SUB_CHANNEL_ACCESS_TOKEN"]
 
 
 def main(data):
-    HighConData = data[3]
-    HighStudyData = data[4]
-    getTime = str(data[6])
+    HighConData = data['highCon']
+    HighStudyData = data['highStudy']
+    getTime = str(data['getTime'])
     message1 = ""
     try:
         for a in HighConData:
