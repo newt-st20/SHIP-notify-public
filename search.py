@@ -1,4 +1,5 @@
 import os
+import json
 
 from dotenv import load_dotenv
 
@@ -67,37 +68,16 @@ def info(id):
 
 
 def recently(type, howmany):
+    itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["recently"]
     data = []
-    if type == 1:
-        docs = db.collection('highCon').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
-        for doc in docs:
-            eachDoc = doc.to_dict()
-            data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
-    elif type == 2:
-        docs = db.collection('highStudy').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
-        for doc in docs:
-            eachDoc = doc.to_dict()
-            data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
-    elif type == 3:
-        docs = db.collection('juniorCon').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
-        for doc in docs:
-            eachDoc = doc.to_dict()
-            data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
-    elif type == 4:
-        docs = db.collection('juniorStudy').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
-        for doc in docs:
-            eachDoc = doc.to_dict()
-            data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
-    elif type == 5:
-        docs = db.collection('juniorSchoolNews').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
-        for doc in docs:
-            eachDoc = doc.to_dict()
-            data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
-    elif type == 6:
-        docs = db.collection('highSchoolNews').order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
-        for doc in docs:
-            eachDoc = doc.to_dict()
-            data.append([eachDoc['title'], eachDoc['date'], eachDoc['id']])
+    docs = db.collection(itemNameList[type]["collectionName"]).order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
+    for doc in docs:
+        eachDoc = doc.to_dict()
+        data.append({
+            "titile":  eachDoc['title'],
+            "date": eachDoc['date'],
+            "id": eachDoc['id']
+        })
     return data
 
 

@@ -1,0 +1,28 @@
+{
+    "recently": [
+        {
+            "name": "高校連絡事項",
+            "collectionName": "highCon"
+        },
+        {
+            "name": "高校学習教材",
+            "collectionName": "highStudy"
+        },
+        {
+            "name": "高校学校通信",
+            "collectionName": "highSchoolNews"
+        },
+        {
+            "name": "中学連絡事項",
+            "collectionName": "juniorCon"
+        },
+        {
+            "name": "中学学習教材",
+            "collectionName": "juniorStudy"
+        },
+        {
+            "name": "中学学校通信",
+            "collectionName": "juniorSchoolNews"
+        }
+    ]
+}
