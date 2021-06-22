@@ -68,7 +68,7 @@ def info(id):
 
 
 def recently(type, howmany):
-    itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["recently"]
+    itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     data = []
     docs = db.collection(itemNameList[type]["collectionName"]).order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
     for doc in docs:
@@ -82,7 +82,7 @@ def recently(type, howmany):
 
 
 def count(type):
-    itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["recently"]
+    itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     dbc = db.collection('count')
     try:
         docDict = dbc.document(itemNameList[type]["collectionName"]).get().to_dict()

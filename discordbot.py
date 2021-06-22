@@ -78,7 +78,7 @@ async def on_message(message):
             content += '\n`sh!when` SHIPの更新を取得する日時を表示'
             content += '\n`sh!wiki` Wikipediaを検索'
             content += '\n`sh!nhk` NHKで現在放送している番組を取得'
-            content += '＜「小説家になろう」関連コマンド＞ ※DMチャンネルでのみ利用可能'
+            content += '\n\n＜「小説家になろう」関連コマンド＞ ※DMチャンネルでのみ利用可能'
             content += '\n`n!when` 更新を取得している日時の取得'
             content += '\n`n!add` 更新を通知する小説の追加'
             content += '\n`n!remove` 更新を通知する小説の削除'
@@ -132,7 +132,7 @@ async def on_message(message):
             embed = discord.Embed(
                 title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
-        elif 'file' in message.content or '-f' in message.content or 'download' in message.content or '-d' in message.content:
+        elif 'file' in message.content or '-f' in message.content:
             flag = False
             if len(message.content.split()) == 2:
                 if isint(message.content.split()[1]):
@@ -173,7 +173,7 @@ async def on_message(message):
                 await message.channel.send(file=file)
                 lc += 1
         elif 'recently' in message.content or 'sh!r' in message.content or '-r' in message.content:
-            itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["recently"]
+            itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
             flag = False
             if len(message.content.split()) == 3:
                 if isint(message.content.split()[1]) and isint(message.content.split()[1]):
@@ -182,8 +182,8 @@ async def on_message(message):
                     flag = True
             if flag == False:
                 description = ""
-                for i in range(4):
-                    description += "`" + str(i) + "` " + itemNameList[i]["name"] + "\n"
+                for i, eachName in enumerate(itemNameList):
+                    description += "`" + str(i) + "` " + eachName["name"] + "\n"
                 embed = discord.Embed(title="最近の更新の取得", description=description, color=discord.Colour.from_rgb(252, 186, 3))
                 await message.channel.send(embed=embed)
                 try:
@@ -217,15 +217,13 @@ async def on_message(message):
                     return
             mainData = search.recently(typeIntMessage, howmanyIntMessage)
             body = ""
-            lc = 1
-            for eachData in mainData:
+            for lc, eachData in enumerate(mainData, 1):
                 try:
                     body += "`" + str(eachData['id']) + "` __**" + eachData['title'] + "**__ - " + str(eachData['date'].strftime('%Y/%m/%d')) + "\n"
                 except:
                     body += "`" + str(eachData['id']) + "` __**" + eachData['title'] + "**__ - " + str(eachData['date']) + "\n"
                 if howmanyIntMessage == lc or lc == 30:
                     break
-                lc += 1
             if body == "":
                 body = "empty"
             embed = discord.Embed(
