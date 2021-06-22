@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import random
+import time
 
 import discord
 import requests
@@ -164,14 +165,12 @@ async def on_message(message):
             else:
                 linkList = data[0][1]
             await message.channel.send("**"+str(data[0][0]+"** - "+str(data[0][2])))
-            lc = 1
-            for link in linkList:
+            for lc, link in enumerate(linkList, 1):
                 fileName = link.split(
                     '%2F')[-1].split('.pdf')[0]+"-"+str(lc)+".pdf"
                 urllib.request.urlretrieve(link, fileName)
                 file = discord.File(fileName, filename=fileName)
                 await message.channel.send(file=file)
-                lc += 1
         elif 'recently' in message.content or 'sh!r' in message.content or '-r' in message.content:
             itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
             flag = False
@@ -304,10 +303,8 @@ async def on_message(message):
                     nhkAreaId = nhkAreaMessage.content
                     nhkAreaLen = idList.index(nhkAreaId)
                     body = ''
-                    c = 0
-                    for i in jsonChannelData:
+                    for c, eachData in enumerate(jsonChannelData, 1):
                         body += '\n`' + str(c+1) + '` **'+i['title']+'**'
-                        c += 1
                     await message.channel.send('📺チャンネルを選択してください'+body)
                     try:
                         nhkChannelMessage = await client.wait_for("message", check=check, timeout=60)
@@ -360,31 +357,30 @@ async def on_message(message):
     if 'sa!' in message.content:
         if message.author.guild_permissions.administrator:
             if message.content == 'sa!get':
-                await message.channel.send('データの取得を開始します')
+                await message.channel.send('SHIPデータの取得を開始します')
                 try:
+                    start = time.time()
                     await getData()
-                    await message.channel.send('処理が完了しました')
+                    elapsedTime = time.time() - start
+                    await message.channel.send('SHIP更新取得処理が完了しました。'+str(elapsedTime)+'[sec]')
                 except Exception as e:
                     await message.channel.send(str(type(e)) + str(e))
             elif message.content == 'sa!shnews':
-                await message.channel.send('データの取得を開始します')
+                await message.channel.send('栄東ニュース更新取得処理を開始します')
                 try:
                     await getNewsData()
-                    await message.channel.send('処理が完了しました')
+                    await message.channel.send('栄東ニュース更新取得処理が完了しました')
                 except Exception as e:
                     await message.channel.send(str(type(e)) + str(e))
             elif message.content == 'sa!narou':
-                await message.channel.send('データの取得を開始します')
                 try:
                     await getNarouData()
-                    await message.channel.send('処理が完了しました')
+                    await message.channel.send('小説家になろう更新取得処理が完了しました')
                 except Exception as e:
                     await message.channel.send(str(type(e)) + str(e))
             elif message.content == 'sa!weather':
-                await message.channel.send('データの取得を開始します')
                 try:
                     await getWeather()
-                    await message.channel.send('処理が完了しました')
                 except Exception as e:
                     await message.channel.send(str(type(e)) + str(e))
             elif message.content == 'sa!delete-all-message':
@@ -495,8 +491,8 @@ async def on_raw_reaction_add(payload):
         await member.add_roles(authenticatedRole)
         unauthenticatedRole = guild.get_role(813015195881570334)
         await member.remove_roles(unauthenticatedRole)
-        await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与し、'+unauthenticatedRole.mention+'ロールを剥奪しました。')
-        await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバー参加時に全員に送信しています__")
+        await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与しました。')
+        await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバー参加時に全員に送信しています__\n")
         await user.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
 
 
@@ -529,10 +525,12 @@ async def loop():
     nowMinute = int(datetime.datetime.now().strftime("%M"))
     if nowMinute < 10:
         if nowHour in hourList:
-            await getLogChannel.send('データの取得を開始します')
+            await getLogChannel.send('SHIPデータの取得を開始します')
             try:
+                start = time.time()
                 await getData()
-                await getLogChannel.send('処理が完了しました')
+                elapsedTime = time.time() - start
+                await getLogChannel.send('SHIPデータ取得処理が完了しました。'+str(elapsedTime)+'[sec]')
             except Exception as e:
                 await getLogChannel.send('**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             if random.randrange(10) == 0:
@@ -544,7 +542,7 @@ async def loop():
         if nowHour in narouHourList:
             try:
                 await getNarouData()
-                await getLogChannel.send('小説家になろうの取更新得処理が完了しました')
+                await getLogChannel.send('小説家になろうの更新取得処理が完了しました')
             except Exception as e:
                 await getLogChannel.send('**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
         if nowHour == 5:
