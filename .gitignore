@@ -1,8 +1,8 @@
 .vscode/
+__pycache__/
+Lib/
+Scripts/
 test/
+.env
 test.py
 local.py
-.env
-discordlocal.py
-vetur.config.js
-__pycache__/
