@@ -414,14 +414,17 @@ def main():
         howManyData = int(docDict['count']) + len(highSchoolNewsSendData)
         db.collection('count').document('highSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
 
-    print("getTime:", str(getTime))
-    print("sortedJuniorConSendData:",juniorConSendData)
-    print("sortedJuniorStudySendData:", juniorStudySendData)
-    print("sortedHighConSendData:", highConSendData)
-    print("sortedHighStudySendData:", highStudySendData)
-    print("juniorSchoolNewsSendData:",juniorSchoolNewsSendData)
-    print("highSchoolNewsSendData:", highSchoolNewsSendData)
-    return juniorConSendData, juniorStudySendData, juniorSchoolNewsSendData, highConSendData, highStudySendData, highSchoolNewsSendData, getTime
+    returnData = {
+        "getTime": getTime,
+        "juniorCon": juniorConSendData,
+        "juniorStudy": juniorStudySendData,
+        "juniorSchoolNews": juniorSchoolNewsSendData,
+        "highCon": highConSendData,
+        "highStudy": highStudySendData,
+        "highSchoolNews": highSchoolNewsSendData
+    }
+    print(returnData)
+    return returnData
 
 
 def getWaitSecs():
