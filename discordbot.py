@@ -229,45 +229,30 @@ async def on_message(message):
                 title="最近の"+itemNameList[typeIntMessage]["name"], description=body, color=discord.Colour.from_rgb(252, 186, 3))
             await message.channel.send(embed=embed)
         # Wikipedia検索
+        # https://wikipedia.readthedocs.io/en/latest/code.html#module-wikipedia.exceptions
         elif 'wiki' in message.content:
+            wikipedia.set_lang("ja")
             flag = False
             if len(message.content.split()) == 2:
-                if isint(message.content.split()[1]):
-                    word = int(message.content.split()[1])
-                    flag = True
-            if flag == False:
-                try:
-                    wordMessage = ""
-                    embed = discord.Embed(
-                        title="Wikipedia検索", description="検索したいワードを入力してください。")
-                    await message.channel.send(embed=embed)
-                    wordMessage = await client.wait_for("message", check=check, timeout=60)
-                    if 'sh!' in wordMessage.content:
-                        await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
-                        return
-                    word = int(wordMessage.content)
-                except Exception as e:
-                    if wordMessage == "":
-                        await message.reply("セッションがタイムアウトしました"+str(e))
-                    return
-            await message.channel.send('Wikipediaで`'+word+'`を検索...')
-            wikipedia.set_lang("ja")
-            response = wikipedia.search(word)
-            if not response:
-                await message.channel.send('Wikipediaで`'+word+'`に関連するページが見つかりませんでした')
+                word = message.content.split()[1]
+                flag = True
+            if flag == True:
+                await message.channel.send('🔍Wikipediaで`'+word+'`を検索中...')
+                response = wikipedia.search(word)
+                if not response:
+                    await message.channel.send('❌Wikipediaで`'+word+'`に関連するページが見つかりませんでした')
+            else:
+                response = wikipedia.random()
             try:
                 page = wikipedia.page(response[0])
                 content = page.content.splitlines()[0]
                 if len(content) > 1000:
                     content = content[0:1000] + "..."
-                embed = discord.Embed(title=word)
-                embed.add_field(name="wikipediaで検索した結果",
-                                value=content.splitlines()[0], inline=False)
-                embed.add_field(name="▶リンク",
-                                value='['+page.url+']('+page.url+')', inline=False)
+                body = content.splitlines()[0] + "\n\n> リンク\n" + '['+page.url+']('+page.url+')'
+                embed = discord.Embed(title=page.title, description=body, color=discord.Colour.from_rgb(255, 255, 255))
                 await message.channel.send(embed=embed)
             except Exception as e:
-                await message.channel.send("エラー:"+str(e))
+                await message.channel.send("❌エラー:"+str(e))
         elif 'neko' in message.content:
             await message.channel.send('にゃーん')
             wait_message = await client.wait_for("message", check=check)
@@ -755,8 +740,8 @@ async def getWeather():
     pops = response['timeSeries'][1]['areas'][1]['pops']
     timeDefines = response['timeSeries'][1]['timeDefines']
     title = "埼玉県南部の天気 - " + response['reportDatetime'][8:13].replace("T","日") + "時発表\n"
-    day1 = response['timeSeries'][0]['areas'][1]['weathers'][0].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨")
-    day2 = response['timeSeries'][0]['areas'][1]['weathers'][1].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨")
+    day1 = response['timeSeries'][0]['areas'][1]['weathers'][0].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨").replace("雷", "⚡雷")
+    day2 = response['timeSeries'][0]['areas'][1]['weathers'][1].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨").replace("雷", "⚡雷")
     body = "`" + response['timeSeries'][0]['timeDefines'][0][8:10] + "日:` " + day1 + "\n`" + response['timeSeries'][0]['timeDefines'][1][8:10] + "日:` " + day2 + "\n> 降水確率\n"
     for (pop, timeDefine) in zip(pops, timeDefines):
         icon = "🌧"*(int(pop)//10)+"➖"*(10-int(pop)//10)
