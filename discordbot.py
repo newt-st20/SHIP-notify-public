@@ -47,9 +47,10 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    guild = member.guild
-    unauthenticatedRole = guild.get_role(813015195881570334)
-    await member.add_roles(unauthenticatedRole)
+    user = client.get_user(member.user_id)
+    await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバー参加時に全員に送信しています__\n")
+    await user.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
+
 
 @client.event
 async def on_member_remove(member):
@@ -462,23 +463,6 @@ async def on_message(message):
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
 
-
-@client.event
-async def on_raw_reaction_add(payload):
-    await client.wait_until_ready()
-    guild = client.get_guild(payload.guild_id)
-    member = guild.get_member(payload.user_id)
-    user = client.get_user(payload.user_id)
-    entranceMessageId = 817952115095109633
-    roleLogChannel = client.get_channel(817401458244714506)
-    if payload.message_id == entranceMessageId:
-        authenticatedRole = guild.get_role(813014134001500170)
-        await member.add_roles(authenticatedRole)
-        unauthenticatedRole = guild.get_role(813015195881570334)
-        await member.remove_roles(unauthenticatedRole)
-        await roleLogChannel.send(user.mention+'に'+authenticatedRole.mention+'ロールを付与しました。')
-        await user.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットやサーバーのお問い合わせチャンネルでお気軽にお尋ねください。\n\n※__このメッセージはサーバー参加時に全員に送信しています__\n")
-        await user.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
 
 
 @tasks.loop(seconds=600)
