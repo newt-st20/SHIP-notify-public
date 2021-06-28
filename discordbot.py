@@ -373,9 +373,21 @@ async def on_message(message):
                     await message.channel.send("このチャンネルのメッセージをすべて削除します。本当によろしいですか？")
                     agreeMessage = await client.wait_for("message", check=check, timeout=10)
                     if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
-                        await message.channel.purge(limit=None)
+                        await agreeMessage.channel.purge(limit=None)
+                        await agreeMessage.channel.send("削除が完了しました。")
                 except:
                     await message.channel.send("操作が中断されました")
+            elif 'sa!delete-some-message' in message.content:
+                if len(message.content.split()) == 2:
+                    if isint(message.content.split()[1]):
+                        try:
+                            await message.reply("これより前の"+str(int(message.content.split()[1]))+"件のメッセージを削除します。よろしいですか？")
+                            agreeMessage = await client.wait_for("message", check=check, timeout=10)
+                            if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
+                                await agreeMessage.channel.purge(limit=int(message.content.split()[1]))
+                                await agreeMessage.channel.send(str(int(message.content.split()[1])+"件のメッセージの削除が完了しました。"))
+                        except:
+                            await message.reply("操作が中断されました")
         else:
             await message.channel.send('このコマンドは管理者のみ利用可能です')
     if isinstance(message.channel, discord.DMChannel):
