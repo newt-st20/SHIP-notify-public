@@ -381,11 +381,11 @@ async def on_message(message):
                 if len(message.content.split()) == 2:
                     if isint(message.content.split()[1]):
                         try:
-                            await message.reply("これより前の"+str(int(message.content.split()[1]))+"件のメッセージを削除します。よろしいですか？")
+                            await message.reply("これより"+str(int(message.content.split()[1]))+"件前までのメッセージを削除します。よろしいですか？")
                             agreeMessage = await client.wait_for("message", check=check, timeout=10)
                             if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
-                                await agreeMessage.channel.purge(limit=int(message.content.split()[1]))
-                                await agreeMessage.channel.send(str(int(message.content.split()[1])+"件のメッセージの削除が完了しました。"))
+                                await agreeMessage.channel.purge(limit=int(message.content.split()[1])+3)
+                                await agreeMessage.channel.send(str(int(message.content.split()[1])+3)+"件のメッセージの削除が完了しました。")
                         except:
                             await message.reply("操作が中断されました")
         else:
