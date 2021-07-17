@@ -3,7 +3,6 @@ import os
 import random
 import time
 
-import psycopg2
 import pyrebase
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -35,8 +34,6 @@ if not firebase_admin._apps:
     firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
 
 db = firestore.client()
-
-DATABASE_URL = os.environ['DATABASE_URL']
 
 def main():
     docs = db.collection('shnews').stream()
@@ -75,7 +72,7 @@ def main():
         body = newsEntry.text.replace(title, "").replace(date, "").replace(
             "カテゴリー："+category, "").replace("投稿時刻", "").replace(gtime, "").replace("\n", "")
         if len(body) > 100:
-            body = body[0:100] + "...((省略))"
+            body = body[0:100] + "......"
         newsData = {
             "title": title,
             "postDateTime": postDateTime,
@@ -85,7 +82,6 @@ def main():
             "images": images
         }
         newsList.append(newsData)
-    time.sleep(getWaitSecs())
     driver.quit()
 
     sendNewsData = []
@@ -106,18 +102,6 @@ def main():
         "getTime": getTime
     }
     return returnData
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL, sslmode='require')
-
-
-def getWaitSecs():
-    max_wait = 7.0
-    min_wait = 3.0
-    mean_wait = 5.0
-    sigma_wait = 1.0
-    return min([max_wait, max([min_wait, round(random.normalvariate(mean_wait, sigma_wait))])])
 
 
 if __name__ == "__main__":
