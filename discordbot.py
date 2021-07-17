@@ -318,16 +318,6 @@ async def on_message(message):
                             await message.reply("操作が中断されました")
         else:
             await message.channel.send('このコマンドは管理者のみ利用可能です')
-    if isinstance(message.channel, discord.DMChannel):
-        userId = str(message.author.id)
-        embed = discord.Embed(title="DMを受信しました", color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
-        embed.add_field(name="ユーザー名",
-                        value=message.author.mention+" ("+userId+")", inline=False)
-        embed.add_field(name="本文",
-                        value=message.content, inline=False)
-        embed.add_field(name="チャンネルID",
-                        value=str(message.channel.id), inline=False)
-        await dmLogChannel.send(embed=embed)
         if 'n!when' in message.content:
             configChannel = client.get_channel(820242721330561044)
             messages = await configChannel.history().flatten()
@@ -338,41 +328,53 @@ async def on_message(message):
                     continue
             hourList = [int(x) for x in whenGetNarouConfigMessage.split()]
             await message.channel.send('現在毎日'+str(hourList)+'時に「小説家になろう」の更新を取得しています。')
-        elif 'n!add' in message.content:
-            if len(message.content.split()) == 2:
-                ncode = message.content.split()[1]
-                if len(ncode) == 7 and ncode[0] == 'n':
-                    result = narou.add(ncode)
-                    if result == "success":
-                        await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新を通知します")
-                    else:
-                        await message.channel.send("https://ncode.syosetu.com/"+ncode+" の小説は存在しません"+result)
+    if 'n!add' in message.content:
+        if len(message.content.split()) == 2:
+            ncode = message.content.split()[1]
+            if len(ncode) == 7 and ncode[0] == 'n':
+                result = narou.add(ncode)
+                if result == "add":
+                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新を通知します")
+                elif result == "already":
+                    await message.channel.send("https://ncode.syosetu.com/"+ncode+" の小説はすでにフォローされています")
                 else:
-                    await message.channel.send("これはncodeではありません。")
+                    await message.channel.send(result)
             else:
-                await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'n!remove' in message.content:
-            if len(message.content.split()) == 2:
-                ncode = message.content.split()[1]
-                if len(ncode) == 7 and ncode[0] == 'n':
-                    result = narou.remove(ncode)
-                    if result == "remove":
-                        await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
-                    else:
-                        await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
+                await message.channel.send("これはncodeではありません。")
+        else:
+            await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
+    elif 'n!remove' in message.content:
+        if len(message.content.split()) == 2:
+            ncode = message.content.split()[1]
+            if len(ncode) == 7 and ncode[0] == 'n':
+                result = narou.remove(ncode)
+                if result == "remove":
+                    await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
                 else:
-                    await message.channel.send("これはncodeではありません。")
+                    await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
             else:
-                await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'n!list' in message.content:
-            result = narou.list()
-            body = ""
-            for eachData in result:
-                body += "`title` "+eachData['title']+" ( https://ncode.syosetu.com/" + eachData['ncode'] + " )\n"
-            if body == "":
-                await message.channel.send("このチャンネルでフォローされている小説はありません")
-            else:
-                await message.channel.send(body)
+                await message.channel.send("これはncodeではありません。")
+        else:
+            await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
+    elif 'n!list' in message.content:
+        result = narou.list()
+        body = ""
+        for eachData in result:
+            body += "`title` "+eachData['title']+" ( https://ncode.syosetu.com/" + eachData['ncode'] + " )\n"
+        if body == "":
+            await message.channel.send("このチャンネルでフォローされている小説はありません")
+        else:
+            await message.channel.send(body)
+    if isinstance(message.channel, discord.DMChannel):
+        userId = str(message.author.id)
+        embed = discord.Embed(title="DMを受信しました", color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
+        embed.add_field(name="ユーザー名",
+                        value=message.author.mention+" ("+userId+")", inline=False)
+        embed.add_field(name="本文",
+                        value=message.content, inline=False)
+        embed.add_field(name="チャンネルID",
+                        value=str(message.channel.id), inline=False)
+        await dmLogChannel.send(embed=embed)
     if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'reply!' in message.content:
         replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
         sendMessage = str(message.content.split('!')[2])
