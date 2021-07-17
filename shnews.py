@@ -1,7 +1,5 @@
 import datetime
 import os
-import random
-import time
 
 import pyrebase
 from bs4 import BeautifulSoup

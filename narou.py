@@ -30,8 +30,7 @@ def main():
             'ncode': doc.id,
             'title': eachDoc['title'],
             'count': eachDoc['count'],
-            'lastup': eachDoc['lastup'],
-            'channels': eachDoc['channels']
+            'lastup': eachDoc['lastup']
         })
     newData = []
     for eachData in data:
@@ -48,22 +47,16 @@ def main():
                 'ncode': eachData['ncode'],
                 'title': eachData['title'],
                 'count': responseJson[1]['general_all_no'],
-                'lastup': responseJson[1]['general_lastup'],
-                'channels': eachData['channels']
+                'lastup': responseJson[1]['general_lastup']
             })
     return newData
 
 
-def add(ncode, channel):
+def add(ncode):
     try:
         doc = db.collection('narou').document(str(ncode)).get()
         if doc.exists:
-            channels = doc.to_dict()['channels']
-            if str(channel) not in channels:
-                channels.append(str(channel))
-                db.collection('narou').document(str(ncode)).update({
-                    'channels' : channels
-                })
+            return "already"
         else:
             response = requests.get(
                 'https://api.syosetu.com/novelapi/api/?out=json&ncode='+str(ncode)+'&of=t-gl-ga-e')
@@ -72,34 +65,28 @@ def add(ncode, channel):
                 'title': responseJson[1]['title'],
                 'lastup': responseJson[1]['general_lastup'],
                 'count': responseJson[1]['general_all_no'],
-                'ended': responseJson[1]['end'],
-                'channels': [str(channel)]
+                'ended': responseJson[1]['end']
                 })
-        return "success"
+            return "add"
     except Exception as e:
         return str(e)
 
 
-def remove(ncode, channel):
+def remove(ncode):
     try:
         doc = db.collection('narou').document(str(ncode)).get()
         if doc.exists:
-            channels = doc.to_dict()['channels']
-            if str(channel) in channels:
-                channels.remove(str(channel))
-                db.collection('narou').document(str(ncode)).update({
-                    'channels' : channels
-                })
+            db.collection('narou').document(str(ncode)).delete()
+            return "remove"
         else:
             return "error"
-        return "success"
     except Exception as e:
         return str(e)
 
 
-def list(channel):
+def list():
     data = []
-    docs = db.collection('narou').where('channels', 'array_contains', str(channel)).stream()
+    docs = db.collection('narou').stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({

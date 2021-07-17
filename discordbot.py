@@ -342,7 +342,7 @@ async def on_message(message):
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 if len(ncode) == 7 and ncode[0] == 'n':
-                    result = narou.add(ncode, message.channel.id)
+                    result = narou.add(ncode)
                     if result == "success":
                         await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新を通知します")
                     else:
@@ -355,8 +355,8 @@ async def on_message(message):
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 if len(ncode) == 7 and ncode[0] == 'n':
-                    result = narou.remove(ncode, message.channel.id)
-                    if result == "success":
+                    result = narou.remove(ncode)
+                    if result == "remove":
                         await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
                     else:
                         await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
@@ -365,7 +365,7 @@ async def on_message(message):
             else:
                 await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
         elif 'n!list' in message.content:
-            result = narou.list(message.channel.id)
+            result = narou.list()
             body = ""
             for eachData in result:
                 body += "`title` "+eachData['title']+" ( https://ncode.syosetu.com/" + eachData['ncode'] + " )\n"
@@ -604,7 +604,7 @@ async def getNewsData():
     getLogChannel = client.get_channel(817400535639916544)
     result = shnews.main()
     if len(result["newsData"]) != 0:
-        for conData in result[0]:
+        for conData in result["newsData"]:
             embed = discord.Embed(
                 title=conData["title"], description="投稿日時: "+conData["date"], color=discord.Colour.from_rgb(230, 32, 226))
             embed.add_field(name="category", value=conData["category"])
@@ -624,14 +624,12 @@ async def getNewsData():
 
 async def getNarouData():
     await client.wait_until_ready()
+    sendChannel = client.get_channel(826094369467138108)
     result = narou.main()
     if len(result) != 0:
         for eachData in result:
             embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+str(eachData['count']), color=discord.Colour.from_rgb(256-int(eachData['ncode'][1:2])*2, 256-int(eachData['ncode'][2:3])*2, 256-int(eachData['ncode'][3:4])*2))
-            for channel in eachData['channels']:
-                print(channel)
-                sendChannel = client.get_channel(int(channel))
-                await sendChannel.send(embed=embed)
+            await sendChannel.send(embed=embed)
 
 async def getWeather():
     await client.wait_until_ready()
