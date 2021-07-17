@@ -603,16 +603,16 @@ async def getNewsData():
     shnewsChannel = client.get_channel(818480374334226443)
     getLogChannel = client.get_channel(817400535639916544)
     result = shnews.main()
-    if len(result[0]) != 0:
+    if len(result["newsData"]) != 0:
         for conData in result[0]:
             embed = discord.Embed(
-                title=conData[0], description="投稿日時: "+conData[1], color=discord.Colour.from_rgb(230, 32, 226))
-            embed.add_field(name="category", value=conData[4])
-            embed.add_field(name="body", value=conData[2], inline=False)
-            if len(conData[5]) != 0:
-                embed.set_image(url=conData[5][0])
-            embed.add_field(name="link", value=conData[3], inline=False)
-            embed.set_footer(text="取得: "+result[1])
+                title=conData["title"], description="投稿日時: "+conData["date"], color=discord.Colour.from_rgb(230, 32, 226))
+            embed.add_field(name="category", value=conData["category"])
+            embed.add_field(name="body", value=conData["body"], inline=False)
+            if len(conData["images"]) != 0:
+                embed.set_image(url=conData["images"][0])
+            embed.add_field(name="link", value=conData["link"], inline=False)
+            embed.set_footer(text="取得: "+result["getTime"])
             await shnewsChannel.send(embed=embed)
     else:
         embed = discord.Embed(

@@ -4,16 +4,44 @@ import random
 import time
 
 import psycopg2
+import pyrebase
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
 load_dotenv()
+
+config = {
+    'apiKey': os.environ['FIREBASE_API_KEY'],
+    'authDomain': os.environ['FIREBASE_AUTH_DOMAIN'],
+    "databaseURL": "xxxxxx",
+    'storageBucket': os.environ['FIREBASE_STORAGE_BUCKET']
+}
+firebase = pyrebase.initialize_app(config)
+
+
+if not firebase_admin._apps:
+    CREDENTIALS = credentials.Certificate({
+    'type': 'service_account',
+    'token_uri': 'https://oauth2.googleapis.com/token',
+    'project_id': os.environ['FIREBASE_PROJECT_ID'],
+    'client_email': os.environ['FIREBASE_CLIENT_EMAIL'],
+    'private_key': os.environ['FIREBASE_PRIVATE_KEY'].replace('\\n', '\n')
+    })
+    firebase_admin.initialize_app(CREDENTIALS,{'databaseURL': 'https://'+os.environ['FIREBASE_PROJECT_ID']+'.firebaseio.com'})
+
+db = firestore.client()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
 def main():
+    docs = db.collection('shnews').stream()
+    gotList = [doc.to_dict()['title'] for doc in docs]
+
     now = datetime.datetime.now()
     getTime = now.strftime('%H:%M:%S')
     if os.environ['STATUS'] == "local":
@@ -30,9 +58,10 @@ def main():
     driver.get('http://www.sakaehigashi.ed.jp/news/')
     news = driver.page_source
     newsSoup = BeautifulSoup(news, 'html.parser')
-    newsTextList = []
+    newsList = []
     newsEntryList = newsSoup.find_all(class_='entry')
     for newsEntry in newsEntryList:
+        newsData = {}
         title = newsEntry.find_all('h3')[0].text
         date = newsEntry.find_all(class_='date')[0].text
         gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
@@ -47,31 +76,36 @@ def main():
             "カテゴリー："+category, "").replace("投稿時刻", "").replace(gtime, "").replace("\n", "")
         if len(body) > 100:
             body = body[0:100] + "...((省略))"
-        newsTextList.append(
-            [title, postDateTime, body, link, category, images])
+        newsData = {
+            "title": title,
+            "postDateTime": postDateTime,
+            "body": body,
+            "link": link,
+            "category": category,
+            "images": images
+        }
+        newsList.append(newsData)
     time.sleep(getWaitSecs())
     driver.quit()
 
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            newsSendData = []
-            for i in newsTextList:
-                cur.execute('SELECT EXISTS (SELECT * FROM sh_news WHERE title = %s)',
-                            [i[0]])
-                (b,) = cur.fetchone()
-                if b == False:
-                    cur.execute('INSERT INTO sh_news (title, datetime, body, link, category, images) VALUES (%s, %s, %s, %s, %s, %s)', [
-                                i[0], i[1], i[2], i[3], i[4], i[5]])
-                    if len(i[2]) > 100:
-                        body = i[2][0:100] + "...((省略))"
-                    newsSendData.append(
-                        [i[0], i[1], i[2], i[3], i[4], i[5]])
-        conn.commit()
-    sortedNewsSendData = []
-    for value in reversed(newsSendData):
-        sortedNewsSendData.append(value)
-    print(sortedNewsSendData)
-    return sortedNewsSendData, getTime
+    sendNewsData = []
+    for value in reversed(newsList):
+        if value["title"] not in gotList:
+            sendNewsData.append(value)
+            db.collection('shnews').add({
+                "title": value["title"],
+                "postDateTime": value["postDateTime"],
+                "link": value["link"],
+                "category": value["category"],
+                "images": value["images"],
+                'timestamp': firestore.SERVER_TIMESTAMP
+            })
+    print(sendNewsData)
+    returnData = {
+        "newsData": sendNewsData,
+        "getTime": getTime
+    }
+    return returnData
 
 
 def get_connection():
