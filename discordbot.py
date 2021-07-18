@@ -375,9 +375,9 @@ async def on_message(message):
         embed.add_field(name="チャンネルID",
                         value=str(message.channel.id), inline=False)
         await dmLogChannel.send(embed=embed)
-    if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'reply!' in message.content:
-        replyDmChannel = client.get_channel(int(message.content.split('!')[1]))
-        sendMessage = str(message.content.split('!')[2])
+    if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'sa!reply' in message.content:
+        replyDmChannel = client.get_channel(int(message.content.split()[1]))
+        sendMessage = str(message.content.split()[2])
         await replyDmChannel.send(sendMessage)
     if "https://discord.com/channels/" in message.content:
         messageChannel = message.content.split("/")[-2]
