@@ -3,6 +3,7 @@
         {
             "name": "高校連絡事項",
             "collectionName": "highCon",
+            "channelId": 818066947463053312,
             "props": [
                 "id",
                 "date",
@@ -21,6 +22,7 @@
         {
             "name": "高校学習教材",
             "collectionName": "highStudy",
+            "channelId": 818066981982830613,
             "props": [
                 "id",
                 "date",
@@ -38,6 +40,7 @@
         {
             "name": "高校学校通信",
             "collectionName": "highSchoolNews",
+            "channelId": 841936546772156426,
             "props": [
                 "id",
                 "date",
@@ -54,6 +57,7 @@
         {
             "name": "中学連絡事項",
             "collectionName": "juniorCon",
+            "channelId": 812592878194262026,
             "props": [
                 "id",
                 "date",
@@ -70,6 +74,7 @@
         {
             "name": "中学学習教材",
             "collectionName": "juniorStudy",
+            "channelId": 814791146966220841,
             "props": [
                 "id",
                 "date",
@@ -86,6 +91,7 @@
         {
             "name": "中学学校通信",
             "collectionName": "juniorSchoolNews",
+            "channelId": 841936448878018560,
             "props": [
                 "id",
                 "date",
