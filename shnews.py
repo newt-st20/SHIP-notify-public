@@ -33,11 +33,6 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
-def test():
-    docs = db.collection('shnews').limit(20).stream()
-    gotList = [doc.to_dict()['link'] for doc in docs]
-    print(gotList)
-
 def main():
     docs = db.collection('shnews').limit(20).stream()
     gotList = [doc.to_dict()['link'] for doc in docs]
@@ -108,4 +103,4 @@ def main():
 
 
 if __name__ == "__main__":
-    test()
+    main()
