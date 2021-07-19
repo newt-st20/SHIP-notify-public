@@ -33,10 +33,15 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
-def main():
-    docs = db.collection('shnews').stream()
-    gotList = [doc.to_dict()['title'] for doc in docs]
+def test():
+    docs = db.collection('shnews').limit(20).stream()
+    gotList = [doc.to_dict()['link'] for doc in docs]
+    print(gotList)
 
+def main():
+    docs = db.collection('shnews').limit(20).stream()
+    gotList = [doc.to_dict()['link'] for doc in docs]
+    print(gotList)
     now = datetime.datetime.now()
     getTime = now.strftime('%H:%M:%S')
     if os.environ['STATUS'] == "local":
@@ -57,7 +62,7 @@ def main():
     newsEntryList = newsSoup.find_all(class_='entry')
     for newsEntry in newsEntryList:
         newsData = {}
-        title = newsEntry.find_all('h3')[0].text
+        title = newsEntry.find_all('h3')[0].text.replace("\u3000", " ")
         date = newsEntry.find_all(class_='date')[0].text
         gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
         postDateTime = date + gtime
@@ -84,7 +89,7 @@ def main():
 
     sendNewsData = []
     for value in reversed(newsList):
-        if value["title"] not in gotList:
+        if value["link"] not in gotList:
             sendNewsData.append(value)
             db.collection('shnews').add({
                 "title": value["title"],
@@ -103,4 +108,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test()
