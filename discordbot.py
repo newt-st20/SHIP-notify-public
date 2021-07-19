@@ -621,7 +621,7 @@ async def getNewsData():
             title="栄東ニュース更新通知", color=discord.Colour.from_rgb(230, 32, 226))
         embed.add_field(name="system-log",
                         value='栄東ニュースに更新はありませんでした')
-        embed.set_footer(text="取得: "+result[1])
+        embed.set_footer(text="取得: "+result["getTime"])
         await getLogChannel.send(embed=embed)
 
 async def getNarouData():

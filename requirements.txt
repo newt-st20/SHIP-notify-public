@@ -4,7 +4,6 @@ certifi==2020.12.5
 chardet==4.0.0
 click==7.1.2
 discord==1.0.1
-discord.py==1.6.0
 Flask==1.1.2
 future==0.18.2
 gunicorn==20.0.4
@@ -17,18 +16,15 @@ MarkupSafe==1.1.1
 oauth2client==4.1.3
 oauthlib==3.1.0
 psutil==5.8.0
-psycopg2==2.8.6
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 requests==2.25.1
 requests-oauthlib==1.3.0
 rsa==4.7
 selenium==3.141.0
-six==1.15.0
+six==1.15.0 #yes
 soupsieve==2.1
-SQLAlchemy==1.3.23
 urllib3==1.26.2
-Werkzeug==1.0.1
 wikipedia==1.4.0
 python-dotenv==0.15.0
 Pyrebase4==4.4.3
