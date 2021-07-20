@@ -23,15 +23,7 @@ db = firestore.client()
 
 def file(id):
     data = []
-    docs = db.collection('highCon').where('id', '==', int(id)).stream()
-    for doc in docs:
-        eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['link'], eachDoc['date']])
-    docs = db.collection('highStudy').where('id', '==', int(id)).stream()
-    for doc in docs:
-        eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['link'], eachDoc['date']])
-    docs = db.collection('highSchoolNews').where('id', '==', int(id)).stream()
+    docs = db.collection('shipPost').where('id', '==', int(id)).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append([eachDoc['title'], eachDoc['link'], eachDoc['date']])
@@ -40,37 +32,22 @@ def file(id):
 
 def info(id):
     data = []
-    docs = db.collection('highCon').where('id', '==', int(id)).stream()
+    item = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))
+    docs = db.collection('shipPost').where('id', '==', int(id)).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], "高校連絡事項", doc.id])
-    docs = db.collection('highStudy').where('id', '==', int(id)).stream()
-    for doc in docs:
-        eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], "高校学習教材", doc.id])
-    docs = db.collection('highSchoolNews').where('id', '==', int(id)).stream()
-    for doc in docs:
-        eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], "高校学校通信", doc.id])
-    docs = db.collection('juniorCon').where('id', '==', int(id)).stream()
-    for doc in docs:
-        eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", "中学連絡事項", doc.id])
-    docs = db.collection('juniorStudy').where('id', '==', int(id)).stream()
-    for doc in docs:
-        eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", "中学学習教材", doc.id])
-    docs = db.collection('juniorSchoolNews').where('id', '==', int(id)).stream()
-    for doc in docs:
-        eachDoc = doc.to_dict()
-        data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", "中学学校通信", doc.id])
+        if "high" in eachDoc["channel"]:
+            data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], item["pageList"][item["pagePosition"].index(eachDoc["channel"])]["name"], doc.id])
+        else:
+            data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", item["pageList"][item["pagePosition"].index(eachDoc["channel"])]["name"], doc.id])
+    print(data)
     return data
 
 
 def recently(type, howmany):
     itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     data = []
-    docs = db.collection(itemNameList[type]["collectionName"]).order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
+    docs = db.collection("shipPost").where('channel', '==', itemNameList[type]["collectionName"]).order_by('id', direction=firestore.Query.DESCENDING).limit(int(howmany)).stream()
     for doc in docs:
         eachDoc = doc.to_dict()
         data.append({
@@ -92,4 +69,4 @@ def count(type):
 
 
 if __name__ == "__main__":
-    recently(5, 10)
+    info(32562)

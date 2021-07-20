@@ -310,7 +310,8 @@ def main():
         if i["id"][0] != 0 and i["id"][0] not in gotList:
             i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
             juniorConSendData.append(i)
-            db.collection('juniorCon').add({
+            db.collection('shipPost').add({
+                'channel': "juniorCon",
                 'id': int(i["id"][0]),
                 'date': i["date"],
                 'folder': i["folder"],
@@ -328,7 +329,8 @@ def main():
         if i["id"][0] != 0 and i["id"][0] not in gotList:
             i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
             juniorStudySendData.append(i)
-            db.collection('juniorStudy').add({
+            db.collection('shipPost').add({
+                'channel': "juniorStudy",
                 'id': int(i["id"][0]),
                 'date': i["date"],
                 'folder': i["folder"],
@@ -345,7 +347,8 @@ def main():
         if i["id"][0] != 0 and i["id"][0] not in gotList:
             i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
             juniorSchoolNewsSendData.append(i)
-            db.collection('juniorSchoolNews').add({
+            db.collection('shipPost').add({
+                'channel': "juniorSchoolNews",
                 'id': int(i["id"][0]),
                 'date': i["date"],
                 'folder': i["folder"],
@@ -362,7 +365,8 @@ def main():
         if i["id"][0] != 0 and i["id"][0] not in gotList:
             i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
             highConSendData.append(i)
-            db.collection('highCon').add({
+            db.collection('shipPost').add({
+                'channel': "highCon",
                 'id': int(i["id"][0]),
                 'date': i["date"],
                 'folder': i["folder"],
@@ -381,7 +385,8 @@ def main():
         if i["id"][0] != 0 and i["id"][0] not in gotList:
             i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
             highStudySendData.append(i)
-            db.collection('highStudy').add({
+            db.collection('shipPost').add({
+                'channel': "highStudy",
                 'id': int(i["id"][0]),
                 'date': i["date"],
                 'folder': i["folder"],
@@ -399,7 +404,8 @@ def main():
         if i["id"][0] != 0 and i["id"][0] not in gotList:
             i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
             highSchoolNewsSendData.append(i)
-            db.collection('highSchoolNews').add({
+            db.collection('shipPost').add({
+                'channel': "highSchoolNews",
                 'id': int(i["id"][0]),
                 'date': i["date"],
                 'folder': i["folder"],

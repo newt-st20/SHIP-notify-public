@@ -105,5 +105,13 @@
                 66
             ]
         }
+    ],
+    "pagePosition": [
+        "highCon",
+        "highStudy",
+        "highSchoolNews",
+        "juniorCon",
+        "juniorStudy",
+        "juniorSchoolNews"
     ]
 }
