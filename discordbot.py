@@ -77,12 +77,12 @@ async def on_message(message):
             content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
             content += '\n`sh!when` SHIPの更新を取得する日時を表示'
             content += '\n`sh!wiki` Wikipediaを検索'
-            content += '\n\n＜「小説家になろう」関連コマンド＞ ※DMチャンネルでのみ利用可能'
+            content += '\n\n>「小説家になろう」関連コマンド'
             content += '\n`n!when` 更新を取得している日時の取得'
             content += '\n`n!add` 更新を通知する小説の追加'
             content += '\n`n!remove` 更新を通知する小説の削除'
             content += '\n`n!list` 更新を通知している小説一覧を表示'
-            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/07/06", description=content, color=discord.Colour.from_rgb(190, 252, 3))
+            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/07/20", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
             flag = False
@@ -98,18 +98,18 @@ async def on_message(message):
                     idMessage = await client.wait_for("message", check=check, timeout=60)
                     if isint(idMessage.content) == False:
                         if 'sh!' in idMessage.content:
-                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                            await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                         else:
-                            await idMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                            await idMessage.reply("❌入力された文字は数字ではありません。最初からやり直してください。")
                         return
                     idIntMessage = int(idMessage.content)
                 except Exception as e:
                     if idMessage == "":
-                        await message.reply("セッションがタイムアウトしました"+str(e))
+                        await message.reply("⏱セッションがタイムアウトしました"+str(e))
                     return
             data = search.info(idIntMessage)
             if len(data) == 0:
-                await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。")
+                await message.reply("❌指定されたidに該当するファイルがデータベースに見つかりませんでした。")
                 return
             body = "`page` "+data[0][4]+"\n"
             body += "`id` "+str(idIntMessage)+"\n"
@@ -145,18 +145,18 @@ async def on_message(message):
                     idMessage = await client.wait_for("message", check=check, timeout=60)
                     if isint(idMessage.content) == False:
                         if 'sh!' in idMessage.content:
-                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                            await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                         else:
-                            await idMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                            await idMessage.reply("❌入力された文字は数字ではありません。最初からやり直してください。")
                         return
                     idIntMessage = int(idMessage.content)
                 except Exception as e:
                     if idMessage == "":
-                        await message.reply("セッションがタイムアウトしました"+str(e))
+                        await message.reply("⏱セッションがタイムアウトしました"+str(e))
                     return
             data = search.file(idIntMessage)
             if len(data) == 0 or str(data[0][1]) == "{}":
-                await message.reply("指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
+                await message.reply("❌指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
                 return
             if str(data[0][1]).startswith('{'):
                 linkList = str(data[0][1])[1:-1].split(",")
@@ -187,30 +187,30 @@ async def on_message(message):
                     typeMessage = await client.wait_for("message", check=check, timeout=60)
                     if isint(typeMessage.content) == False:
                         if 'sh!' in typeMessage.content:
-                            await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                            await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                         else:
-                            await typeMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                            await typeMessage.reply("❌入力された文字は数字ではありません。最初からやり直してください。")
                         return
                     typeIntMessage = int(typeMessage.content)
                     data = search.count(typeIntMessage)
                     if data == 0:
-                        await typeMessage.reply("指定されたタイプは存在しません。")
+                        await typeMessage.reply("❌指定されたタイプは存在しません。")
                         return
                     await message.channel.send(str(data)+"件のデータが見つかりました。何件表示しますか？(最大30件まで)")
                     try:
                         howmanyMessage = await client.wait_for("message", check=check, timeout=60)
                         if isint(howmanyMessage.content) == False:
                             if 'sh!' in howmanyMessage.content:
-                                await message.reply("別のコマンドが実行されたためこのセッションは終了しました。")
+                                await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                             else:
-                                await howmanyMessage.reply("入力された文字は数字ではありません。最初からやり直してください。")
+                                await howmanyMessage.reply("❌入力された文字は数字ではありません。最初からやり直してください。")
                             return
                         howmanyIntMessage = int(howmanyMessage.content)
                     except Exception as e:
-                        await howmanyMessage.reply("セッションがタイムアウトしました"+str(e))
+                        await howmanyMessage.reply("⏱セッションがタイムアウトしました"+str(e))
                         return
                 except Exception as e:
-                    await typeMessage.reply("セッションがタイムアウトしました"+str(e))
+                    await typeMessage.reply("⏱セッションがタイムアウトしました"+str(e))
                     return
             mainData = search.recently(typeIntMessage, howmanyIntMessage)
             body = ""
@@ -263,9 +263,9 @@ async def on_message(message):
                     whenGetConfigMessage = msg.content.lstrip("GET_HOUR=")
                     continue
             hourList = [int(x) for x in whenGetConfigMessage.split()]
-            await message.channel.send('現在毎日'+str(hourList)+'時にSHIPデータを取得しています')
+            await message.channel.send('⏲現在毎日'+str(hourList)+'時にSHIPデータを取得しています')
         else:
-            await message.channel.send('このコマンドは用意されていません')
+            await message.channel.send('❌このコマンドは用意されていません')
     if 'sa!' in message.content:
         if message.author.guild_permissions.administrator:
             if message.content == 'sa!get':
@@ -299,7 +299,7 @@ async def on_message(message):
                     await message.channel.send(str(type(e)) + str(e))
             elif message.content == 'sa!delete-all-message':
                 try:
-                    await message.channel.send("このチャンネルのメッセージをすべて削除します。本当によろしいですか？")
+                    await message.channel.send("⚠️このチャンネルのメッセージをすべて削除します。本当によろしいですか？")
                     agreeMessage = await client.wait_for("message", check=check, timeout=10)
                     if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
                         await agreeMessage.channel.purge(limit=None)
@@ -310,7 +310,7 @@ async def on_message(message):
                 if len(message.content.split()) == 2:
                     if isint(message.content.split()[1]):
                         try:
-                            await message.reply("これより"+str(int(message.content.split()[1]))+"件前までのメッセージを削除します。よろしいですか？")
+                            await message.reply("⚠️これより"+str(int(message.content.split()[1]))+"件前までのメッセージを削除します。よろしいですか？")
                             agreeMessage = await client.wait_for("message", check=check, timeout=10)
                             if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
                                 await agreeMessage.channel.purge(limit=int(message.content.split()[1])+3)
@@ -318,7 +318,7 @@ async def on_message(message):
                         except:
                             await message.reply("操作が中断されました")
         else:
-            await message.channel.send('このコマンドは管理者のみ利用可能です')
+            await message.channel.send('⚠️このコマンドは管理者のみ利用可能です')
     if 'n!' in message.content:
         if 'n!when' in message.content:
             configChannel = client.get_channel(820242721330561044)
@@ -342,7 +342,7 @@ async def on_message(message):
                     else:
                         await message.channel.send(result)
                 else:
-                    await message.channel.send("これはncodeではありません。")
+                    await message.channel.send("これはncodeではありません。最初からやり直してください")
             else:
                 await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
         elif 'n!remove' in message.content:
@@ -355,7 +355,7 @@ async def on_message(message):
                     else:
                         await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
                 else:
-                    await message.channel.send("これはncodeではありません。")
+                    await message.channel.send("これはncodeではありません。最初からやり直してください")
             else:
                 await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
         elif 'n!list' in message.content:
@@ -502,10 +502,10 @@ async def getData():
                         await sendChannel.send(embed=embed)
                     except Exception as e:
                         await sendChannel.send(str(e))
-                else:
-                    noneUpdateChannelList.append(eachName["name"])
             else:
                 await getLogChannel.send(eachName["collectionName"]+"に更新がありましたが、discordNotifyBoolの設定によりLINE版には更新が通知されませんでした")
+        else:
+            noneUpdateChannelList.append(eachName["name"])
     if len(noneUpdateChannelList) != 0:
         body = result['getTime'] + "の取得で以下のチャンネルに更新がありませんでした。\n" + str(noneUpdateChannelList)
         embed = discord.Embed(
