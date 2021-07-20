@@ -21,10 +21,6 @@ load_dotenv()
 
 TOKEN = os.environ['DISCORD_TOKEN']
 
-headers = {
-    "Authorization": "Bot " + TOKEN
-}
-
 def isint(s):
     try:
         int(s, 10)
@@ -32,16 +28,6 @@ def isint(s):
         return False
     else:
         return True
-
-async def notify_callback(id, token):
-    url = "https://discord.com/api/v8/interactions/{0}/{1}/callback".format(id, token)
-    json = {
-        "type": 6
-    }
-    async with aiohttp.ClientSession() as s:
-        async with s.post(url, json=json) as r:
-            if 200 <= r.status < 300:
-                return
 
 
 intents = discord.Intents.all()
@@ -278,11 +264,6 @@ async def on_message(message):
                     continue
             hourList = [int(x) for x in whenGetConfigMessage.split()]
             await message.channel.send('現在毎日'+str(hourList)+'時にSHIPデータを取得しています')
-        elif 'btntest' in message.content:
-            endpoint = "https://discordapp.com/api/channels/" + str(message.channel.id) + "/messages"
-            postData = json.load(open('json/button.json', 'r', encoding="utf-8_sig"))["example"]
-            r = requests.post(endpoint, headers=headers, json=postData)
-            print(r)
         else:
             await message.channel.send('このコマンドは用意されていません')
     if 'sa!' in message.content:
@@ -423,20 +404,6 @@ async def on_message(message):
         embed.set_author(name=oldmessage.author.name, icon_url=oldmessage.author.avatar_url)
         embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
         await message.channel.send(embed=embed)
-
-@client.event
-async def on_socket_response(message):
-    if message["t"] != "INTERACTION_CREATE":
-        return
-    print(message)
-    custom_id = message["d"]["data"]["custom_id"]
-    if custom_id == "click_one":
-        endpoint = "https://discordapp.com/api/channels/" + str(message["d"]["channel_id"]) + "/messages"
-        postData = {
-            "content": "test"
-        }
-        r = requests.post(endpoint, headers=headers, json=postData)
-        await notify_callback(message["d"]["id"], message["d"]["token"])
 
 @tasks.loop(seconds=600)
 async def loop():
