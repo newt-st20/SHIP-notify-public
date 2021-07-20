@@ -3,6 +3,7 @@ import os
 import random
 import re
 import time
+import json
 
 from dotenv import load_dotenv
 import pyrebase
@@ -98,6 +99,7 @@ def main():
     driver.find_element_by_name('login').click()
     time.sleep(1)
     count = 0
+    dataList = {}
     while count < 2:
         if count == 0:
             schooltype = "high"
@@ -295,138 +297,46 @@ def main():
         print(schoolNewsList)
 
         if schooltype == "junior":
-            juniorConList = conList
-            juniorStudyList = studyList
-            juniorSchoolNewsList = schoolNewsList
+            dataList["juniorCon"] = conList
+            dataList["juniorStudy"] = studyList
+            dataList["juniorSchoolNews"] = schoolNewsList
         elif schooltype == "high":
-            highConList = conList
-            highStudyList = studyList
-            highSchoolNewsList = schoolNewsList
+            dataList["highCon"] = conList
+            dataList["highStudy"] = studyList
+            dataList["highSchoolNews"] = schoolNewsList
         count += 1
     driver.quit()
 
-    juniorConSendData = []
-    for i in reversed(juniorConList):
-        if i["id"][0] != 0 and i["id"][0] not in gotList:
-            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-            juniorConSendData.append(i)
-            db.collection('shipPost').add({
-                'channel': "juniorCon",
-                'id': int(i["id"][0]),
-                'date': i["date"],
-                'folder': i["folder"],
-                'title': i["title"],
-                'description': i["description"],
-                'timestamp': firestore.SERVER_TIMESTAMP
-            })
-    docDict = db.collection('count').document('juniorCon').get().to_dict()
-    if len(juniorConSendData) != 0:
-        howManyData = int(docDict['count']) + len(juniorConSendData)
-        db.collection('count').document('juniorCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
-    
-    juniorStudySendData = []
-    for i in reversed(juniorStudyList):
-        if i["id"][0] != 0 and i["id"][0] not in gotList:
-            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-            juniorStudySendData.append(i)
-            db.collection('shipPost').add({
-                'channel': "juniorStudy",
-                'id': int(i["id"][0]),
-                'date': i["date"],
-                'folder': i["folder"],
-                'title': i["title"],
-                'timestamp': firestore.SERVER_TIMESTAMP
-            })
-    docDict = db.collection('count').document('juniorStudy').get().to_dict()
-    if len(juniorStudySendData) != 0:
-        howManyData = int(docDict['count']) + len(juniorStudySendData)
-        db.collection('count').document('juniorStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
-    
-    juniorSchoolNewsSendData = []
-    for i in reversed(juniorSchoolNewsList):
-        if i["id"][0] != 0 and i["id"][0] not in gotList:
-            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-            juniorSchoolNewsSendData.append(i)
-            db.collection('shipPost').add({
-                'channel': "juniorSchoolNews",
-                'id': int(i["id"][0]),
-                'date': i["date"],
-                'folder': i["folder"],
-                'title': i["title"],
-                'timestamp': firestore.SERVER_TIMESTAMP
-            })
-    docDict = db.collection('count').document('juniorSchoolNews').get().to_dict()
-    if len(juniorSchoolNewsSendData) != 0:
-        howManyData = int(docDict['count']) + len(juniorSchoolNewsSendData)
-        db.collection('count').document('juniorSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
-    
-    highConSendData = []
-    for i in reversed(highConList):
-        if i["id"][0] != 0 and i["id"][0] not in gotList:
-            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-            highConSendData.append(i)
-            db.collection('shipPost').add({
-                'channel': "highCon",
-                'id': int(i["id"][0]),
-                'date': i["date"],
-                'folder': i["folder"],
-                'title': i["title"],
-                'description': i["description"],
-                'link': i["link"],
-                'timestamp': firestore.SERVER_TIMESTAMP
-            })
-    docDict = db.collection('count').document('highCon').get().to_dict()
-    if len(highConSendData) != 0:
-        howManyData = int(docDict['count']) + len(highConSendData)
-        db.collection('count').document('highCon').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
-    
-    highStudySendData = []
-    for i in reversed(highStudyList):
-        if i["id"][0] != 0 and i["id"][0] not in gotList:
-            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-            highStudySendData.append(i)
-            db.collection('shipPost').add({
-                'channel': "highStudy",
-                'id': int(i["id"][0]),
-                'date': i["date"],
-                'folder': i["folder"],
-                'title': i["title"],
-                'link': i["link"],
-                'timestamp': firestore.SERVER_TIMESTAMP
-            })
-    docDict = db.collection('count').document('highStudy').get().to_dict()
-    if len(highStudySendData) != 0:
-        howManyData = int(docDict['count']) + len(highStudySendData)
-        db.collection('count').document('highStudy').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
-    
-    highSchoolNewsSendData = []
-    for i in reversed(highSchoolNewsList):
-        if i["id"][0] != 0 and i["id"][0] not in gotList:
-            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-            highSchoolNewsSendData.append(i)
-            db.collection('shipPost').add({
-                'channel': "highSchoolNews",
-                'id': int(i["id"][0]),
-                'date': i["date"],
-                'folder': i["folder"],
-                'title': i["title"],
-                'link': i["link"],
-                'timestamp': firestore.SERVER_TIMESTAMP
-            })
-    docDict = db.collection('count').document('highSchoolNews').get().to_dict()
-    if len(highSchoolNewsSendData) != 0:
-        howManyData = int(docDict['count']) + len(highSchoolNewsSendData)
-        db.collection('count').document('highSchoolNews').update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
 
     returnData = {
-        "getTime": getTime,
-        "juniorCon": juniorConSendData,
-        "juniorStudy": juniorStudySendData,
-        "juniorSchoolNews": juniorSchoolNewsSendData,
-        "highCon": highConSendData,
-        "highStudy": highStudySendData,
-        "highSchoolNews": highSchoolNewsSendData
+        "getTime": getTime
     }
+
+    item = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
+    for eachChannel in item:
+        sendData = []
+        for i in reversed(dataList[eachChannel["collectionName"]]):
+            if i["id"][0] != 0 and i["id"][0] not in gotList:
+                i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
+                sendData.append(i)
+                eachAddData = {
+                    'channel': eachChannel["collectionName"],
+                    'id': int(i["id"][0]),
+                    'date': i["date"],
+                    'folder': i["folder"],
+                    'title': i["title"],
+                    'timestamp': firestore.SERVER_TIMESTAMP}
+                if "description" in eachChannel["props"]:
+                    eachAddData['description'] = i["description"]
+                if "link" in eachChannel["props"]:
+                    eachAddData['link'] = i["link"]
+                db.collection('shipPost').add(eachAddData)
+        docDict = db.collection('count').document(eachChannel["collectionName"]).get().to_dict()
+        if len(sendData) != 0:
+            howManyData = int(docDict['count']) + len(sendData)
+            db.collection('count').document(eachChannel["collectionName"]).update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+        returnData[eachChannel["collectionName"]] = sendData
+
     print(returnData)
     return returnData
 
