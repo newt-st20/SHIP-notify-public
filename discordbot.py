@@ -466,44 +466,60 @@ async def loop():
 async def getData():
     await client.wait_until_ready()
     getLogChannel = client.get_channel(817400535639916544)
+    configChannel = client.get_channel(820242721330561044)
+    messages = await configChannel.history().flatten()
+    for msg in messages:
+        if "DISCORD_NOTIFY=" in msg.content:
+            discordNotifyBool = msg.content.lstrip("DISCORD_NOTIFY=")
+            continue
+    for msg in messages:
+        if "LINE_NOTIFY=" in msg.content:
+            lineNotifyBool = msg.content.lstrip("LINE_NOTIFY=")
+            continue
     result = shipcheck.main()
     itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     noneUpdateChannelList = []
     for eachName in itemNameList:
         if len(result[eachName["collectionName"]]) != 0:
-            sendChannel = client.get_channel(eachName["channelId"])
-            for conData in result[eachName["collectionName"]]:
-                try:
-                    if conData['title'] != '':
-                        embed = discord.Embed(
-                            title=conData['title'], description="投稿: "+conData['date'], color=discord.Colour.from_rgb(52, 235, 79))
-                    else:
-                        embed = discord.Embed(
-                            title=eachName["name"]+"更新通知", description="投稿: "+conData['date'], color=discord.Colour.from_rgb(52, 235, 79))
-                    embed.add_field(name="id", value=conData['id'][0])
-                    if conData['folder'] != '':
-                        embed.add_field(name="path", value=conData['folder'])
-                    if "description" in eachName["props"]:
-                        if conData['description'] != '':
-                            embed.add_field(name="description",
-                                            value=conData['description'], inline=False)
-                    embed.set_footer(text="取得: "+result['getTime'])
-                    await sendChannel.send(embed=embed)
-                except Exception as e:
-                    await sendChannel.send(str(e))
+            if discordNotifyBool == "true":
+                sendChannel = client.get_channel(eachName["channelId"])
+                for conData in result[eachName["collectionName"]]:
+                    try:
+                        if conData['title'] != '':
+                            embed = discord.Embed(
+                                title=conData['title'], description="投稿: "+conData['date'], color=discord.Colour.from_rgb(52, 235, 79))
+                        else:
+                            embed = discord.Embed(
+                                title=eachName["name"]+"更新通知", description="投稿: "+conData['date'], color=discord.Colour.from_rgb(52, 235, 79))
+                        embed.add_field(name="id", value=conData['id'][0])
+                        if conData['folder'] != '':
+                            embed.add_field(name="path", value=conData['folder'])
+                        if "description" in eachName["props"]:
+                            if conData['description'] != '':
+                                embed.add_field(name="description",
+                                                value=conData['description'], inline=False)
+                        embed.set_footer(text="取得: "+result['getTime'])
+                        await sendChannel.send(embed=embed)
+                    except Exception as e:
+                        await sendChannel.send(str(e))
+                else:
+                    noneUpdateChannelList.append(eachName["name"])
             else:
-                noneUpdateChannelList.append(eachName["name"])
+                await getLogChannel.send(eachName["collectionName"]+"に更新がありましたが、discordNotifyBoolの設定によりLINE版には更新が通知されませんでした")
     if len(noneUpdateChannelList) != 0:
         body = result['getTime'] + "の取得で以下のチャンネルに更新がありませんでした。\n" + str(noneUpdateChannelList)
         embed = discord.Embed(
             title="未更新チャンネル", description=body, color=discord.Colour.from_rgb(52, 235, 79))
         await getLogChannel.send(embed=embed)
     if len(result['highCon']) != 0 or len(result['highStudy']) != 0:
-        try:
-            log = line.main(result)
-            await getLogChannel.send("LINE版処理完了\n" + log)
-        except Exception as e:
-            await getLogChannel.send("LINE版での不具合:\n" + str(e))
+        if lineNotifyBool == "true":
+            try:
+                log = line.main(result)
+                await getLogChannel.send("LINE版処理完了\n" + log)
+            except Exception as e:
+                await getLogChannel.send("LINE版での不具合:\n" + str(e))
+        else:
+            await getLogChannel.send("highCon,highStudyのいずれかに更新がありましたが、lineNotifyBoolの設定によりLINE版には更新が通知されませんでした")
 
 
 async def getNewsData():
@@ -558,7 +574,6 @@ async def getWeather():
         body += "> 埼玉県の天気概況\n" + response['headlineText'] + "\n"
     embed = discord.Embed(title=title, description=body, color=discord.Colour.from_rgb(163, 212, 255))
     await weatherChannel.send(embed=embed)
-
 
 loop.start()
 
