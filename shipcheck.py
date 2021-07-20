@@ -341,13 +341,5 @@ def main():
     return returnData
 
 
-def getWaitSecs():
-    max_wait = 7.0
-    min_wait = 3.0
-    mean_wait = 5.0
-    sigma_wait = 1.0
-    return min([max_wait, max([min_wait, round(random.normalvariate(mean_wait, sigma_wait))])])
-
-
 if __name__ == "__main__":
     main()

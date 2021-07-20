@@ -470,7 +470,7 @@ async def getData():
     itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     noneUpdateChannelList = []
     for eachName in itemNameList:
-        if len(result['juniorCon']) != 0:
+        if len(result[eachName["collectionName"]]) != 0:
             sendChannel = client.get_channel(eachName["channelId"])
             for conData in result[eachName["collectionName"]]:
                 try:
