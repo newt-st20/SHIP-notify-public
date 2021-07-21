@@ -469,10 +469,6 @@ async def getData():
         if "DISCORD_NOTIFY=" in msg.content:
             discordNotifyBool = msg.content.lstrip("DISCORD_NOTIFY=")
             continue
-    for msg in messages:
-        if "LINE_NOTIFY=" in msg.content:
-            lineNotifyBool = msg.content.lstrip("LINE_NOTIFY=")
-            continue
     result = shipcheck.main()
     itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     noneUpdateChannelList = []
@@ -509,6 +505,11 @@ async def getData():
             title="未更新チャンネル", description=body, color=discord.Colour.from_rgb(52, 235, 79))
         await getLogChannel.send(embed=embed)
     if len(result['highCon']) != 0 or len(result['highStudy']) != 0:
+        messages = await configChannel.history().flatten()
+        for msg in messages:
+            if "LINE_NOTIFY=" in msg.content:
+                lineNotifyBool = msg.content.lstrip("LINE_NOTIFY=")
+                continue
         if lineNotifyBool == "true":
             try:
                 log = line.main(result)
