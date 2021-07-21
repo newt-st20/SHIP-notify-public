@@ -158,10 +158,7 @@ async def on_message(message):
             if len(data) == 0 or str(data[0][1]) == "{}":
                 await message.reply("❌指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
                 return
-            if str(data[0][1]).startswith('{'):
-                linkList = str(data[0][1])[1:-1].split(",")
-            else:
-                linkList = data[0][1]
+            linkList = data[0][1]
             await message.channel.send("**"+str(data[0][0]+"** - "+str(data[0][2])))
             for lc, link in enumerate(linkList, 1):
                 fileName = link.split(
@@ -433,7 +430,7 @@ async def loop():
         await announceMessage.edit(embed=embed)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
-    if nowMinute < 0:
+    if nowMinute < 10:
         if nowHour in hourList:
             await getLogChannel.send('SHIPデータの取得を開始します')
             try:
