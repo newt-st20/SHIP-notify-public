@@ -43,13 +43,13 @@ def main():
     gotList = []
     channelNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pagePosition"]
     for channelName in channelNameList:
-        docs = db.collection('shipPost').where('channel', '==', channelName).limit(20).stream()
+        docs = db.collection('shipPost').where('channel', '==', channelName).order_by('id', direction=firestore.Query.DESCENDING).limit(30).stream()
         gotList.extend([int(doc.to_dict()['id']) for doc in docs])
     print(gotList)
 
     if os.environ['STATUS'] == "local":
-        CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
-        DOWNLOAD_DIR = 'D:\Downloads'
+        CHROME_DRIVER_PATH = 'C:/chromedriver.exe'
+        DOWNLOAD_DIR = 'C:/Users/ff192/Documents/ship-file'
     else:
         CHROME_DRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
         DOWNLOAD_DIR = '/app/tmp'
@@ -120,10 +120,7 @@ def main():
                                 result = re.match(".*name=(.*)&size.*", eachConPageLink.get("href"))
                                 print(result.group(1))
                                 time.sleep(5)
-                                if os.environ['STATUS'] == "local":
-                                    filepath = 'D:\Downloads/' + result.group(1)
-                                else:
-                                    filepath = DOWNLOAD_DIR + '/' + result.group(1)
+                                filepath = DOWNLOAD_DIR + '/' + result.group(1)
                                 try:
                                     storage.child(
                                         'pdf/high-con/'+str(eachconList["id"][0])+'/'+result.group(1)).put(filepath)
