@@ -555,8 +555,7 @@ async def getNarouData():
 async def getWeather():
     await client.wait_until_ready()
     weatherChannel = client.get_channel(855709750704209921)
-    url = "https://www.jma.go.jp/bosai/forecast/data/forecast/110000.json"
-    response = requests.get(url).json()[0]
+    response = requests.get("https://www.jma.go.jp/bosai/forecast/data/forecast/110000.json").json()[0]
     pops = response['timeSeries'][1]['areas'][1]['pops']
     timeDefines = response['timeSeries'][1]['timeDefines']
     title = "埼玉県南部の天気 - " + response['reportDatetime'][8:13].replace("T","日") + "時発表\n"

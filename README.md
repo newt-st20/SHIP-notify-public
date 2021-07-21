@@ -11,5 +11,8 @@ SHIPのスクレイピングにはseleniumを使用。中高それぞれの「�
 ## 再利用にあたって
 再利用(フォーク)などは基本自由としますが、一度連絡を入れてください。
 
+
+## その他備考
 ### webDriver バージョン設定
 環境変数 <code>CHROMEDRIVER_VERSION</code> に[ここ](https://chromedriver.chromium.org/downloads)に記載されているバージョンをセットする。
+現在のバージョンは<code>92.0.4515.43</code>
