@@ -41,36 +41,11 @@ def main():
     getTime = now.strftime('%H:%M:%S')
 
     gotList = []
-    try:
-        docs = db.collection('juniorCon').stream()
+    channelNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pagePosition"]
+    for channelName in channelNameList:
+        docs = db.collection('shipPost').where('channel', '==', channelName).limit(20).stream()
         gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    except Exception as e:
-        print(str(e))
-    try:
-        docs = db.collection('juniorStudy').stream()
-        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    except Exception as e:
-        print(str(e))
-    try:
-        docs = db.collection('juniorSchoolNews').stream()
-        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    except Exception as e:
-        print(str(e))
-    try:
-        docs = db.collection('highCon').stream()
-        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    except Exception as e:
-        print(str(e))
-    try:
-        docs = db.collection('highStudy').stream()
-        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    except Exception as e:
-        print(str(e))
-    try:
-        docs = db.collection('highSchoolNews').stream()
-        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
-    except Exception as e:
-        print(str(e))
+    print(gotList)
 
     if os.environ['STATUS'] == "local":
         CHROME_DRIVER_PATH = 'C:\chromedriver.exe'
