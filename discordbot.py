@@ -74,14 +74,13 @@ async def on_message(message):
             content = '`sh!info` idからSHIP上のファイル名や投稿日などを取得。省略形は`-i`'
             content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す。省略形は`-f`'
             content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
-            content += '\n`sh!when` SHIPの更新を取得する日時を表示'
             content += '\n`sh!wiki` Wikipediaを検索'
             content += '\n\n>「小説家になろう」関連コマンド'
             content += '\n`n!when` 更新を取得している日時の取得'
             content += '\n`n!add` 更新を通知する小説の追加'
             content += '\n`n!remove` 更新を通知する小説の削除'
             content += '\n`n!list` 更新を通知している小説一覧を表示'
-            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/07/20", description=content, color=discord.Colour.from_rgb(190, 252, 3))
+            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/07/22", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
             flag = False
@@ -114,18 +113,18 @@ async def on_message(message):
             body += "`id` "+str(idIntMessage)+"\n"
             body += "`date` "+str(data[0][1]).replace("-", "/")+"\n"
             body += "`folder` "+data[0][2]+"\n"
-            if data[0][4] == "高校連絡事項" or data[0][4] == "高校学習教材" or data[0][4] == "高校学校通信":
+            if "高校" in data[0][4]:
                 linkList = str(data[0][3])[1:-1].split(",")
                 body += "`file` "+str(len(linkList))+"\n"
-            if data[0][4] == "高校連絡事項" or data[0][4] == "中学連絡事項":
+            if "連絡事項" in data[0][4]:
                 body += "`link` https://ship.sakae-higashi.jp/sub_window_anke/?obj_id=" + \
                     str(idIntMessage)+"&t=3\n"
-            elif data[0][4] == "高校学習教材" or data[0][4] == "中学学習教材":
+            elif "学習教材" in data[0][4]:
                 body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
                     str(idIntMessage)+"&t=7\n"
-            elif data[0][4] == "高校学校通信" or data[0][4] == "中学学校通信":
+            elif "学校通信" in data[0][4]:
                 body += "`link` https://ship.sakae-higashi.jp/sub_window/?obj_id="+str(idIntMessage)+"&t=7\n"
-                body += "`original id` "+ data[0][5] + "\n"
+            body += "`original id` "+ data[0][5] + "\n"
             body += "\n※リンクはSHIPにログインした状態でのみ開けます"
             embed = discord.Embed(
                 title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
@@ -154,7 +153,7 @@ async def on_message(message):
                         await message.reply("⏱セッションがタイムアウトしました"+str(e))
                     return
             data = search.file(idIntMessage)
-            if len(data) == 0 or str(data[0][1]) == "{}":
+            if len(data) == 0:
                 await message.reply("❌指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
                 return
             linkList = data[0][1]
@@ -251,15 +250,6 @@ async def on_message(message):
             await message.channel.send('にゃーん')
             wait_message = await client.wait_for("message", check=check)
             await message.channel.send(wait_message.content)
-        elif 'when' in message.content:
-            configChannel = client.get_channel(820242721330561044)
-            messages = await configChannel.history().flatten()
-            for msg in messages:
-                if "GET_HOUR=" in msg.content:
-                    whenGetConfigMessage = msg.content.lstrip("GET_HOUR=")
-                    continue
-            hourList = [int(x) for x in whenGetConfigMessage.split()]
-            await message.channel.send('⏲現在毎日'+str(hourList)+'時にSHIPデータを取得しています')
         else:
             await message.channel.send('❌このコマンドは用意されていません')
     if 'sa!' in message.content:
@@ -310,7 +300,7 @@ async def on_message(message):
                             agreeMessage = await client.wait_for("message", check=check, timeout=10)
                             if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
                                 await agreeMessage.channel.purge(limit=int(message.content.split()[1])+3)
-                                await agreeMessage.channel.send(str(int(message.content.split()[1])+3)+"件のメッセージの削除が完了しました。")
+                                await agreeMessage.channel.send(str(message.content.split()[1])+"件のメッセージの削除が完了しました。")
                         except:
                             await message.reply("操作が中断されました")
         else:
@@ -366,11 +356,11 @@ async def on_message(message):
     if isinstance(message.channel, discord.DMChannel):
         userId = str(message.author.id)
         embed = discord.Embed(title="DMを受信しました", color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
-        embed.add_field(name="ユーザー名",
+        embed.add_field(name="user",
                         value=message.author.mention+" ("+userId+")", inline=False)
-        embed.add_field(name="本文",
+        embed.add_field(name="body",
                         value=message.content, inline=False)
-        embed.add_field(name="チャンネルID",
+        embed.add_field(name="channelId",
                         value=str(message.channel.id), inline=False)
         await dmLogChannel.send(embed=embed)
     if message.channel == dmLogChannel and message.author.guild_permissions.administrator and 'sa!reply' in message.content:
@@ -382,25 +372,14 @@ async def on_message(message):
         messageId = message.content.split("/")[-1]
         oldchannel = client.get_channel(int(messageChannel))
         oldmessage = await oldchannel.fetch_message(int(messageId))
-        if str(message.type) == "MessageType.default":
-            userId = str(oldmessage.author.id)
-            if len(oldmessage.attachments) != 0:
-                if oldmessage.content == "":
-                    body = oldmessage.attachments[0].filename
-                else:
-                    body = oldmessage.content+"," + \
-                        oldmessage.attachments[0].filename
-                embed = discord.Embed(timestamp=oldmessage.created_at,description=body,color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
-                embed.set_image(url=str(oldmessage.attachments[0].url))
-            elif oldmessage.content != "":
-                embed = discord.Embed(timestamp=oldmessage.created_at,description=oldmessage.content,color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
-            elif oldmessage.embeds:
-                embed = discord.Embed(timestamp=oldmessage.created_at,description="リッチメッセージ",color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
-            else:
-                embed = discord.Embed(timestamp=oldmessage.created_at,description="システムメッセージ",color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
-        embed.set_author(name=oldmessage.author.name, icon_url=oldmessage.author.avatar_url)
-        embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
-        await message.channel.send(embed=embed)
+        userId = str(oldmessage.author.id)
+        if oldmessage.content != "":
+            embed = discord.Embed(timestamp=oldmessage.created_at,description=oldmessage.content,color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
+            embed.set_author(name=oldmessage.author.name, icon_url=oldmessage.author.avatar_url)
+            embed.set_footer(text=oldchannel.name+"チャンネルでのメッセージ")
+            await message.channel.send(embed=embed)
+        elif oldmessage.embeds:
+            await message.channel.send(content=str(oldmessage.created_at)[:19]+"に"+oldchannel.name+"チャンネルで"+oldmessage.author.mention+"が送信したEmbedメッセージ", embed=oldmessage.embeds[0])
 
 @tasks.loop(seconds=600)
 async def loop():
@@ -475,14 +454,15 @@ async def getData():
         if len(result[eachName["collectionName"]]) != 0:
             if discordNotifyBool == "true":
                 sendChannel = client.get_channel(eachName["channelId"])
+                c = eachName["color"]
                 for conData in result[eachName["collectionName"]]:
                     try:
                         if conData['title'] != '':
                             embed = discord.Embed(
-                                title=conData['title'], description="投稿: "+conData['date'], color=discord.Colour.from_rgb(52, 235, 79))
+                                title=conData['title'], description="投稿: "+conData['date'], color=discord.Colour.from_rgb(c[0], c[1], c[2]))
                         else:
                             embed = discord.Embed(
-                                title=eachName["name"]+"更新通知", description="投稿: "+conData['date'], color=discord.Colour.from_rgb(52, 235, 79))
+                                title=eachName["name"]+"更新通知", description="投稿: "+conData['date'], color=discord.Colour.from_rgb(c[0], c[1], c[2]))
                         embed.add_field(name="id", value=conData['id'][0])
                         if conData['folder'] != '':
                             embed.add_field(name="path", value=conData['folder'])
