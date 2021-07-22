@@ -1,14 +1,13 @@
 import datetime
 import os
 
+import firebase_admin
 import pyrebase
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from firebase_admin import credentials, firestore
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
 
 load_dotenv()
 

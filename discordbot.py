@@ -1,21 +1,20 @@
 import datetime
 import json
 import os
-import aiohttp
 import time
+import urllib.request
 
 import discord
 import requests
 import wikipedia
 from discord.ext import tasks
 from dotenv import load_dotenv
-import urllib.request
 
+import line
+import narou
 import search
 import shipcheck
 import shnews
-import line
-import narou
 
 load_dotenv()
 

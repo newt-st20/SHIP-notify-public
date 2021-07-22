@@ -1,11 +1,9 @@
-import os
 import json
-
-from dotenv import load_dotenv
+import os
 
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+from dotenv import load_dotenv
+from firebase_admin import credentials, firestore
 
 load_dotenv()
 
@@ -40,7 +38,6 @@ def info(id):
             data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], eachDoc['link'], item["pageList"][item["pagePosition"].index(eachDoc["channel"])]["name"], doc.id])
         else:
             data.append([eachDoc['title'], eachDoc['date'], eachDoc['folder'], "", item["pageList"][item["pagePosition"].index(eachDoc["channel"])]["name"], doc.id])
-    print(data)
     return data
 
 
@@ -64,7 +61,7 @@ def count(type):
     try:
         docDict = dbc.document(itemNameList[type]["collectionName"]).get().to_dict()
         return docDict['count']
-    except Exception as e:
+    except:
         return 0
 
 

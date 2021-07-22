@@ -1,16 +1,15 @@
 import datetime
+import json
 import os
 import re
 import time
-import json
 
-from dotenv import load_dotenv
+import firebase_admin
 import pyrebase
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+from firebase_admin import credentials, firestore
 from selenium import webdriver
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
 
 load_dotenv()
 
