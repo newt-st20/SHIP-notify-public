@@ -427,6 +427,8 @@ async def loop():
                 await getLogChannel.send('栄東ニュースの更新取得処理が完了しました。'+str(elapsedTime)+'[sec]')
             except Exception as e:
                 await getLogChannel.send('**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+            game = discord.Game("commands: sh!help")
+            await client.change_presence(status=discord.Status.online, activity=game)
         if nowHour in narouHourList:
             try:
                 await getNarouData()
