@@ -410,6 +410,8 @@ async def loop():
     nowMinute = int(datetime.datetime.now().strftime("%M"))
     if nowMinute < 10:
         if nowHour in hourList:
+            game = discord.Game("Getting SHIP data...")
+            await client.change_presence(status=discord.Status.dnd, activity=game)
             await getLogChannel.send('SHIPデータの取得を開始します')
             try:
                 start = time.time()
@@ -422,7 +424,7 @@ async def loop():
                 start = time.time()
                 await getNewsData()
                 elapsedTime = time.time() - start
-                await getLogChannel.send('栄東ニュースの更新取得処理が完了しました'+str(elapsedTime)+'[sec]')
+                await getLogChannel.send('栄東ニュースの更新取得処理が完了しました。'+str(elapsedTime)+'[sec]')
             except Exception as e:
                 await getLogChannel.send('**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
         if nowHour in narouHourList:
