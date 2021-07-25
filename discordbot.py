@@ -11,6 +11,7 @@ from discord.ext import tasks
 from dotenv import load_dotenv
 
 import line
+import linebeta
 import narou
 import search
 import shipcheck
@@ -499,6 +500,8 @@ async def getData():
                 await getLogChannel.send("LINE版処理完了\n" + log)
             except Exception as e:
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
+                betalog = linebeta.main(result)
+                await getLogChannel.send(betalog)
         else:
             await getLogChannel.send("highCon,highStudyのいずれかに更新がありましたが、lineNotifyBoolの設定によりLINE版には更新が通知されませんでした")
 
