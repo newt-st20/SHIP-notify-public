@@ -49,27 +49,6 @@
             }
         ]
     },
-    "pushForNotifyMiddleUser": {
-        "messages": [
-            {
-                "type": "text",
-                "text": "【定期通知】:\nSHIP-notifyは正常に動作しています。",
-                "quickReply": {
-                    "items": [
-                        {
-                            "type": "action",
-                            "imageUrl": "https://newt-house.web.app/ship-notify/images/ship-notify-notify-few.jpg",
-                            "action": {
-                                "type": "message",
-                                "label": "この通知をオフにする",
-                                "text": "!notify-few"
-                            }
-                        }
-                    ]
-                }
-            }
-        ]
-    },
     "eachMenuDate": {
         "type": "box",
         "layout": "horizontal",
