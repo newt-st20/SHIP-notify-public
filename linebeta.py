@@ -19,61 +19,39 @@ def main(data):
     separate = jsonLoad["separate"]
     highConData = data['highCon']
     if len(highConData) != 0:
-        message1 = {
-            "type": "box",
-            "layout": "vertical",
-            "margin": "xxl",
-            "spacing": "sm",
-            "contents": [{
-                    "type": "text",
-                    "text": "高校連絡事項",
-                    "size": "xl",
-                    "color": "#1DB446",
-                }
-            ]
-        }
+        highConMessage = copy.deepcopy(jsonLoad['channelHead'])
+        highConMessage['contents'][0]['text'] = "高校連絡事項"
         for a in highConData:
-            message1['contents'].append(separate)
+            highConMessage['contents'].append(separate)
             jsonEachMenuDate = copy.deepcopy(jsonLoad["eachMenuDate"])
             jsonEachMenuDate["contents"][1]["text"] = a["date"]
-            message1['contents'].append(jsonEachMenuDate)
+            highConMessage['contents'].append(jsonEachMenuDate)
             jsonEachMenuFolder = copy.deepcopy(jsonLoad["eachMenuFolder"])
             jsonEachMenuFolder["contents"][1]["text"] = a["folder"] if a["folder"]!="" else "root"
-            message1['contents'].append(jsonEachMenuFolder)
+            highConMessage['contents'].append(jsonEachMenuFolder)
             jsonEachMenuTitle = copy.deepcopy(jsonLoad["eachMenuTitle"])
             jsonEachMenuTitle["contents"][1]["text"] = a["title"]
-            message1['contents'].append(jsonEachMenuTitle)
+            highConMessage['contents'].append(jsonEachMenuTitle)
             jsonEachMenuDescription = copy.deepcopy(jsonLoad["eachMenuDescription"])
             jsonEachMenuDescription["contents"][1]["text"] = a["description"]
-            message1['contents'].append(jsonEachMenuDescription)
-        jsonData['messages'][0]['contents']['body']['contents'].append(message1)
+            highConMessage['contents'].append(jsonEachMenuDescription)
+        jsonData['messages'][0]['contents']['body']['contents'].append(highConMessage)
     highStudyData = data['highStudy']
     if len(highStudyData) != 0:
-        message2 = {
-            "type": "box",
-            "layout": "vertical",
-            "margin": "xxl",
-            "spacing": "sm",
-            "contents": [{
-                    "type": "text",
-                    "text": "高校学習教材",
-                    "size": "xl",
-                    "color": "#1DB446",
-                }
-            ]
-        }
+        highStudyMessage = copy.deepcopy(jsonLoad['channelHead'])
+        highStudyMessage['contents'][0]['text'] = "高校学習教材"
         for a in highStudyData:
-            message2['contents'].append(separate)
+            highStudyMessage['contents'].append(separate)
             jsonEachMenuDate = copy.deepcopy(jsonLoad["eachMenuDate"])
             jsonEachMenuDate["contents"][1]["text"] = a["date"]
-            message2['contents'].append(jsonEachMenuDate)
+            highStudyMessage['contents'].append(jsonEachMenuDate)
             jsonEachMenuFolder = copy.deepcopy(jsonLoad["eachMenuFolder"])
             jsonEachMenuFolder["contents"][1]["text"] = a["folder"] if a["folder"]!="" else "root"
-            message2['contents'].append(jsonEachMenuFolder)
+            highStudyMessage['contents'].append(jsonEachMenuFolder)
             jsonEachMenuTitle = copy.deepcopy(jsonLoad["eachMenuTitle"])
             jsonEachMenuTitle["contents"][1]["text"] = a["title"]
-            message2['contents'].append(jsonEachMenuTitle)
-        jsonData['messages'][0]['contents']['body']['contents'].append(message2)
+            highStudyMessage['contents'].append(jsonEachMenuTitle)
+        jsonData['messages'][0]['contents']['body']['contents'].append(highStudyMessage)
 
     betaheaders = {
         'Authorization': 'Bearer ' + LINE_BETA_CHANNEL_ACCESS_TOKEN,

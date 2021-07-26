@@ -133,6 +133,20 @@
             }
         ]
     },
+    "channelHead": {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "xxl",
+        "spacing": "sm",
+        "contents": [
+            {
+                "type": "text",
+                "text": "高校連絡事項",
+                "size": "xl",
+                "color": "#1DB446"
+            }
+        ]
+    },
     "separate": {
         "type": "separator",
         "margin": "xxl"
