@@ -308,7 +308,9 @@ def main():
             db.collection('count').document(eachChannel["collectionName"]).update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
         returnData[eachChannel["collectionName"]] = sendData
 
-        db.collection('getLog').add(returnData)
+        docRef = db.collection('getLog').add(returnData)
+        getLogId = docRef[0].id
+        print(getLogId)
 
     print(returnData)
     return returnData

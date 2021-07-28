@@ -517,7 +517,7 @@ async def getData():
             except Exception as e:
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
                 betalog = linebeta.main(result)
-                await getLogChannel.send(betalog)
+            await getLogChannel.send(betalog)
         else:
             await getLogChannel.send("highCon,highStudyのいずれかに更新がありましたが、lineNotifyBoolの設定によりLINE版には更新が通知されませんでした")
 
