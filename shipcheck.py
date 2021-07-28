@@ -279,7 +279,8 @@ def main():
 
 
     returnData = {
-        "getTime": getTime
+        "getTime": getTime,
+        "timestamp": firestore.SERVER_TIMESTAMP
     }
 
     item = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
@@ -306,6 +307,8 @@ def main():
             howManyData = int(docDict['count']) + len(sendData)
             db.collection('count').document(eachChannel["collectionName"]).update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
         returnData[eachChannel["collectionName"]] = sendData
+
+        db.collection('getLog').add(returnData)
 
     print(returnData)
     return returnData
