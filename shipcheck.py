@@ -285,6 +285,7 @@ def main():
     }
 
     item = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
+    flag = False
     for eachChannel in item:
         sendData = []
         for i in reversed(dataList[eachChannel["collectionName"]]):
@@ -307,11 +308,12 @@ def main():
         if len(sendData) != 0:
             howManyData = int(docDict['count']) + len(sendData)
             db.collection('count').document(eachChannel["collectionName"]).update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+            flag = True
         returnData[eachChannel["collectionName"]] = sendData
-
-    docRef = db.collection('getLog').document()
-    docRef.set(returnData)
-    returnData['logId'] = docRef.id
+    if flag == True:
+        docRef = db.collection('getLog').document()
+        docRef.set(returnData)
+        returnData['logId'] = docRef.id
     print(returnData)
     return returnData
 
