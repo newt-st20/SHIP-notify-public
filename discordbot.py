@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 import line
 import linebeta
+import twitter
 import narou
 import search
 import shipcheck
@@ -518,6 +519,11 @@ async def getData():
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
                 betalog = linebeta.main(result)
             await getLogChannel.send(betalog)
+        try:
+            twitterlog = twitter.main(result['logId'])
+            await getLogChannel.send("twitter版処理完了\n" + twitterlog)
+        except Exception as e:
+            await getLogChannel.send("twitter版不具合:\n" + str(e))
         else:
             await getLogChannel.send("highCon,highStudyのいずれかに更新がありましたが、lineNotifyBoolの設定によりLINE版には更新が通知されませんでした")
 

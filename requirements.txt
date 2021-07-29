@@ -14,7 +14,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
 oauth2client==4.1.3
-oauthlib==3.1.0
+oauthlib==3.1.1
 psutil==5.8.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
@@ -29,3 +29,5 @@ wikipedia==1.4.0
 python-dotenv==0.15.0
 Pyrebase4==4.4.3
 firebase-admin==5.0.0
+PySocks==1.7.1
+tweepy==3.10.0

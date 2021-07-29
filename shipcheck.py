@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from firebase_admin import credentials, firestore
 from selenium import webdriver
 
+
 load_dotenv()
 
 config = {
@@ -310,8 +311,7 @@ def main():
 
     docRef = db.collection('getLog').document()
     docRef.set(returnData)
-    print(docRef.id)
-
+    returnData['logId'] = docRef.id
     print(returnData)
     return returnData
 
