@@ -517,8 +517,8 @@ async def getData():
                 await getLogChannel.send("LINE版処理完了\n" + log)
             except Exception as e:
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
-                betalog = linebeta.main(result)
-            await getLogChannel.send(betalog)
+        betalog = linebeta.main(result)
+        await getLogChannel.send(betalog)
         try:
             twitterlog = twitter.main(result['logId'])
             await getLogChannel.send("twitter版処理完了\n" + twitterlog)
