@@ -3,6 +3,7 @@ from requests_oauthlib import OAuth1
 import requests
 import os
 from dotenv import load_dotenv
+import urllib
 
 load_dotenv()
 
@@ -13,10 +14,13 @@ ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 
 
 def main(logid):
-    endpoint = "https://api.twitter.com/1.1/statuses/update.json?status=https://ship-assistant.web.app/getlog/"+str(logid)
+    endpoint = "https://api.twitter.com/1.1/statuses/update.json"
+    parameter = {
+        "status": "https://ship-assistant.web.app/log/"+str(logid)
+    }
     auth = OAuth1(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-    response = requests.post(endpoint, auth=auth).json()
+    response = requests.post(endpoint, params=parameter, auth=auth).json()
     print(json.dumps(response, indent=4))
 
 if __name__ == '__main__':
-    main()
+    main('aKBdmVxoVtFDUGbTfVgr')
