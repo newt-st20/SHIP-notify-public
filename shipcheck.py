@@ -281,7 +281,8 @@ def main():
 
     returnData = {
         "getTime": getTime,
-        "timestamp": firestore.SERVER_TIMESTAMP
+        "timestamp": firestore.SERVER_TIMESTAMP,
+        "logId": ""
     }
 
     item = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]

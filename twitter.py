@@ -13,14 +13,15 @@ ACCESS_TOKEN = os.environ['TWITTER_ACCESS_TOKEN']
 ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 
 
-def main(logid):
+def main(logid, updateList):
     endpoint = "https://api.twitter.com/1.1/statuses/update.json"
     parameter = {
-        "status": "https://ship-assistant.web.app/log/"+str(logid)
+        "status": str(updateList)+"に更新がありました。 https://ship-assistant.web.app/log/"+str(logid)
     }
     auth = OAuth1(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     response = requests.post(endpoint, params=parameter, auth=auth).json()
     print(json.dumps(response, indent=4))
+    return response
 
 if __name__ == '__main__':
-    main('aKBdmVxoVtFDUGbTfVgr')
+    main()

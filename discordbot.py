@@ -472,6 +472,7 @@ async def getData():
     result = shipcheck.main()
     itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     noneUpdateChannelList = []
+    updateList = []
     for eachName in itemNameList:
         if len(result[eachName["collectionName"]]) != 0:
             if discordNotifyBool == "true":
@@ -498,6 +499,7 @@ async def getData():
                         await sendChannel.send(str(e))
             else:
                 await getLogChannel.send(eachName["collectionName"]+"に更新がありましたが、discordNotifyBoolの設定によりLINE版には更新が通知されませんでした")
+            updateList.append(eachName["collectionName"])
         else:
             noneUpdateChannelList.append(eachName["name"])
     if len(noneUpdateChannelList) != 0:
@@ -517,15 +519,16 @@ async def getData():
                 await getLogChannel.send("LINE版処理完了\n" + log)
             except Exception as e:
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
+        else:
+            await getLogChannel.send("highCon,highStudyのいずれかに更新がありましたが、lineNotifyBoolの設定によりLINE版には更新が通知されませんでした")
         betalog = linebeta.main(result)
         await getLogChannel.send(betalog)
+    if result["logId"] != "":
         try:
-            twitterlog = twitter.main(result['logId'])
+            twitterlog = twitter.main(result['logId'], updateList)
             await getLogChannel.send("twitter版処理完了\n" + twitterlog)
         except Exception as e:
             await getLogChannel.send("twitter版不具合:\n" + str(e))
-        else:
-            await getLogChannel.send("highCon,highStudyのいずれかに更新がありましたが、lineNotifyBoolの設定によりLINE版には更新が通知されませんでした")
 
 
 async def getNewsData():
