@@ -11,7 +11,7 @@
         "messages": [
             {
                 "type": "flex",
-                "altText": "This is a Flex Message",
+                "altText": "SHIPに更新がありました",
                 "contents": {
                     "type": "bubble",
                     "body": {

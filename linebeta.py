@@ -65,7 +65,7 @@ def main(data):
         if response.status_code != 200:
             logMessage = "Something error happend on LINE. \n\n[error message]\n"+ response.text +"\n\n[post json data]\n" + jsonData
         else:
-            logMessage = "Send message succeed on LINE.\n[post json data]\n" + jsonData
+            logMessage = "Send message succeed on LINE.\n[post json data]\n" + str(jsonData)
         return logMessage
 
 

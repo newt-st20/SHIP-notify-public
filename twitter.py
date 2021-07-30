@@ -13,7 +13,7 @@ ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 
 
 def main(logid):
-    endpoint = "https://api.twitter.com/1.1/statuses/update.json?status=https://ship-assistant.web.app/getlog/"+logid
+    endpoint = "https://api.twitter.com/1.1/statuses/update.json?status=https://ship-assistant.web.app/getlog/"+str(logid)
     auth = OAuth1(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     response = requests.post(endpoint, auth=auth).json()
     print(json.dumps(response, indent=4))
