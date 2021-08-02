@@ -525,8 +525,8 @@ async def getData():
         await getLogChannel.send(betalog)
     if result["logId"] != "":
         try:
-            twitterlog = twitter.main(result['logId'], updateList)
-            await getLogChannel.send("twitter版処理完了\n" + twitterlog)
+            tweetUrl = twitter.main(result['logId'], updateList)
+            await getLogChannel.send("twitter版処理完了\n" + tweetUrl)
         except Exception as e:
             await getLogChannel.send("twitter版不具合:\n" + str(e))
 

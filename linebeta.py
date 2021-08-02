@@ -67,9 +67,9 @@ def main(data):
     if len(highConData) != 0 or len(highStudyData) != 0:
         response = requests.post(broadcastEndPoint, json=jsonData, headers=betaheaders)
         if response.status_code != 200:
-            logMessage = "Something error happend on LINE. \n\n[error message]\n"+ response.text +"\n\n[post json data]\n" + jsonData
+            logMessage = "Something error happend on LINE. \n\n[error message]\n"+ response.text
         else:
-            logMessage = "Send message succeed on LINE.\n[post json data]\n" + str(jsonData)
+            logMessage = "Send message succeed on LINE."
         return logMessage
 
 

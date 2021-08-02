@@ -23,7 +23,8 @@ def main(logid, updateList):
     auth = OAuth1(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     response = requests.post(endpoint, params=parameter, auth=auth).json()
     print(json.dumps(response, indent=4))
-    return str(response)
+    tweetUrl = "https://twitter.com/ShipNotify/status/"+response['id_str']
+    return tweetUrl
 
 if __name__ == '__main__':
     main()
