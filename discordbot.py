@@ -499,7 +499,7 @@ async def getData():
                         await sendChannel.send(str(e))
             else:
                 await getLogChannel.send(eachName["collectionName"]+"に更新がありましたが、discordNotifyBoolの設定によりLINE版には更新が通知されませんでした")
-            updateList.append(eachName["collectionName"])
+            updateList.append(eachName["name"])
         else:
             noneUpdateChannelList.append(eachName["name"])
     if len(noneUpdateChannelList) != 0:

@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import datetime
 
 import requests
 from dotenv import load_dotenv
@@ -11,6 +12,8 @@ LINE_BETA_CHANNEL_ACCESS_TOKEN = os.environ["LINE_BETA_CHANNEL_ACCESS_TOKEN"]
 
 
 def main(data):
+    now = datetime.datetime.now()
+    date = now.strftime("%y%m%d")
     getTime = str(data['getTime'])
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
@@ -52,6 +55,7 @@ def main(data):
             jsonEachMenuTitle["contents"][1]["text"] = a["title"]
             highStudyMessage['contents'].append(jsonEachMenuTitle)
         jsonData['messages'][0]['contents']['body']['contents'].append(highStudyMessage)
+    jsonData['messages'][0]['contents']['footer']['contents'][0]['action']['uri'] = "https://ship-assistant.web.app/log/"+data['logId']+"utm_source=line_"+date+"&utm_medium=LINE"
 
     betaheaders = {
         'Authorization': 'Bearer ' + LINE_BETA_CHANNEL_ACCESS_TOKEN,

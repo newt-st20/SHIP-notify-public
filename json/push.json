@@ -44,6 +44,21 @@
                                 "margin": "xxl"
                             }
                         ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "button",
+                                "style": "primary",
+                                "action": {
+                                    "type": "uri",
+                                    "label": "サイトで確認",
+                                    "uri": ""
+                                }
+                            }
+                        ]
                     }
                 }
             }
