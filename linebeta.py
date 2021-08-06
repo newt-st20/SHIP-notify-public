@@ -17,19 +17,21 @@ def main(data):
     getTime = str(data['getTime'])
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
+    jsonHead = jsonLoad['channelHead']
     jsonData = jsonLoad['flexMessage']
+    eachMenu = jsonLoad['eachMenu']
     jsonData['messages'][0]['contents']['body']['contents'][2]['text'] = "getTime: " + getTime
     separate = jsonLoad["separate"]
 
     highConData = data['highCon']
     if len(highConData) != 0:
-        highConMessage = copy.deepcopy(jsonLoad['channelHead'])
+        highConMessage = copy.deepcopy(jsonHead)
         highConMessage['contents'][0]['text'] = "高校連絡事項"
         props = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))['pageList'][0]['lineProps']
         for a in highConData:
             highConMessage['contents'].append(separate)
             for prop in props:
-                jsonEachMenu = copy.deepcopy(jsonLoad["eachMenu"])
+                jsonEachMenu = copy.deepcopy(eachMenu)
                 jsonEachMenu["contents"][0]["text"] = prop
                 jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(empty)"
                 highConMessage['contents'].append(jsonEachMenu)
@@ -37,13 +39,13 @@ def main(data):
     
     highStudyData = data['highStudy']
     if len(highStudyData) != 0:
-        highStudyMessage = copy.deepcopy(jsonLoad['channelHead'])
+        highStudyMessage = copy.deepcopy(jsonHead)
         highStudyMessage['contents'][0]['text'] = "高校学習教材"
         props = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))['pageList'][1]['lineProps']
         for a in highStudyData:
             highStudyMessage['contents'].append(separate)
             for prop in props:
-                jsonEachMenu = copy.deepcopy(jsonLoad["eachMenu"])
+                jsonEachMenu = copy.deepcopy(eachMenu)
                 jsonEachMenu["contents"][0]["text"] = prop
                 jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(empty)"
                 highStudyMessage['contents'].append(jsonEachMenu)
@@ -51,13 +53,13 @@ def main(data):
 
     highSchoolNewsData = data['highSchoolNews']
     if len(highSchoolNewsData) != 0:
-        highSchoolNewsMessage = copy.deepcopy(jsonLoad['channelHead'])
-        highSchoolNewsMessage['contents'][0]['text'] = "高校学習教材"
+        highSchoolNewsMessage = copy.deepcopy(jsonHead)
+        highSchoolNewsMessage['contents'][0]['text'] = "高校学校通信"
         props = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))['pageList'][2]['lineProps']
         for a in highSchoolNewsData:
             highSchoolNewsMessage['contents'].append(separate)
             for prop in props:
-                jsonEachMenu = copy.deepcopy(jsonLoad["eachMenu"])
+                jsonEachMenu = copy.deepcopy(eachMenu)
                 jsonEachMenu["contents"][0]["text"] = prop
                 jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(empty)"
                 highSchoolNewsMessage['contents'].append(jsonEachMenu)
@@ -82,4 +84,4 @@ def main(data):
 
 
 if __name__ == "__main__":
-    main({'getTime': '06:06:12', 'timestamp': 'xxxx', 'logId': '62QSd77AOgIT9VzfE2qA', 'highCon': [], 'highStudy': [{'id': ['32597', '7'], 'link': [], 'date': '2021/08/06', 'folder': '2021 SCC42（高3）/数学 富澤 答', 'title': '0806求積3（体積）'}], 'highSchoolNews': [], 'juniorCon': [], 'juniorStudy': [], 'juniorSchoolNews': []})
+    main()
