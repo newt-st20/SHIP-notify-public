@@ -55,7 +55,7 @@ def main(data):
             jsonEachMenuTitle["contents"][1]["text"] = a["title"]
             highStudyMessage['contents'].append(jsonEachMenuTitle)
         jsonData['messages'][0]['contents']['body']['contents'].append(highStudyMessage)
-    jsonData['messages'][0]['contents']['footer']['contents'][0]['action']['uri'] = "https://ship-assistant.web.app/log/"+data['logId']+"utm_source=line_"+date+"&utm_medium=LINE"
+    jsonData['messages'][0]['contents']['footer']['contents'][0]['action']['uri'] = "https://ship-assistant.web.app/log/"+data['logId']+"?utm_source=line_"+date+"&utm_medium=LINE"
 
     betaheaders = {
         'Authorization': 'Bearer ' + LINE_BETA_CHANNEL_ACCESS_TOKEN,

@@ -95,7 +95,7 @@ def main():
         conTrs.pop(0)
         conList = []
         for conTr in conTrs:
-            eachconList = {}
+            eachConList = {}
             conTrTds = conTr.find_all('td')
             try:
                 stage = conTrTds[2].find('a').get('onclick')
@@ -103,7 +103,7 @@ def main():
                 if int(conId[0]) not in gotList:
                     print(conId[0]+" is not in the database.")
                     try:
-                        eachconList["id"] = conId
+                        eachConList["id"] = conId
                         driver.get(
                             "https://ship.sakae-higashi.jp/sub_window_anke/?obj_id="+conId[0]+"&t=3")
                         conEachPageSoup = BeautifulSoup(
@@ -111,7 +111,7 @@ def main():
                         conPageMain = conEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
                         conPageDescription = conPageMain.find_all(
                             "table")[-2].text.replace("\n", "")
-                        eachconList["description"] = conPageDescription
+                        eachConList["description"] = conPageDescription
                         if schooltype == "high":
                             conPageLinks = conPageMain.find_all("a")
                             conPageLinkList = []
@@ -123,23 +123,23 @@ def main():
                                 filepath = DOWNLOAD_DIR + '/' + result.group(1)
                                 try:
                                     storage.child(
-                                        'pdf/high-con/'+str(eachconList["id"][0])+'/'+result.group(1)).put(filepath)
+                                        'pdf/high-con/'+str(eachConList["id"][0])+'/'+result.group(1)).put(filepath)
                                     conPageLinkList.append(storage.child(
-                                        'pdf/high-con/'+str(eachconList["id"][0])+'/'+result.group(1)).get_url(token=None))
+                                        'pdf/high-con/'+str(eachConList["id"][0])+'/'+result.group(1)).get_url(token=None))
                                 except Exception as e:
                                     print(str(e))
-                            eachconList["link"] = conPageLinkList
+                            eachConList["link"] = conPageLinkList
                     except Exception as e:
                         print(str(e))
-                        eachconList["id"] = [0, 0]
-                        eachconList["description"] = ""
-                    eachconList["date"] = conTrTds[0].text
+                        eachConList["id"] = [0, 0]
+                        eachConList["description"] = ""
+                    eachConList["date"] = conTrTds[0].text
                     try:
-                        eachconList["folder"] = conTrTds[1].find('span').get('title')
+                        eachConList["folder"] = conTrTds[1].find('span').get('title')
                     except:
-                        eachconList["folder"] = ""
-                    eachconList["title"] = conTrTds[2].text.replace("\n", "")
-                    conList.append(eachconList)
+                        eachConList["folder"] = ""
+                    eachConList["title"] = conTrTds[2].text.replace("\n", "")
+                    conList.append(eachConList)
             except Exception as e:
                 print(str(e))
         print(conList)
