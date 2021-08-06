@@ -13,6 +13,12 @@
                 "link",
                 "timestamp"
             ],
+            "lineProps": [
+                "date",
+                "folder",
+                "title",
+                "description"
+            ],
             "color": [
                 52,
                 235,
@@ -31,6 +37,11 @@
                 "link",
                 "timestamp"
             ],
+            "lineProps": [
+                "date",
+                "folder",
+                "title"
+            ],
             "color": [
                 52,
                 229,
@@ -47,6 +58,11 @@
                 "folder",
                 "title",
                 "link"
+            ],
+            "lineProps": [
+                "date",
+                "folder",
+                "title"
             ],
             "color": [
                 242,

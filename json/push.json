@@ -64,76 +64,13 @@
             }
         ]
     },
-    "eachMenuDate": {
+    "eachMenu": {
         "type": "box",
         "layout": "horizontal",
         "contents": [
-            {
-                "type": "text",
-                "text": "date",
-                "size": "sm",
-                "color": "#555555",
-                "flex": 1
-            },
             {
                 "type": "text",
                 "text": "",
-                "size": "sm",
-                "color": "#111111",
-                "flex": 3,
-                "wrap": true
-            }
-        ]
-    },
-    "eachMenuFolder": {
-        "type": "box",
-        "layout": "horizontal",
-        "contents": [
-            {
-                "type": "text",
-                "text": "folder",
-                "size": "sm",
-                "color": "#555555",
-                "flex": 1
-            },
-            {
-                "type": "text",
-                "text": "",
-                "size": "sm",
-                "color": "#111111",
-                "flex": 3,
-                "wrap": true
-            }
-        ]
-    },
-    "eachMenuTitle": {
-        "type": "box",
-        "layout": "horizontal",
-        "contents": [
-            {
-                "type": "text",
-                "text": "title",
-                "size": "sm",
-                "color": "#555555",
-                "flex": 1
-            },
-            {
-                "type": "text",
-                "text": "",
-                "size": "sm",
-                "color": "#111111",
-                "flex": 3,
-                "wrap": true
-            }
-        ]
-    },
-    "eachMenuDescription": {
-        "type": "box",
-        "layout": "horizontal",
-        "contents": [
-            {
-                "type": "text",
-                "text": "description",
                 "size": "sm",
                 "color": "#555555",
                 "flex": 1
