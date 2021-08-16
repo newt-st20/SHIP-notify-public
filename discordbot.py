@@ -78,12 +78,12 @@ async def on_message(message):
             content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す。省略形は`-f`'
             content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
             content += '\n`sh!wiki` Wikipediaを検索'
-            content += '\n\n>「小説家になろう」関連コマンド'
+            content += '\n\n> 「小説家になろう」関連コマンド'
             content += '\n`n!when` 更新を取得している日時の取得'
             content += '\n`n!add` 更新を通知する小説の追加'
             content += '\n`n!remove` 更新を通知する小説の削除'
             content += '\n`n!list` 更新を通知している小説一覧を表示'
-            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/07/22", description=content, color=discord.Colour.from_rgb(190, 252, 3))
+            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/08/16", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
             flag = False
@@ -119,16 +119,7 @@ async def on_message(message):
             if "高校" in data[0][4]:
                 linkList = str(data[0][3])[1:-1].split(",")
                 body += "`file` "+str(len(linkList))+"\n"
-            if "連絡事項" in data[0][4]:
-                body += "`link` https://ship.sakae-higashi.jp/sub_window_anke/?obj_id=" + \
-                    str(idIntMessage)+"&t=3\n"
-            elif "学習教材" in data[0][4]:
-                body += "`link` https://ship.sakae-higashi.jp/sub_window_study/?obj_id=" + \
-                    str(idIntMessage)+"&t=7\n"
-            elif "学校通信" in data[0][4]:
-                body += "`link` https://ship.sakae-higashi.jp/sub_window/?obj_id="+str(idIntMessage)+"&t=7\n"
-            body += "`original id` "+ data[0][5] + "\n"
-            body += "\n※リンクはSHIPにログインした状態でのみ開けます"
+            body += "`link` https://ship-assistant.web.app/post/" + str(idIntMessage)
             embed = discord.Embed(
                 title=data[0][0], description=body, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
