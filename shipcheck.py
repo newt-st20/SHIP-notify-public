@@ -43,7 +43,7 @@ def main():
     gotList = []
     channelNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pagePosition"]
     for channelName in channelNameList:
-        docs = db.collection('shipPost').where('channel', '==', channelName).order_by('id', direction=firestore.Query.DESCENDING).limit(30).stream()
+        docs = db.collection('shipPost').where('channel', '==', channelName).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(1).stream()
         gotList.extend([int(doc.to_dict()['id']) for doc in docs])
     print(gotList)
 
@@ -140,6 +140,8 @@ def main():
                         eachConList["folder"] = ""
                     eachConList["title"] = conTrTds[2].text.replace("\n", "")
                     conList.append(eachConList)
+                else:
+                    break
             except Exception as e:
                 print(str(e))
         print(conList)
@@ -204,6 +206,8 @@ def main():
                     except:
                         eachstudyList["title"] = ""
                     studyList.append(eachstudyList)
+                else:
+                    break
             except Exception as e:
                 print(str(e))
         print(studyList)
@@ -263,6 +267,8 @@ def main():
                         eachSchoolNewsList["folder"] = ""
                     eachSchoolNewsList["title"] = schoolNewsTrTds[2].text.replace("\n", "")
                     schoolNewsList.append(eachSchoolNewsList)
+                else:
+                    break
             except Exception as e:
                 print(str(e))
         print(schoolNewsList)
@@ -290,21 +296,20 @@ def main():
     for eachChannel in item:
         sendData = []
         for i in reversed(dataList[eachChannel["collectionName"]]):
-            if i["id"][0] != 0 and i["id"][0] not in gotList:
-                i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-                sendData.append(i)
-                eachAddData = {
-                    'channel': eachChannel["collectionName"],
-                    'id': int(i["id"][0]),
-                    'date': i["date"],
-                    'folder': i["folder"],
-                    'title': i["title"],
-                    'timestamp': firestore.SERVER_TIMESTAMP}
-                if "description" in eachChannel["props"]:
-                    eachAddData['description'] = i["description"]
-                if "link" in eachChannel["props"]:
-                    eachAddData['link'] = i["link"]
-                db.collection('shipPost').add(eachAddData)
+            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
+            sendData.append(i)
+            eachAddData = {
+                'channel': eachChannel["collectionName"],
+                'id': int(i["id"][0]),
+                'date': i["date"],
+                'folder': i["folder"],
+                'title': i["title"],
+                'timestamp': firestore.SERVER_TIMESTAMP}
+            if "description" in eachChannel["props"]:
+                eachAddData['description'] = i["description"]
+            if "link" in eachChannel["props"]:
+                eachAddData['link'] = i["link"]
+            db.collection('shipPost').add(eachAddData)
         docDict = db.collection('count').document(eachChannel["collectionName"]).get().to_dict()
         if len(sendData) != 0:
             howManyData = int(docDict['count']) + len(sendData)
