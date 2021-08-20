@@ -46,15 +46,15 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    await member.send("「SHIP Info」サーバーへようこそ！このサーバーとbotでは、**SHIPの更新の通知を受け取ったり**、**コマンドからSHIP上のファイルをダウンロード**したりすることができます。何かわからないことがある場合はこのチャットなどで気軽にお尋ねください。\n\n※__このメッセージはサーバー参加時に全員に送信しています__\n")
-    await member.send("botとのDMやコマンドチャンネルなどでは様々なコマンドを使うことができます。**例えばここで`sh!r`と送信すれば最近のSHIPの更新を一覧で確認することができます。**\nなおコマンドの一覧は`sh!help`と送信することで確認できます。ぜひお試しください。")
+    await member.send("「SHIP Info」サーバーへようこそ！このサーバーでは、SHIPの更新通知を始めとして様々な情報を確認することができます。何かわからないことがある場合はこのチャットなどで気軽にお尋ねください。\
+    \nbotとのDMやサーバー内では様々なコマンドを使うことができます。利用可能なコマンドはここで`sh!help`と送信することで確認できます。\n\n__**※このメッセージはサーバー参加時に全員に送信しています**__")
 
 
 @client.event
 async def on_member_remove(member):
     await client.wait_until_ready()
     joinLeaveLogChannel = client.get_channel(810813680618831906)
-    await joinLeaveLogChannel.send(member.name+"("+member.id+") が退出しました")
+    await joinLeaveLogChannel.send(str(member.name)+" ( "+str(member.id)+" ) が脱退しました")
 
 
 @client.event
