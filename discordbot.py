@@ -545,7 +545,7 @@ async def getWeather():
     title = "埼玉県南部の天気 - " + response['reportDatetime'][8:13].replace("T","日") + "時発表\n"
     day1 = response['timeSeries'][0]['areas'][1]['weathers'][0].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨").replace("雷", "⚡雷")
     day2 = response['timeSeries'][0]['areas'][1]['weathers'][1].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨").replace("雷", "⚡雷")
-    body = "`" + response['timeSeries'][0]['timeDefines'][0][8:10] + "日:` " + day1 + "\n`" + response['timeSeries'][0]['timeDefines'][1][8:10] + "日:` " + day2 + "\n> 降水確率\n"
+    body = "`" + response['timeSeries'][0]['timeDefines'][0][8:10] + "日:` `" + day1 + "`\n`" + response['timeSeries'][0]['timeDefines'][1][8:10] + "日:` `" + day2 + "`\n> 降水確率\n"
     for (pop, timeDefine) in zip(pops, timeDefines):
         icon = "🌧"*(int(pop)//10)+"➖"*(10-int(pop)//10)
         body += "`" + timeDefine[8:13].replace("T","日") + "時` " + icon + pop + "%\n"
