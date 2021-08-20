@@ -275,21 +275,6 @@ async def on_message(message):
                     await getWeather()
                 except Exception as e:
                     await message.channel.send(str(type(e)) + str(e))
-            elif 'line' in message.content and len(message.content.split()) == 3:
-                id = message.content.split()[2]
-                account = message.content.split()[1]
-                if account == "main":
-                    header = {
-                        'Authorization': 'Bearer '+os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
-                    }
-                elif account == "sub":
-                    header = {
-                        'Authorization': 'Bearer '+os.environ["LINE_SUB_CHANNEL_ACCESS_TOKEN"]
-                    }
-                if 'lineid' in message.content:
-                    endpoint = "https://api.line.me/v2/bot/profile/"+id
-                    result = requests.get(endpoint, headers=header)
-                    await message.channel.send(str(result.text))
             elif message.content == 'sa!delete-all-message':
                 try:
                     await message.channel.send("⚠️このチャンネルのメッセージをすべて削除します。本当によろしいですか？")
