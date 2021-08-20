@@ -6,13 +6,11 @@ import urllib.request
 
 import discord
 import requests
-from requests.api import request
 import wikipedia
 from discord.ext import tasks
 from dotenv import load_dotenv
 
 import line
-import linebeta
 import twitter
 import narou
 import search
@@ -512,8 +510,6 @@ async def getData():
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
         else:
             await getLogChannel.send("highCon,highStudyのいずれかに更新がありましたが、lineNotifyBoolの設定によりLINE版には更新が通知されませんでした")
-        betalog = linebeta.main(result)
-        await getLogChannel.send(betalog)
     if result["logId"] != "":
         try:
             tweetUrl = twitter.main(result['logId'], updateList)

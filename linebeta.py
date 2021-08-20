@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-LINE_BETA_CHANNEL_ACCESS_TOKEN = os.environ["LINE_BETA_CHANNEL_ACCESS_TOKEN"]
+LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
+LINE_SUB_CHANNEL_ACCESS_TOKEN = os.environ["LINE_SUB_CHANNEL_ACCESS_TOKEN"]
 
 
 def main(data):
@@ -67,19 +68,29 @@ def main(data):
 
     jsonData['messages'][0]['contents']['footer']['contents'][0]['action']['uri'] = "https://ship-assistant.web.app/log/"+data['logId']+"?utm_source=line_"+date+"&utm_medium=LINE"
 
-    betaheaders = {
-        'Authorization': 'Bearer ' + LINE_BETA_CHANNEL_ACCESS_TOKEN,
+    headers = {
+        'Authorization': 'Bearer ' + LINE_CHANNEL_ACCESS_TOKEN,
+        'Content-type': 'application/json'
+    }
+    subheaders = {
+        'Authorization': 'Bearer ' + LINE_SUB_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
 
     broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
     print(jsonData)
     if len(highConData) != 0 or len(highStudyData) != 0:
-        response = requests.post(broadcastEndPoint, json=jsonData, headers=betaheaders)
+        response = requests.post(broadcastEndPoint, json=jsonData, headers=headers)
+        subresponse = requests.post(broadcastEndPoint, json=jsonData, headers=subheaders)
+        logMessage = ""
         if response.status_code != 200:
-            logMessage = "Something error happend on LINE. \n\n[error message]\n"+ response.text
+            logMessage += "Something error happend on LINE main. \n\n[error message]\n"+ response.text
         else:
-            logMessage = "Send message succeed on LINE."
+            logMessage += "Send message succeed on LINE main."
+        if subresponse.status_code != 200:
+            logMessage += "Something error happend on LINE sub. \n\n[error message]\n"+ subresponse.text
+        else:
+            logMessage += "Send message succeed on LINE sub."
         return logMessage
 
 
