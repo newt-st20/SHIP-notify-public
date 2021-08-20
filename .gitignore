@@ -6,4 +6,4 @@ test/
 .env
 test.py
 local.py
-linetest.py
+notice.py

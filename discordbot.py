@@ -46,7 +46,7 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    await member.send("「SHIP Info」サーバーへようこそ！このサーバーでは、SHIPの更新通知を始めとして様々な情報を確認することができます。何かわからないことがある場合はこのチャットなどで気軽にお尋ねください。\
+    await member.send("「SHIP Info」サーバーへようこそ！このサーバーでは、SHIPの更新情報をはじめとして様々な情報を確認することができます。何かわからないことがある場合はこのチャットなどで気軽にお尋ねください。\
     \nbotとのDMやサーバー内では様々なコマンドを使うことができます。利用可能なコマンドはここで`sh!help`と送信することで確認できます。\n\n__**※このメッセージはサーバー参加時に全員に送信しています**__")
 
 
@@ -393,10 +393,9 @@ async def loop():
     narouHourList = [int(x) for x in whenNarouGetConfigMessage.split()]
     announceMessage = await ruleChannel.fetch_message(821736777391538206)
     if str(hourList) not in str(announceMessage.embeds[0].to_dict()):
-        editDatetime = "更新日時: " + str(announceMessage.edited_at.strftime("%Y/%m/%d %H:%M:%S"))
-        editedBody = "現在は"+str(hourList) + "時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
-        embed = discord.Embed(title="データ取得タイミング", description=editDatetime, color=discord.Colour.from_rgb(245, 236, 66))
-        embed.add_field(name="SHIPデータを取得する時間", value=editedBody, inline=False)
+        body = "現在は毎日"+str(hourList) + "時ごろに取得しています。データを取得するタイミングは変更する場合があります。"
+        embed = discord.Embed(title="SHIPデータを取得するタイミング", description=body, color=discord.Colour.from_rgb(245, 236, 66))
+        embed.set_footer(text="更新日時: " + str(announceMessage.edited_at.strftime("%Y/%m/%d %H:%M:%S")))
         await announceMessage.edit(embed=embed)
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
