@@ -106,7 +106,7 @@ async def on_message(message):
                     if idMessage == "":
                         await message.reply("⏱セッションがタイムアウトしました"+str(e))
                     return
-            data = search.info(idIntMessage)
+            data = search.Search().info(idIntMessage)
             if len(data) == 0:
                 await message.reply("❌指定されたidに該当するファイルがデータベースに見つかりませんでした。")
                 return
@@ -144,7 +144,7 @@ async def on_message(message):
                     if idMessage == "":
                         await message.reply("⏱セッションがタイムアウトしました"+str(e))
                     return
-            data = search.file(idIntMessage)
+            data = search.Search().file(idIntMessage)
             if len(data) == 0:
                 await message.reply("❌指定されたidに該当するファイルがデータベースに見つかりませんでした。idが間違っているか、中学ページのファイルの可能性があります。")
                 return
@@ -179,7 +179,7 @@ async def on_message(message):
                             await typeMessage.reply("❌入力された文字は数字ではありません。最初からやり直してください。")
                         return
                     typeIntMessage = int(typeMessage.content)
-                    data = search.count(typeIntMessage)
+                    data = search.Search().count(typeIntMessage)
                     if data == 0:
                         await typeMessage.reply("❌指定されたタイプは存在しません。")
                         return
@@ -199,7 +199,7 @@ async def on_message(message):
                 except Exception as e:
                     await typeMessage.reply("⏱セッションがタイムアウトしました"+str(e))
                     return
-            mainData = search.recently(typeIntMessage, howmanyIntMessage)
+            mainData = search.Search().recently(typeIntMessage, howmanyIntMessage)
             body = ""
             for lc, eachData in enumerate(mainData, 1):
                 try:
@@ -213,15 +213,14 @@ async def on_message(message):
             embed = discord.Embed(
                 title="最近の"+itemNameList[typeIntMessage]["name"], description=body, color=discord.Colour.from_rgb(252, 186, 3))
             await message.channel.send(embed=embed)
+        elif 'role' in message.content:
+            await message.channel.send('Now prepairing. Please wait...')
         # Wikipedia検索
         # https://wikipedia.readthedocs.io/en/latest/code.html#module-wikipedia.exceptions
         elif 'wiki' in message.content:
             wikipedia.set_lang("ja")
-            flag = False
             if len(message.content.split()) == 2:
                 word = message.content.split()[1]
-                flag = True
-            if flag == True:
                 await message.channel.send('🔍Wikipediaで`'+word+'`を検索中...')
                 response = wikipedia.search(word)
                 if not response:
