@@ -372,6 +372,42 @@ async def on_message(message):
         elif oldmessage.embeds:
             await message.channel.send(content=str(oldmessage.created_at)[:19]+"に"+oldchannel.name+"チャンネルで"+oldmessage.author.mention+"が送信したEmbedメッセージ", embed=oldmessage.embeds[0])
 
+@client.event
+async def on_raw_reaction_add(payload):
+    await client.wait_until_ready()
+    guild = client.get_guild(payload.guild_id)
+    member = guild.get_member(payload.user_id)
+    roleLogChannel = client.get_channel(879613626875523112)
+    if payload.message_id == 879613073084776468:
+        if payload.emoji.name == '✨':
+            advancedinfoRole = guild.get_role(817407279820308531)
+            await member.add_roles(advancedinfoRole)
+            await roleLogChannel.send('add:' + member.mention+' , '+ advancedinfoRole.mention)
+        elif payload.emoji.name == '📚':
+            narouRole = guild.get_role(879616444579586108)
+            await member.add_roles(narouRole)
+            await roleLogChannel.send('add:' + member.mention+' , '+ narouRole.mention)
+        else:
+            print(payload.emoji.name)
+
+@client.event
+async def on_raw_reaction_remove(payload):
+    await client.wait_until_ready()
+    guild = client.get_guild(payload.guild_id)
+    member = guild.get_member(payload.user_id)
+    roleLogChannel = client.get_channel(879613626875523112)
+    if payload.message_id == 879613073084776468:
+        if payload.emoji.name == '✨':
+            advancedinfoRole = guild.get_role(817407279820308531)
+            await member.remove_roles(advancedinfoRole)
+            await roleLogChannel.send('remove:' + member.mention+' , '+ advancedinfoRole.mention)
+        elif payload.emoji.name == '📚':
+            narouRole = guild.get_role(879616444579586108)
+            await member.remove_roles(narouRole)
+            await roleLogChannel.send('remove:' + member.mention+' , '+ narouRole.mention)
+        else:
+            print(payload.emoji.name)
+
 @tasks.loop(seconds=600)
 async def loop():
     await client.wait_until_ready()
