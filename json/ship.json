@@ -51,7 +51,7 @@
         {
             "name": "高校学校通信",
             "collectionName": "highSchoolNews",
-            "channelId": 841936546772156426,
+            "channelId": 841936448878018560,
             "props": [
                 "id",
                 "date",
@@ -107,7 +107,7 @@
         {
             "name": "中学学校通信",
             "collectionName": "juniorSchoolNews",
-            "channelId": 841936448878018560,
+            "channelId": 841936546772156426,
             "props": [
                 "id",
                 "date",
