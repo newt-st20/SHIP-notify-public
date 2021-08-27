@@ -1,13 +1,12 @@
 import datetime
 import os
+import requests
 
 import firebase_admin
 import pyrebase
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from firebase_admin import credentials, firestore
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
 load_dotenv()
 
@@ -33,66 +32,54 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 def main():
-    docs = db.collection('shnews').limit(20).stream()
-    gotList = [doc.to_dict()['link'] for doc in docs]
-    print(gotList)
+    docs = db.collection('shnews').order_by('timestamp', direction=firestore.Query.DESCENDING).limit(1).stream()
+    latestEntry = [doc.to_dict()['link'] for doc in docs]
+    print(latestEntry)
     now = datetime.datetime.now()
     getTime = now.strftime('%H:%M:%S')
-    if os.environ['STATUS'] == "local":
-        driver_path = 'C:\chromedriver.exe'
-    else:
-        driver_path = '/app/.chromedriver/bin/chromedriver'
-    options = Options()
-    options.add_argument('--disable-gpu')
-    options.add_argument('--disable-extensions')
-    options.add_argument('--proxy-server="direct://"')
-    options.add_argument('--proxy-bypass-list=*')
-    options.add_argument('--start-maximized')
-    driver = webdriver.Chrome(executable_path=driver_path, options=options)
-    driver.get('http://www.sakaehigashi.ed.jp/news/')
-    news = driver.page_source
+    news = requests.get('http://www.sakaehigashi.ed.jp/news/').content
     newsSoup = BeautifulSoup(news, 'html.parser')
     newsList = []
     newsEntryList = newsSoup.find_all(class_='entry')
     for newsEntry in newsEntryList:
-        newsData = {}
-        title = newsEntry.find_all('h3')[0].text.replace("\u3000", " ")
-        date = newsEntry.find_all(class_='date')[0].text
-        gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
-        postDateTime = date + gtime
-        link = newsEntry.find_all('a')[0].get('href')
-        category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
-        imageAreas = newsEntry.find_all('img')
-        images = []
-        for imageArea in imageAreas:
-            images.append(imageArea.get('src'))
-        body = newsEntry.text.replace(title, "").replace(date, "").replace(
-            "カテゴリー："+category, "").replace("投稿時刻", "").replace(gtime, "").replace("\n", "")
-        if len(body) > 100:
-            body = body[0:100] + "......"
-        newsData = {
-            "title": title,
-            "postDateTime": postDateTime,
-            "body": body,
-            "link": link,
-            "category": category,
-            "images": images
-        }
-        newsList.append(newsData)
-    driver.quit()
+        if newsEntry.find_all('a')[0].get('href') in latestEntry[0]:
+            break
+        else:
+            newsData = {}
+            title = newsEntry.find_all('h3')[0].text.replace("\u3000", " ")
+            date = newsEntry.find_all(class_='date')[0].text
+            gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
+            postDateTime = date + gtime
+            body = newsEntry.text.replace(title, "").replace(date, "").replace(
+                "カテゴリー："+category, "").replace("投稿時刻", "").replace(gtime, "").replace("\n", "")
+            if len(body) > 100:
+                body = body[0:100] + "..."
+            link = newsEntry.find_all('a')[0].get('href')
+            category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
+            images = []
+            for imageArea in newsEntry.find_all('img'):
+                images.append(imageArea.get('src'))
+            newsData = {
+                "title": title,
+                "postDateTime": postDateTime,
+                "body": body,
+                "link": link,
+                "category": category,
+                "images": images
+            }
+            newsList.append(newsData)
 
     sendNewsData = []
     for value in reversed(newsList):
-        if value["link"] not in gotList:
-            sendNewsData.append(value)
-            db.collection('shnews').add({
-                "title": value["title"],
-                "postDateTime": value["postDateTime"],
-                "link": value["link"],
-                "category": value["category"],
-                "images": value["images"],
-                'timestamp': firestore.SERVER_TIMESTAMP
-            })
+        sendNewsData.append(value)
+        db.collection('shnews').add({
+            "title": value["title"],
+            "postDateTime": value["postDateTime"],
+            "link": value["link"],
+            "category": value["category"],
+            "images": value["images"],
+            'timestamp': firestore.SERVER_TIMESTAMP
+        })
     print(sendNewsData)
     returnData = {
         "newsData": sendNewsData,
