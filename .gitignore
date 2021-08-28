@@ -2,8 +2,6 @@
 __pycache__/
 Lib/
 Scripts/
-test/
 .env
 test.py
-local.py
 notice.py

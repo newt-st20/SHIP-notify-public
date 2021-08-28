@@ -3,12 +3,15 @@ import json
 import os
 import time
 import urllib.request
+from pathlib import Path
 
 import discord
+from pdf2image.pdf2image import convert_from_bytes
 import requests
 import wikipedia
 from discord.ext import tasks
 from dotenv import load_dotenv
+from pdf2image import convert_from_path
 
 import line
 import twitter
@@ -156,6 +159,39 @@ async def on_message(message):
                 urllib.request.urlretrieve(link, fileName)
                 file = discord.File(fileName, filename=fileName)
                 await message.channel.send(file=file)
+        elif '-p' in message.content:
+            # NOTE:Herokuのubuntuのバージョンが 20.04で、pipのpillowがバックで利用しているlibpng12が利用できず、libpng16のみ利用できるので、pdf2imageのライブラリの更新を待つしかなさそう...?
+            poppler_dir = Path(__file__).parent.absolute() / "poppler/bin"
+            os.environ["PATH"] += os.pathsep + str(poppler_dir)
+            idIntMessage = int(message.content.split()[1])
+            data = search.Search().file(idIntMessage)
+            if len(data[0][1]) != 0:
+                await message.channel.send("**"+data[0][0]+"** - "+str(data[0][2])+" にファイルが見つかりました。これより変換作業を開始します...")
+                links = data[0][1]
+                for i, link in enumerate(links):
+                    print(link)
+                    if 'pdf?alt=media' in link:
+                        await message.channel.send(str(i+1)+" / "+str(len(links))+"ファイル目を変換中...")
+                        fileName = link.split('%2F')[-1].split('.pdf')[0]
+                        if os.environ['STATUS'] == "local":
+                            folder = 'C:/Users/ff192/Documents/newt/ship-notify-public/'
+                        else:
+                            folder = './tmp/'
+                        urlData = requests.get(link).content
+                        pages = convert_from_bytes(urlData, output_folder=folder, dpi=500)
+                        print(pages)
+                        imageList = []
+                        for i, page in enumerate(pages):
+                            eachImageFileName = fileName + "-"+str(i+1)+".jpg"
+                            page.save(eachImageFileName, "JPEG")
+                            imageList.append(discord.File(eachImageFileName))
+                        print(imageList)
+                        await message.channel.send(files=imageList)
+                    else:
+                        await message.channel.send(str(i+1)+" / "+str(len(links))+"ファイル目はPDFファイルではありませんでした。")
+                await message.channel.send("処理が完了しました。")
+            else:
+                await message.channel.send("**"+data[0][0]+"** - "+str(data[0][2])+" にはファイルが見つかりませんでした。")
         elif 'recently' in message.content or 'sh!r' in message.content or '-r' in message.content:
             itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
             flag = False

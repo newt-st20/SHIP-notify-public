@@ -25,7 +25,10 @@ class Search:
         docs = db.collection('shipPost').where('id', '==', int(id)).stream()
         for doc in docs:
             eachDoc = doc.to_dict()
-            self.data.append([eachDoc['title'], eachDoc['link'], eachDoc['date']])
+            if 'high' in eachDoc['channel']:
+                self.data.append([eachDoc['title'], eachDoc['link'], eachDoc['date']])
+            else:
+                self.data.append([eachDoc['title'], [], eachDoc['date']])
         return self.data
 
     def info(self, id):
@@ -61,4 +64,4 @@ class Search:
 
 
 if __name__ == "__main__":
-    print(Search().file(8823))
+    Search().file()
