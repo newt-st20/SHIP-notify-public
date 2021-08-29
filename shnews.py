@@ -50,12 +50,12 @@ def main():
             date = newsEntry.find_all(class_='date')[0].text
             gtime = newsEntry.find_all(class_='time')[0].text.strip("投稿時刻")
             postDateTime = date + gtime
+            category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
             body = newsEntry.text.replace(title, "").replace(date, "").replace(
                 "カテゴリー："+category, "").replace("投稿時刻", "").replace(gtime, "").replace("\n", "")
             if len(body) > 100:
                 body = body[0:100] + "..."
             link = newsEntry.find_all('a')[0].get('href')
-            category = newsEntry.find_all(class_='cat')[0].find_all('a')[0].text
             images = []
             for imageArea in newsEntry.find_all('img'):
                 images.append(imageArea.get('src'))
