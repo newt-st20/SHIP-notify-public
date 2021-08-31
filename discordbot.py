@@ -511,7 +511,10 @@ async def getData():
     messages = await configChannel.history().flatten()
     for msg in messages:
         if "DISCORD_NOTIFY=" in msg.content:
-            discordNotifyBool = msg.content.lstrip("DISCORD_NOTIFY=")
+            if msg.content.lstrip("DISCORD_NOTIFY=") == "true":
+                discordNotifyBool = True
+            else:
+                discordNotifyBool = False
             continue
     result = shipcheck.main()
     getTime = result['getTime']
@@ -520,7 +523,7 @@ async def getData():
     updateList = []
     for eachName in itemNameList:
         if len(result[eachName["collectionName"]]) != 0:
-            if discordNotifyBool == "true":
+            if discordNotifyBool:
                 sendChannel = client.get_channel(eachName["channelId"])
                 c = eachName["color"]
                 for conData in result[eachName["collectionName"]]:
@@ -556,9 +559,12 @@ async def getData():
         messages = await configChannel.history().flatten()
         for msg in messages:
             if "LINE_NOTIFY=" in msg.content:
-                lineNotifyBool = msg.content.lstrip("LINE_NOTIFY=")
+                if msg.content.lstrip("LINE_NOTIFY=") == "true":
+                    lineNotifyBool = True
+                else:
+                    lineNotifyBool = False
                 continue
-        if lineNotifyBool == "true":
+        if lineNotifyBool:
             try:
                 log = line.main(result)
                 await getLogChannel.send("LINE版処理完了\n" + log)
