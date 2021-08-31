@@ -530,7 +530,7 @@ async def getData():
                         else:
                             embed = discord.Embed(
                                 title=eachName["name"]+"更新通知", description="投稿: "+conData['date'], color=discord.Colour.from_rgb(c[0], c[1], c[2]))
-                        embed.add_field(name="id", value=conData['id'][0])
+                        embed.add_field(name="id", value="["+str(conData['id'][0])+"](https://ship-assistant.web.app/post/"+str(conData['id'][0])+")")
                         if conData['folder'] != '':
                             embed.add_field(name="path", value=conData['folder'])
                         if "description" in eachName["props"]:
