@@ -38,7 +38,6 @@ storage = firebase.storage()
 
 def main():
     now = datetime.datetime.now()
-    getTime = now.strftime('%H:%M:%S')
 
     gotList = []
     channelNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pagePosition"]
@@ -286,7 +285,6 @@ def main():
 
 
     returnData = {
-        "getTime": getTime,
         "timestamp": firestore.SERVER_TIMESTAMP,
         "logId": ""
     }

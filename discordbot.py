@@ -6,12 +6,11 @@ import urllib.request
 from pathlib import Path
 
 import discord
-from pdf2image.pdf2image import convert_from_bytes
+from pdf2image import convert_from_bytes
 import requests
 import wikipedia
 from discord.ext import tasks
 from dotenv import load_dotenv
-from pdf2image import convert_from_path
 
 import line
 import twitter
@@ -514,6 +513,7 @@ async def getData():
             discordNotifyBool = msg.content.lstrip("DISCORD_NOTIFY=")
             continue
     result = shipcheck.main()
+    getTime = result['timestamp'].strftime('%H:%M:%S')
     itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     noneUpdateChannelList = []
     updateList = []
@@ -537,7 +537,7 @@ async def getData():
                             if conData['description'] != '':
                                 embed.add_field(name="description",
                                                 value=conData['description'], inline=False)
-                        embed.set_footer(text="取得: "+result['getTime'])
+                        embed.set_footer(text="取得: "+getTime)
                         await sendChannel.send(embed=embed)
                     except Exception as e:
                         await sendChannel.send(str(e))
@@ -547,7 +547,7 @@ async def getData():
         else:
             noneUpdateChannelList.append(eachName["name"])
     if len(noneUpdateChannelList) != 0:
-        body = result['getTime'] + "の取得で以下のチャンネルに更新がありませんでした。\n" + str(noneUpdateChannelList)
+        body = getTime + "の取得で以下のチャンネルに更新がありませんでした。\n" + str(noneUpdateChannelList)
         embed = discord.Embed(
             title="未更新チャンネル", description=body, color=discord.Colour.from_rgb(52, 235, 79))
         await getLogChannel.send(embed=embed)
@@ -578,6 +578,7 @@ async def getNewsData():
     shnewsChannel = client.get_channel(818480374334226443)
     getLogChannel = client.get_channel(817400535639916544)
     result = shnews.main()
+    getTime = result['timestamp'].strftime('%H:%M:%S')
     if len(result["newsData"]) != 0:
         for conData in result["newsData"]:
             embed = discord.Embed(
@@ -587,14 +588,14 @@ async def getNewsData():
             if len(conData["images"]) != 0:
                 embed.set_image(url=conData["images"][0])
             embed.add_field(name="link", value=conData["link"], inline=False)
-            embed.set_footer(text="取得: "+result["getTime"])
+            embed.set_footer(text="取得: "+getTime)
             await shnewsChannel.send(embed=embed)
     else:
         embed = discord.Embed(
             title="栄東ニュース更新通知", color=discord.Colour.from_rgb(230, 32, 226))
         embed.add_field(name="system-log",
                         value='栄東ニュースに更新はありませんでした')
-        embed.set_footer(text="取得: "+result["getTime"])
+        embed.set_footer(text="取得: "+getTime)
         await getLogChannel.send(embed=embed)
 
 async def getNarouData():
