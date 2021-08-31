@@ -42,6 +42,7 @@ async def on_ready():
     wakeLogChannel = client.get_channel(817389202161270794)
     wakeMessage = os.environ['STATUS'] + ": 起動しました"
     await wakeLogChannel.send(wakeMessage)
+    print(wakeMessage)
     game = discord.Game("commands: sh!help")
     await client.change_presence(activity=game)
 
@@ -513,7 +514,7 @@ async def getData():
             discordNotifyBool = msg.content.lstrip("DISCORD_NOTIFY=")
             continue
     result = shipcheck.main()
-    getTime = result['timestamp'].strftime('%H:%M:%S')
+    getTime = result['getTime']
     itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     noneUpdateChannelList = []
     updateList = []
@@ -578,7 +579,7 @@ async def getNewsData():
     shnewsChannel = client.get_channel(818480374334226443)
     getLogChannel = client.get_channel(817400535639916544)
     result = shnews.main()
-    getTime = result['timestamp'].strftime('%H:%M:%S')
+    getTime = result['getTime']
     if len(result["newsData"]) != 0:
         for conData in result["newsData"]:
             embed = discord.Embed(

@@ -285,6 +285,7 @@ def main():
 
 
     returnData = {
+        "getTime": now.strftime('%H:%M:%S'),
         "timestamp": firestore.SERVER_TIMESTAMP,
         "logId": ""
     }
