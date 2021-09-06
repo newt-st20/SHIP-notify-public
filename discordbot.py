@@ -555,7 +555,7 @@ async def getData():
         embed = discord.Embed(
             title="未更新チャンネル", description=body, color=discord.Colour.from_rgb(52, 235, 79))
         await getLogChannel.send(embed=embed)
-    if len(result['highCon']) != 0 or len(result['highStudy']) != 0:
+    if len(result['highCon']) != 0 or len(result['highStudy']) != 0 or len(result['highSchoolNews']):
         messages = await configChannel.history().flatten()
         for msg in messages:
             if "LINE_NOTIFY=" in msg.content:

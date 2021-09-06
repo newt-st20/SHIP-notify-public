@@ -62,21 +62,21 @@ def main(data):
         logMessage = ""
         betaresponse = requests.post(broadcastEndPoint, json=jsonData, headers=betaheaders)
         if betaresponse.status_code != 200:
-            logMessage += "Something error happend on LINE beta. \n\n[error message]\n"+ betaresponse.text
+            logMessage += "\nSomething error happend on LINE beta. [error message]"+ betaresponse.text
         else:
-            logMessage += "Send message succeed on LINE beta."
+            logMessage += "\nSend message succeed on LINE beta."
         response = requests.post(broadcastEndPoint, json=jsonData, headers=headers)
         if response.status_code != 200:
-            logMessage += "Something error happend on LINE main. \n\n[error message]\n"+ response.text
+            logMessage += "\nSomething error happend on LINE main. [error message]"+ response.text
         else:
-            logMessage += "Send message succeed on LINE main."
+            logMessage += "\nSend message succeed on LINE main."
         subresponse = requests.post(broadcastEndPoint, json=jsonData, headers=subheaders)
         if subresponse.status_code != 200:
-            logMessage += "Something error happend on LINE sub. \n\n[error message]\n"+ subresponse.text
+            logMessage += "\nSomething error happend on LINE sub. [error message]"+ subresponse.text
         else:
-            logMessage += "Send message succeed on LINE sub."
+            logMessage += "\nSend message succeed on LINE sub."
+        logMessage += "\n\njsonData length:" + str(len(str(jsonData)))
         print(logMessage)
-
         return logMessage
 
 if __name__ == "__main__":
