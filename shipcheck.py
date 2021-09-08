@@ -39,11 +39,11 @@ storage = firebase.storage()
 def main():
     now = datetime.datetime.now()
 
-    gotList = []
+    gotList = {}
     channelNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pagePosition"]
     for channelName in channelNameList:
         docs = db.collection('shipPost').where('channel', '==', channelName).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(1).stream()
-        gotList.extend([int(doc.to_dict()['id']) for doc in docs])
+        gotList[channelName] = [int(doc.to_dict()['id']) for doc in docs][0]
     print(gotList)
 
     if os.environ['STATUS'] == "local":
@@ -88,6 +88,7 @@ def main():
             driver.find_element_by_name('cheng_jr').click()
         driver.get(
             "https://ship.sakae-higashi.jp/connection/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
+        channelName = schooltype + "Con"
         con = driver.page_source
         conSoup = BeautifulSoup(con, 'html.parser')
         conTrs = conSoup.find_all(class_='allc')[0].find_all('tr')
@@ -99,7 +100,7 @@ def main():
             try:
                 stage = conTrTds[2].find('a').get('onclick')
                 conId = re.findall("'([^']*)'", stage)
-                if int(conId[0]) not in gotList:
+                if int(conId[0]) > gotList[channelName]:
                     print(conId[0]+" is not in the database.")
                     try:
                         eachConList["id"] = conId
@@ -147,6 +148,7 @@ def main():
 
         driver.get(
             "https://ship.sakae-higashi.jp/study/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
+        channelName = schooltype + "Study"
         study = driver.page_source
         studySoup = BeautifulSoup(study, 'html.parser')
         studyTrs = studySoup.find_all(class_='allc')[0].find_all('tr')
@@ -158,7 +160,7 @@ def main():
             try:
                 stage = studyTrTds[2].find('a').get('onclick')
                 studyId = re.findall("'([^']*)'", stage)
-                if int(studyId[0]) not in gotList:
+                if int(studyId[0]) > gotList[channelName]:
                     print(studyId[0]+" is not in the database.")
                     try:
                         eachstudyList["id"] = studyId
@@ -213,6 +215,7 @@ def main():
 
         driver.get(
             "https://ship.sakae-higashi.jp/school_news/search.php?obj_id=&depth=&search=&s_y=2011&s_m=01&s_d=01&e_y=2030&e_m=12&e_d=31")
+        channelName = schooltype + "SchoolNews"
         schoolNews = driver.page_source
         schoolNewsSoup = BeautifulSoup(schoolNews, 'html.parser')
         schoolNewsTrs = schoolNewsSoup.find_all(class_='allc')[0].find_all('tr')
@@ -224,7 +227,7 @@ def main():
             try:
                 stage = schoolNewsTrTds[2].find('a').get('onclick')
                 schoolNewsId = re.findall("'([^']*)'", stage)
-                if int(schoolNewsId[0]) not in gotList:
+                if int(schoolNewsId[0]) > gotList[channelName]:
                     print(schoolNewsId[0]+" is not in the database.")
                     try:
                         eachSchoolNewsList["id"] = schoolNewsId
@@ -282,7 +285,7 @@ def main():
             dataList["highSchoolNews"] = schoolNewsList
         count += 1
     driver.quit()
-
+    print(dataList)
 
     returnData = {
         "getTime": now.strftime('%H:%M:%S'),
@@ -292,34 +295,37 @@ def main():
 
     item = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
     flag = False
-    for eachChannel in item:
-        sendData = []
-        for i in reversed(dataList[eachChannel["collectionName"]]):
-            i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
-            sendData.append(i)
-            eachAddData = {
-                'channel': eachChannel["collectionName"],
-                'id': int(i["id"][0]),
-                'date': i["date"],
-                'folder': i["folder"],
-                'title': i["title"],
-                'timestamp': firestore.SERVER_TIMESTAMP}
-            if "description" in eachChannel["props"]:
-                eachAddData['description'] = i["description"]
-            if "link" in eachChannel["props"]:
-                eachAddData['link'] = i["link"]
-            db.collection('shipPost').add(eachAddData)
-        docDict = db.collection('count').document(eachChannel["collectionName"]).get().to_dict()
-        if len(sendData) != 0:
-            howManyData = int(docDict['count']) + len(sendData)
-            db.collection('count').document(eachChannel["collectionName"]).update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
-            flag = True
-        returnData[eachChannel["collectionName"]] = sendData
-    if flag == True:
-        docRef = db.collection('getLog').document()
-        docRef.set(returnData)
-        returnData['logId'] = docRef.id
-    print(returnData)
+
+    productMode = True
+    if productMode:
+        for eachChannel in item:
+            sendData = []
+            for i in reversed(dataList[eachChannel["collectionName"]]):
+                i["date"] = i["date"].replace("年", "/").replace("月", "/").replace("日", "")
+                sendData.append(i)
+                eachAddData = {
+                    'channel': eachChannel["collectionName"],
+                    'id': int(i["id"][0]),
+                    'date': i["date"],
+                    'folder': i["folder"],
+                    'title': i["title"],
+                    'timestamp': firestore.SERVER_TIMESTAMP}
+                if "description" in eachChannel["props"]:
+                    eachAddData['description'] = i["description"]
+                if "link" in eachChannel["props"]:
+                    eachAddData['link'] = i["link"]
+                db.collection('shipPost').add(eachAddData)
+            docDict = db.collection('count').document(eachChannel["collectionName"]).get().to_dict()
+            if len(sendData) != 0:
+                howManyData = int(docDict['count']) + len(sendData)
+                db.collection('count').document(eachChannel["collectionName"]).update({'count': howManyData, 'update': firestore.SERVER_TIMESTAMP})
+                flag = True
+            returnData[eachChannel["collectionName"]] = sendData
+        if flag == True:
+            docRef = db.collection('getLog').document()
+            docRef.set(returnData)
+            returnData['logId'] = docRef.id
+        print(returnData)
     return returnData
 
 
