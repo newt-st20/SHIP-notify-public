@@ -61,19 +61,6 @@ async def on_ready():
 
 
 @client.event
-async def on_member_join(member):
-    await member.send("「SHIP Info」サーバーへようこそ！このサーバーでは、SHIPの更新情報をはじめとして様々な情報を確認することができます。何かわからないことがある場合はこのチャットなどで気軽にお尋ねください。\
-    \nbotとのDMやサーバー内では様々なコマンドを使うことができます。利用可能なコマンドはここで`sh!help`と送信することで確認できます。\n\n__**※このメッセージはサーバー参加時に全員に送信しています**__")
-
-
-@client.event
-async def on_member_remove(member):
-    await client.wait_until_ready()
-    joinLeaveLogChannel = client.get_channel(joinLeaveLogCid)
-    await joinLeaveLogChannel.send(str(member.name)+" ( "+str(member.id)+" ) が脱退しました")
-
-
-@client.event
 async def on_message(message):
     def check(msg):
         return msg.author == message.author
@@ -173,37 +160,38 @@ async def on_message(message):
                 await message.channel.send(file=file)
         elif '-p' in message.content:
             # NOTE:Herokuのubuntuのバージョンが 20.04で、pipのpillowがバックで利用しているlibpng12が利用できず、libpng16のみ利用できるので、pdf2imageのライブラリの更新を待つしかなさそう...?
-            poppler_dir = Path(__file__).parent.absolute() / "poppler/bin"
-            os.environ["PATH"] += os.pathsep + str(poppler_dir)
-            idIntMessage = int(message.content.split()[1])
-            data = search.Search().file(idIntMessage)
-            if len(data[0][1]) != 0:
-                await message.channel.send("**"+data[0][0]+"** - "+str(data[0][2])+" にファイルが見つかりました。これより変換作業を開始します...")
-                links = data[0][1]
-                for i, link in enumerate(links):
-                    print(link)
-                    if 'pdf?alt=media' in link:
-                        await message.channel.send(str(i+1)+" / "+str(len(links))+"ファイル目を変換中...")
-                        fileName = link.split('%2F')[-1].split('.pdf')[0]
-                        if os.environ['STATUS'] == "local":
-                            folder = 'C:/Users/ff192/Documents/newt/ship-notify-public/'
+            if os.environ['STATUS'] == "local":
+                poppler_dir = Path(__file__).parent.absolute() / "poppler/bin"
+                os.environ["PATH"] += os.pathsep + str(poppler_dir)
+                idIntMessage = int(message.content.split()[1])
+                data = search.Search().file(idIntMessage)
+                if len(data[0][1]) != 0:
+                    await message.channel.send("**"+data[0][0]+"** - "+str(data[0][2])+" にファイルが見つかりました。これより変換作業を開始します...")
+                    links = data[0][1]
+                    for i, link in enumerate(links):
+                        print(link)
+                        if 'pdf?alt=media' in link:
+                            await message.channel.send(str(i+1)+" / "+str(len(links))+"ファイル目を変換中...")
+                            fileName = link.split('%2F')[-1].split('.pdf')[0]
+                            if os.environ['STATUS'] == "local":
+                                folder = 'C:/Users/ff192/Documents/newt/ship-notify-public/'
+                            else:
+                                folder = './tmp/'
+                            urlData = requests.get(link).content
+                            pages = convert_from_bytes(urlData, output_folder=folder, dpi=500)
+                            print(pages)
+                            imageList = []
+                            for i, page in enumerate(pages):
+                                eachImageFileName = fileName + "-"+str(i+1)+".jpg"
+                                page.save(eachImageFileName, "JPEG")
+                                imageList.append(discord.File(eachImageFileName))
+                            print(imageList)
+                            await message.channel.send(files=imageList)
                         else:
-                            folder = './tmp/'
-                        urlData = requests.get(link).content
-                        pages = convert_from_bytes(urlData, output_folder=folder, dpi=500)
-                        print(pages)
-                        imageList = []
-                        for i, page in enumerate(pages):
-                            eachImageFileName = fileName + "-"+str(i+1)+".jpg"
-                            page.save(eachImageFileName, "JPEG")
-                            imageList.append(discord.File(eachImageFileName))
-                        print(imageList)
-                        await message.channel.send(files=imageList)
-                    else:
-                        await message.channel.send(str(i+1)+" / "+str(len(links))+"ファイル目はPDFファイルではありませんでした。")
-                await message.channel.send("処理が完了しました。")
-            else:
-                await message.channel.send("**"+data[0][0]+"** - "+str(data[0][2])+" にはファイルが見つかりませんでした。")
+                            await message.channel.send(str(i+1)+" / "+str(len(links))+"ファイル目はPDFファイルではありませんでした。")
+                    await message.channel.send("処理が完了しました。")
+                else:
+                    await message.channel.send("**"+data[0][0]+"** - "+str(data[0][2])+" にはファイルが見つかりませんでした。")
         elif 'recently' in message.content or 'sh!r' in message.content or '-r' in message.content:
             itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
             flag = False
@@ -415,6 +403,20 @@ async def on_message(message):
         elif oldmessage.embeds:
             await message.channel.send(content=str(oldmessage.created_at)[:19]+"に"+oldchannel.name+"チャンネルで"+oldmessage.author.mention+"が送信したEmbedメッセージ", embed=oldmessage.embeds[0])
 
+
+@client.event
+async def on_member_join(member):
+    await member.send("「SHIP Info」サーバーへようこそ！このサーバーでは、SHIPの更新情報をはじめとして様々な情報を確認することができます。何かわからないことがある場合はこのチャットなどで気軽にお尋ねください。\
+    \nbotとのDMやサーバー内では様々なコマンドを使うことができます。利用可能なコマンドはここで`sh!help`と送信することで確認できます。\n\n__**※このメッセージはサーバー参加時に全員に送信しています**__")
+
+
+@client.event
+async def on_member_remove(member):
+    await client.wait_until_ready()
+    joinLeaveLogChannel = client.get_channel(joinLeaveLogCid)
+    await joinLeaveLogChannel.send(str(member.name)+" ( "+str(member.id)+" ) が脱退しました")
+
+
 @client.event
 async def on_raw_reaction_add(payload):
     await client.wait_until_ready()
@@ -450,6 +452,7 @@ async def on_raw_reaction_remove(payload):
             await roleLogChannel.send('remove:' + member.mention+' , '+ narouRole.mention)
         else:
             print(payload.emoji.name)
+
 
 @tasks.loop(seconds=600)
 async def loop():
@@ -612,6 +615,7 @@ async def getNewsData():
         embed.set_footer(text="取得: "+getTime)
         await getLogChannel.send(embed=embed)
 
+
 async def getNarouData():
     await client.wait_until_ready()
     sendChannel = client.get_channel(narouCid)
@@ -620,6 +624,7 @@ async def getNarouData():
         for eachData in result:
             embed = discord.Embed(title=eachData['title'], description="投稿: "+eachData['lastup']+"\nリンク: https://ncode.syosetu.com/"+eachData['ncode']+"/"+str(eachData['count']), color=discord.Colour.from_rgb(256-int(eachData['ncode'][1:2])*2, 256-int(eachData['ncode'][2:3])*2, 256-int(eachData['ncode'][3:4])*2))
             await sendChannel.send(embed=embed)
+
 
 async def getWeather():
     await client.wait_until_ready()
@@ -639,6 +644,7 @@ async def getWeather():
         body += "> 埼玉県の天気概況\n" + response['headlineText'] + "\n"
     embed = discord.Embed(title=title, description=body, color=discord.Colour.from_rgb(163, 212, 255))
     await weatherChannel.send(embed=embed)
+
 
 loop.start()
 
