@@ -80,11 +80,11 @@ async def on_message(message):
             content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
             content += '\n`sh!wiki` Wikipediaを検索'
             content += '\n\n> 「小説家になろう」関連コマンド'
-            content += '\n`n!when` 更新を取得している日時の取得'
-            content += '\n`n!add` 更新を通知する小説の追加'
-            content += '\n`n!remove` 更新を通知する小説の削除'
-            content += '\n`n!list` 更新を通知している小説一覧を表示'
-            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/08/16", description=content, color=discord.Colour.from_rgb(190, 252, 3))
+            content += '\n`sh!nwhen` 更新を取得している日時の取得'
+            content += '\n`sh!nadd` 更新を通知する小説の追加'
+            content += '\n`sh!nremove` 更新を通知する小説の削除'
+            content += '\n`sh!nlist` 更新を通知している小説一覧を表示'
+            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/09/15", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
             flag = False
@@ -277,63 +277,7 @@ async def on_message(message):
             await message.channel.send('にゃーん')
             wait_message = await client.wait_for("message", check=check)
             await message.channel.send(wait_message.content)
-        else:
-            await message.channel.send('❌このコマンドは用意されていません')
-    if 'sa!' in message.content:
-        if message.author.guild_permissions.administrator:
-            if message.content == 'sa!get':
-                await message.channel.send('SHIPデータの取得を開始します')
-                try:
-                    start = time.time()
-                    await getData()
-                    elapsedTime = time.time() - start
-                    await message.channel.send('SHIP更新取得処理が完了しました。'+str(elapsedTime)+'[sec]')
-                except Exception as e:
-                    await message.channel.send(str(type(e)) + str(e))
-            elif message.content == 'sa!shnews':
-                await message.channel.send('栄東ニュース更新取得処理を開始します')
-                try:
-                    start = time.time()
-                    await getNewsData()
-                    elapsedTime = time.time() - start
-                    await message.channel.send('栄東ニュースの更新取得処理が完了しました'+str(elapsedTime)+'[sec]')
-                except Exception as e:
-                    await message.channel.send(str(type(e)) + str(e))
-            elif message.content == 'sa!narou':
-                try:
-                    await getNarouData()
-                    await message.channel.send('小説家になろう更新取得処理が完了しました')
-                except Exception as e:
-                    await message.channel.send(str(type(e)) + str(e))
-            elif message.content == 'sa!weather':
-                try:
-                    await getWeather()
-                except Exception as e:
-                    await message.channel.send(str(type(e)) + str(e))
-            elif message.content == 'sa!delete-all-message':
-                try:
-                    await message.channel.send("⚠️このチャンネルのメッセージをすべて削除します。本当によろしいですか？")
-                    agreeMessage = await client.wait_for("message", check=check, timeout=10)
-                    if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
-                        await agreeMessage.channel.purge(limit=None)
-                        await agreeMessage.channel.send("削除が完了しました。")
-                except:
-                    await message.channel.send("操作が中断されました")
-            elif 'sa!delete-some-message' in message.content:
-                if len(message.content.split()) == 2:
-                    if isint(message.content.split()[1]):
-                        try:
-                            await message.reply("⚠️これより"+str(int(message.content.split()[1]))+"件前までのメッセージを削除します。よろしいですか？")
-                            agreeMessage = await client.wait_for("message", check=check, timeout=10)
-                            if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
-                                await agreeMessage.channel.purge(limit=int(message.content.split()[1])+3)
-                                await agreeMessage.channel.send(str(message.content.split()[1])+"件のメッセージの削除が完了しました。")
-                        except:
-                            await message.reply("操作が中断されました")
-        else:
-            await message.channel.send('⚠️このコマンドは管理者のみ利用可能です')
-    if 'n!' in message.content:
-        if 'n!when' in message.content:
+        if 'sh!nwhen' in message.content:
             configChannel = client.get_channel(820242721330561044)
             messages = await configChannel.history().flatten()
             whenGetNarouConfigMessage = ""
@@ -343,7 +287,7 @@ async def on_message(message):
                     continue
             hourList = [int(x) for x in whenGetNarouConfigMessage.split()]
             await message.channel.send('現在毎日'+str(hourList)+'時に「小説家になろう」の更新を取得しています。')
-        if 'n!add' in message.content:
+        if 'sh!nadd' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 if len(ncode) == 7 and ncode[0] == 'n':
@@ -358,7 +302,7 @@ async def on_message(message):
                     await message.channel.send("これはncodeではありません。最初からやり直してください")
             else:
                 await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'n!remove' in message.content:
+        elif 'sh!nremove' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 if len(ncode) == 7 and ncode[0] == 'n':
@@ -371,7 +315,7 @@ async def on_message(message):
                     await message.channel.send("これはncodeではありません。最初からやり直してください")
             else:
                 await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'n!list' in message.content:
+        elif 'sh!nlist' in message.content:
             result = narou.list()
             body = ""
             for eachData in result:
@@ -380,6 +324,56 @@ async def on_message(message):
                 await message.channel.send("このチャンネルでフォローされている小説はありません")
             else:
                 await message.channel.send(body)
+        if message.author.guild_permissions.administrator:
+            if message.content == 'sh!get':
+                await message.channel.send('SHIPデータの取得を開始します')
+                try:
+                    start = time.time()
+                    await getData()
+                    elapsedTime = time.time() - start
+                    await message.channel.send('SHIP更新取得処理が完了しました。'+str(elapsedTime)+'[sec]')
+                except Exception as e:
+                    await message.channel.send(str(type(e)) + str(e))
+            elif message.content == 'sh!shnews':
+                await message.channel.send('栄東ニュース更新取得処理を開始します')
+                try:
+                    start = time.time()
+                    await getNewsData()
+                    elapsedTime = time.time() - start
+                    await message.channel.send('栄東ニュースの更新取得処理が完了しました'+str(elapsedTime)+'[sec]')
+                except Exception as e:
+                    await message.channel.send(str(type(e)) + str(e))
+            elif message.content == 'sa!narou':
+                try:
+                    await getNarouData()
+                    await message.channel.send('小説家になろう更新取得処理が完了しました')
+                except Exception as e:
+                    await message.channel.send(str(type(e)) + str(e))
+            elif message.content == 'sh!weather':
+                try:
+                    await getWeather()
+                except Exception as e:
+                    await message.channel.send(str(type(e)) + str(e))
+            elif message.content == 'sh!delete-all-message':
+                try:
+                    await message.channel.send("⚠️このチャンネルのメッセージをすべて削除します。本当によろしいですか？")
+                    agreeMessage = await client.wait_for("message", check=check, timeout=10)
+                    if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
+                        await agreeMessage.channel.purge(limit=None)
+                        await agreeMessage.channel.send("削除が完了しました。")
+                except:
+                    await message.channel.send("操作が中断されました")
+            elif 'sh!delete-some-message' in message.content:
+                if len(message.content.split()) == 2:
+                    if isint(message.content.split()[1]):
+                        try:
+                            await message.reply("⚠️これより"+str(int(message.content.split()[1]))+"件前までのメッセージを削除します。よろしいですか？")
+                            agreeMessage = await client.wait_for("message", check=check, timeout=10)
+                            if agreeMessage.content == "yes" and agreeMessage.author.guild_permissions.administrator:
+                                await agreeMessage.channel.purge(limit=int(message.content.split()[1])+3)
+                                await agreeMessage.channel.send(str(message.content.split()[1])+"件のメッセージの削除が完了しました。")
+                        except:
+                            await message.reply("操作が中断されました")
     if isinstance(message.channel, discord.DMChannel):
         userId = str(message.author.id)
         embed = discord.Embed(title="DMを受信しました", color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
