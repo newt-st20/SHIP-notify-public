@@ -23,6 +23,19 @@ load_dotenv()
 
 TOKEN = os.environ['DISCORD_TOKEN']
 
+joinLeaveLogCid = 810813680618831906
+wakeLogCid = 817389202161270794
+getLogCid = 817400535639916544
+roleLogCid = 879613626875523112
+dmLogCid = 817971315138756619
+configCid = 820242721330561044
+ruleCid = 821735577383731231
+conHighCid = 818066947463053312
+studyHighCid = 818066981982830613
+weatherCid = 855709750704209921
+shnewsCid = 818480374334226443
+narouCid = 826094369467138108
+
 def isint(s):
     try:
         int(s, 10)
@@ -39,7 +52,7 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
     await client.wait_until_ready()
-    wakeLogChannel = client.get_channel(817389202161270794)
+    wakeLogChannel = client.get_channel(wakeLogCid)
     wakeMessage = os.environ['STATUS'] + ": 起動しました"
     await wakeLogChannel.send(wakeMessage)
     print(wakeMessage)
@@ -56,7 +69,7 @@ async def on_member_join(member):
 @client.event
 async def on_member_remove(member):
     await client.wait_until_ready()
-    joinLeaveLogChannel = client.get_channel(810813680618831906)
+    joinLeaveLogChannel = client.get_channel(joinLeaveLogCid)
     await joinLeaveLogChannel.send(str(member.name)+" ( "+str(member.id)+" ) が脱退しました")
 
 
@@ -64,11 +77,10 @@ async def on_member_remove(member):
 async def on_message(message):
     def check(msg):
         return msg.author == message.author
-
     await client.wait_until_ready()
-    dmLogChannel = client.get_channel(817971315138756619)
-    conHighChannel = client.get_channel(818066947463053312)
-    studyHighChannel = client.get_channel(818066981982830613)
+    dmLogChannel = client.get_channel(dmLogCid)
+    conHighChannel = client.get_channel(conHighCid)
+    studyHighChannel = client.get_channel(studyHighCid)
     if message.author.bot:
         return
     if 'sh!' in message.content or message.content.startswith('-'):
@@ -277,7 +289,7 @@ async def on_message(message):
             await message.channel.send(wait_message.content)
         # なろうコマンド
         elif 'nwhen' in message.content:
-            configChannel = client.get_channel(820242721330561044)
+            configChannel = client.get_channel(configCid)
             messages = await configChannel.history().flatten()
             whenGetNarouConfigMessage = ""
             for msg in messages:
@@ -408,7 +420,7 @@ async def on_raw_reaction_add(payload):
     await client.wait_until_ready()
     guild = client.get_guild(payload.guild_id)
     member = guild.get_member(payload.user_id)
-    roleLogChannel = client.get_channel(879613626875523112)
+    roleLogChannel = client.get_channel(roleLogCid)
     if payload.message_id == 879613073084776468:
         if payload.emoji.name == '✨':
             advancedinfoRole = guild.get_role(817407279820308531)
@@ -426,7 +438,7 @@ async def on_raw_reaction_remove(payload):
     await client.wait_until_ready()
     guild = client.get_guild(payload.guild_id)
     member = guild.get_member(payload.user_id)
-    roleLogChannel = client.get_channel(879613626875523112)
+    roleLogChannel = client.get_channel(roleLogCid)
     if payload.message_id == 879613073084776468:
         if payload.emoji.name == '✨':
             advancedinfoRole = guild.get_role(817407279820308531)
@@ -442,9 +454,9 @@ async def on_raw_reaction_remove(payload):
 @tasks.loop(seconds=600)
 async def loop():
     await client.wait_until_ready()
-    getLogChannel = client.get_channel(817400535639916544)
-    configChannel = client.get_channel(820242721330561044)
-    ruleChannel = client.get_channel(821735577383731231)
+    getLogChannel = client.get_channel(getLogCid)
+    configChannel = client.get_channel(configCid)
+    ruleChannel = client.get_channel(ruleCid)
     messages = await configChannel.history().flatten()
     for msg in messages:
         if "GET_HOUR=" in msg.content:
@@ -501,8 +513,8 @@ async def loop():
 
 async def getData():
     await client.wait_until_ready()
-    getLogChannel = client.get_channel(817400535639916544)
-    configChannel = client.get_channel(820242721330561044)
+    getLogChannel = client.get_channel(getLogCid)
+    configChannel = client.get_channel(configCid)
     messages = await configChannel.history().flatten()
     for msg in messages:
         if "DISCORD_NOTIFY=" in msg.content:
@@ -577,8 +589,8 @@ async def getData():
 
 async def getNewsData():
     await client.wait_until_ready()
-    shnewsChannel = client.get_channel(818480374334226443)
-    getLogChannel = client.get_channel(817400535639916544)
+    shnewsChannel = client.get_channel(shnewsCid)
+    getLogChannel = client.get_channel(getLogCid)
     result = shnews.main()
     getTime = result['getTime']
     if len(result["newsData"]) != 0:
@@ -602,7 +614,7 @@ async def getNewsData():
 
 async def getNarouData():
     await client.wait_until_ready()
-    sendChannel = client.get_channel(826094369467138108)
+    sendChannel = client.get_channel(narouCid)
     result = narou.main()
     if len(result) != 0:
         for eachData in result:
@@ -611,7 +623,7 @@ async def getNarouData():
 
 async def getWeather():
     await client.wait_until_ready()
-    weatherChannel = client.get_channel(855709750704209921)
+    weatherChannel = client.get_channel(weatherCid)
     response = requests.get("https://www.jma.go.jp/bosai/forecast/data/forecast/110000.json").json()[0]
     pops = response['timeSeries'][1]['areas'][1]['pops']
     timeDefines = response['timeSeries'][1]['timeDefines']
