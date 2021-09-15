@@ -249,8 +249,6 @@ async def on_message(message):
             embed = discord.Embed(
                 title="最近の"+itemNameList[typeIntMessage]["name"], description=body, color=discord.Colour.from_rgb(252, 186, 3))
             await message.channel.send(embed=embed)
-        elif 'role' in message.content:
-            await message.channel.send('Now prepairing. Please wait...')
         # Wikipedia検索
         # https://wikipedia.readthedocs.io/en/latest/code.html#module-wikipedia.exceptions
         elif 'wiki' in message.content:
@@ -277,7 +275,8 @@ async def on_message(message):
             await message.channel.send('にゃーん')
             wait_message = await client.wait_for("message", check=check)
             await message.channel.send(wait_message.content)
-        if 'sh!nwhen' in message.content:
+        # なろうコマンド
+        elif 'nwhen' in message.content:
             configChannel = client.get_channel(820242721330561044)
             messages = await configChannel.history().flatten()
             whenGetNarouConfigMessage = ""
@@ -287,7 +286,7 @@ async def on_message(message):
                     continue
             hourList = [int(x) for x in whenGetNarouConfigMessage.split()]
             await message.channel.send('現在毎日'+str(hourList)+'時に「小説家になろう」の更新を取得しています。')
-        if 'sh!nadd' in message.content:
+        elif 'nadd' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 if len(ncode) == 7 and ncode[0] == 'n':
@@ -302,7 +301,7 @@ async def on_message(message):
                     await message.channel.send("これはncodeではありません。最初からやり直してください")
             else:
                 await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'sh!nremove' in message.content:
+        elif 'nremove' in message.content:
             if len(message.content.split()) == 2:
                 ncode = message.content.split()[1]
                 if len(ncode) == 7 and ncode[0] == 'n':
@@ -315,7 +314,7 @@ async def on_message(message):
                     await message.channel.send("これはncodeではありません。最初からやり直してください")
             else:
                 await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'sh!nlist' in message.content:
+        elif 'nlist' in message.content:
             result = narou.list()
             body = ""
             for eachData in result:
@@ -324,7 +323,7 @@ async def on_message(message):
                 await message.channel.send("このチャンネルでフォローされている小説はありません")
             else:
                 await message.channel.send(body)
-        if message.author.guild_permissions.administrator:
+        elif message.author.guild_permissions.administrator:
             if message.content == 'sh!get':
                 await message.channel.send('SHIPデータの取得を開始します')
                 try:
@@ -374,6 +373,8 @@ async def on_message(message):
                                 await agreeMessage.channel.send(str(message.content.split()[1])+"件のメッセージの削除が完了しました。")
                         except:
                             await message.reply("操作が中断されました")
+        else:
+            await message.channel.send("このコマンドは存在しません")
     if isinstance(message.channel, discord.DMChannel):
         userId = str(message.author.id)
         embed = discord.Embed(title="DMを受信しました", color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
