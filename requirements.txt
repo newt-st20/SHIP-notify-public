@@ -32,3 +32,4 @@ firebase-admin==5.0.0
 PySocks==1.7.1
 pdf2image==1.16.0
 pillow==8.2.0
+py-cord==1.7.3
