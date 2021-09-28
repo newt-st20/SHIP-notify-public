@@ -27,7 +27,7 @@
                             },
                             {
                                 "type": "text",
-                                "text": "SHIP Update Notify",
+                                "text": "SHIP Update Notice",
                                 "weight": "bold",
                                 "size": "xxl",
                                 "margin": "md"

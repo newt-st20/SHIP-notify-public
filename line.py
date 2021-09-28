@@ -35,12 +35,12 @@ def main(data):
             message['contents'][0]['text'] = channel['jpName']
             props = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))['pageList'][index]['lineProps']
             for a in channelData:
-                message['contents'].append(separate)
                 for prop in props:
                     jsonEachMenu = copy.deepcopy(eachMenu)
                     jsonEachMenu["contents"][0]["text"] = prop
-                    jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(empty)"
+                    jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(root)"
                     message['contents'].append(jsonEachMenu)
+                message['contents'].append(separate)
             jsonData['messages'][0]['contents']['body']['contents'].append(message)
             altText += "[" + channel['jpName'] + "]"
     
