@@ -26,6 +26,7 @@ def main(data):
     channelList = jsonLoad['channelList']
 
     flag = False
+    altText = ""
     for index, channel in enumerate(channelList):
         channelData = data[channel['name']]
         if len(channelData) != 0:
@@ -41,7 +42,9 @@ def main(data):
                     jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(empty)"
                     message['contents'].append(jsonEachMenu)
             jsonData['messages'][0]['contents']['body']['contents'].append(message)
-
+            altText += "[" + channel['jpName'] + "]"
+    
+    jsonData['messages'][0]['altText'] = altText + "に更新がありました"
     jsonData['messages'][0]['contents']['footer']['contents'][0]['action']['uri'] = "https://ship-assistant.web.app/log/"+data['logId']+"?utm_source=line_"+date+"&utm_medium=LINE"
 
     betaheaders = {
