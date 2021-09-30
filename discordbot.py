@@ -599,7 +599,7 @@ async def getNewsData():
     if len(result["newsData"]) != 0:
         for conData in result["newsData"]:
             embed = discord.Embed(
-                title=conData["title"], description="投稿日時: "+conData["postDateTime"], color=discord.Colour.from_rgb(230, 32, 226))
+                title=conData["title"], description="投稿日: "+conData["date"], color=discord.Colour.from_rgb(230, 32, 226))
             embed.add_field(name="category", value=conData["category"])
             embed.add_field(name="body", value=conData["body"], inline=False)
             if len(conData["images"]) != 0:
