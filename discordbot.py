@@ -336,10 +336,7 @@ async def on_message(message):
             elif message.content == 'sh!shnews':
                 await message.channel.send('栄東ニュース更新取得処理を開始します')
                 try:
-                    start = time.time()
                     await getNewsData()
-                    elapsedTime = time.time() - start
-                    await message.channel.send('栄東ニュースの更新取得処理が完了しました'+str(elapsedTime)+'[sec]')
                 except Exception as e:
                     await message.channel.send(str(type(e)) + str(e))
             elif message.content == 'sa!narou':
@@ -606,14 +603,9 @@ async def getNewsData():
             embed.add_field(name="link", value=conData["link"], inline=False)
             embed.set_footer(text="取得: "+getTime)
             await shnewsChannel.send(embed=embed)
-            shnewsLogBody += conData["link"] + "\n"
-    else:
-        shnewsLogBody = "更新はありませんでした\n"
-    shnewsLogBody += "\n" + time.time() - start
+    shnewsLogBody = "栄東ニュース更新通知取得処理が完了しました。\n所要時間: "+str(time.time() - start)+"[esc]"
     embed = discord.Embed(
-        title="栄東ニュース更新通知", color=discord.Colour.from_rgb(230, 32, 226))
-    embed.add_field(name="system-log: 栄東ニュース",
-                    value='栄東ニュースに更新はありませんでした')
+        title="system-log", description=shnewsLogBody, color=discord.Colour.from_rgb(230, 32, 226))
     embed.set_footer(text="取得: "+getTime)
     await getLogChannel.send(embed=embed)
 
