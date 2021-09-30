@@ -493,10 +493,7 @@ async def loop():
             except Exception as e:
                 await getLogChannel.send(' @advanced-info \n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             try:
-                start = time.time()
                 await getNewsData()
-                elapsedTime = time.time() - start
-                await getLogChannel.send('栄東ニュースの更新取得処理が完了しました。'+str(elapsedTime)+'[sec]')
             except Exception as e:
                 await getLogChannel.send(' @advanced-info \n**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             game = discord.Game("commands: sh!help")
@@ -591,12 +588,14 @@ async def getData():
 
 
 async def getNewsData():
+    start = time.time()
     await client.wait_until_ready()
     shnewsChannel = client.get_channel(shnewsCid)
     getLogChannel = client.get_channel(getLogCid)
     result = shnews.main()
     getTime = result['getTime']
     if len(result["newsData"]) != 0:
+        shnewsLogBody = "更新:\n"
         for conData in result["newsData"]:
             embed = discord.Embed(
                 title=conData["title"], description="投稿日: "+conData["date"], color=discord.Colour.from_rgb(230, 32, 226))
@@ -607,13 +606,16 @@ async def getNewsData():
             embed.add_field(name="link", value=conData["link"], inline=False)
             embed.set_footer(text="取得: "+getTime)
             await shnewsChannel.send(embed=embed)
+            shnewsLogBody += conData["link"] + "\n"
     else:
-        embed = discord.Embed(
-            title="栄東ニュース更新通知", color=discord.Colour.from_rgb(230, 32, 226))
-        embed.add_field(name="system-log",
-                        value='栄東ニュースに更新はありませんでした')
-        embed.set_footer(text="取得: "+getTime)
-        await getLogChannel.send(embed=embed)
+        shnewsLogBody = "更新はありませんでした\n"
+    shnewsLogBody += "\n" + time.time() - start
+    embed = discord.Embed(
+        title="栄東ニュース更新通知", color=discord.Colour.from_rgb(230, 32, 226))
+    embed.add_field(name="system-log: 栄東ニュース",
+                    value='栄東ニュースに更新はありませんでした')
+    embed.set_footer(text="取得: "+getTime)
+    await getLogChannel.send(embed=embed)
 
 
 async def getNarouData():
