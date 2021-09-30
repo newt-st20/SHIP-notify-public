@@ -491,14 +491,14 @@ async def loop():
                 elapsedTime = time.time() - start
                 await getLogChannel.send('SHIPデータ取得処理が完了しました。'+str(elapsedTime)+'[sec]')
             except Exception as e:
-                await getLogChannel.send('**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(' @advanced-info \n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             try:
                 start = time.time()
                 await getNewsData()
                 elapsedTime = time.time() - start
                 await getLogChannel.send('栄東ニュースの更新取得処理が完了しました。'+str(elapsedTime)+'[sec]')
             except Exception as e:
-                await getLogChannel.send('**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(' @advanced-info \n**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             game = discord.Game("commands: sh!help")
             await client.change_presence(status=discord.Status.online, activity=game)
         if nowHour in narouHourList:
@@ -506,12 +506,12 @@ async def loop():
                 await getNarouData()
                 await getLogChannel.send('小説家になろうの更新取得処理が完了しました')
             except Exception as e:
-                await getLogChannel.send('**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(' @advanced-info \n**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
         if nowHour == 5:
             try:
                 await getWeather()
             except Exception as e:
-                await getLogChannel.send('**failedToGetWeather**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(' @advanced-info \n**failedToGetWeather**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
 
 
 async def getData():
