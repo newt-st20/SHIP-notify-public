@@ -15,13 +15,13 @@ LINE_BETA_CHANNEL_ACCESS_TOKEN = os.environ["LINE_BETA_CHANNEL_ACCESS_TOKEN"]
 
 def main(data):
     date = datetime.datetime.now().strftime("%y%m%d")
-    getTime = str(data['getTime'])
+    getDatetime = datetime.datetime.now().strftime("%y/%m/%d") + " " + str(data['getTime'])
     jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
     jsonLoad = json.load(jsonOpen)
     jsonHead = jsonLoad['channelHead']
     jsonData = jsonLoad['flexMessage']
     eachMenu = jsonLoad['eachMenu']
-    jsonData['messages'][0]['contents']['body']['contents'][2]['text'] = "getTime: " + getTime
+    jsonData['messages'][0]['contents']['body']['contents'][2]['text'] = "Fetch: " + getDatetime
     separate = jsonLoad["separate"]
     channelList = jsonLoad['channelList']
 
@@ -37,7 +37,7 @@ def main(data):
             for a in channelData:
                 for prop in props:
                     jsonEachMenu = copy.deepcopy(eachMenu)
-                    jsonEachMenu["contents"][0]["text"] = prop if prop =="description" else "detail"
+                    jsonEachMenu["contents"][0]["text"] = prop if prop != "description" else "detail"
                     jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(root)"
                     message['contents'].append(jsonEachMenu)
                 message['contents'].append(separate)

@@ -34,7 +34,7 @@
                             },
                             {
                                 "type": "text",
-                                "text": "getTime:",
+                                "text": "Fetch: ",
                                 "size": "xs",
                                 "color": "#aaaaaa",
                                 "wrap": true
@@ -94,9 +94,10 @@
         "contents": [
             {
                 "type": "text",
-                "text": "高校連絡事項",
+                "text": "高校",
                 "size": "xl",
-                "color": "#1DB446"
+                "color": "#007bff",
+                "weight": "bold"
             }
         ]
     },
