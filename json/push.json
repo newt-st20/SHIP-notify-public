@@ -22,7 +22,7 @@
                                 "type": "text",
                                 "text": "SHIP-NOTIFY",
                                 "weight": "bold",
-                                "color": "#1DB446",
+                                "color": "#007bff",
                                 "size": "sm"
                             },
                             {
@@ -52,6 +52,7 @@
                             {
                                 "type": "button",
                                 "style": "primary",
+                                "color": "#007bff",
                                 "action": {
                                     "type": "uri",
                                     "label": "サイトで確認",

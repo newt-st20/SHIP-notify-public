@@ -37,7 +37,7 @@ def main(data):
             for a in channelData:
                 for prop in props:
                     jsonEachMenu = copy.deepcopy(eachMenu)
-                    jsonEachMenu["contents"][0]["text"] = prop
+                    jsonEachMenu["contents"][0]["text"] = prop if prop =="description" else "detail"
                     jsonEachMenu["contents"][1]["text"] = a[prop] if a[prop]!="" else "(root)"
                     message['contents'].append(jsonEachMenu)
                 message['contents'].append(separate)
