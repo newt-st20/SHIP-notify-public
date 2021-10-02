@@ -454,6 +454,8 @@ async def on_raw_reaction_remove(payload):
 @tasks.loop(seconds=600)
 async def loop():
     await client.wait_until_ready()
+    guild = client.get_guild(810813680618831902)
+    advancedinfoRole = guild.get_role(817407279820308531)
     getLogChannel = client.get_channel(getLogCid)
     configChannel = client.get_channel(configCid)
     ruleChannel = client.get_channel(ruleCid)
@@ -488,11 +490,11 @@ async def loop():
                 elapsedTime = time.time() - start
                 await getLogChannel.send('SHIPデータ取得処理が完了しました。'+str(elapsedTime)+'[sec]')
             except Exception as e:
-                await getLogChannel.send(' @advanced-info \n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             try:
                 await getNewsData()
             except Exception as e:
-                await getLogChannel.send(' @advanced-info \n**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
             game = discord.Game("commands: sh!help")
             await client.change_presence(status=discord.Status.online, activity=game)
         if nowHour in narouHourList:
@@ -500,12 +502,12 @@ async def loop():
                 await getNarouData()
                 await getLogChannel.send('小説家になろうの更新取得処理が完了しました')
             except Exception as e:
-                await getLogChannel.send(' @advanced-info \n**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetNarouUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
         if nowHour == 5:
             try:
                 await getWeather()
             except Exception as e:
-                await getLogChannel.send(' @advanced-info \n**failedToGetWeather**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+                await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetWeather**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
 
 
 async def getData():
