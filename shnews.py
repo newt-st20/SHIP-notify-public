@@ -71,7 +71,7 @@ def main():
         if os.environ['STATUS'] == "remote":
             db.collection('shnews').add({
                 "title": value["title"],
-                "postDateTime": value["postDateTime"],
+                "date": value["date"],
                 "link": value["link"],
                 "category": value["category"],
                 "images": value["images"],
