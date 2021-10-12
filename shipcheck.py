@@ -110,7 +110,7 @@ def main():
                             driver.page_source, 'html.parser')
                         conPageMain = conEachPageSoup.find_all(class_='ac')[0].find_all(class_='bg_w')[0]
                         conPageDescription = conPageMain.find_all(
-                            "table")[-2].text.replace("\n", "")
+                            "table")[2].text.replace("\n", "")
                         eachConList["description"] = conPageDescription
                         if schooltype == "high":
                             conPageLinks = conPageMain.find_all("a")
