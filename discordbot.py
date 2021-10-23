@@ -628,17 +628,19 @@ async def getWeather():
     response = requests.get("https://www.jma.go.jp/bosai/forecast/data/forecast/110000.json").json()[0]
     pops = response['timeSeries'][1]['areas'][1]['pops']
     timeDefines = response['timeSeries'][1]['timeDefines']
-    if "雨" in response['timeSeries'][0]['areas'][1]['weathers'][0] or "雨" in response['timeSeries'][0]['areas'][1]['weathers'][1]:
+    if "雨" in response['timeSeries'][0]['areas'][1]['weathers'][0]:
         title = "埼玉県南部の天気 - " + response['reportDatetime'][8:13].replace("T","日") + "時発表\n"
         day1 = response['timeSeries'][0]['areas'][1]['weathers'][0].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨").replace("雷", "⚡雷")
-        day2 = response['timeSeries'][0]['areas'][1]['weathers'][1].replace("晴れ", "🌞晴れ").replace("くもり","☁くもり").replace("雨","☔雨").replace("雷", "⚡雷")
-        body = "`" + response['timeSeries'][0]['timeDefines'][0][8:10] + "日:` `" + day1 + "`\n`" + response['timeSeries'][0]['timeDefines'][1][8:10] + "日:` `" + day2 + "`\n> 降水確率\n"
+        body = "`" + response['timeSeries'][0]['timeDefines'][0][8:10] + "日:` " + day1 + "\n> 降水確率\n"
         for (pop, timeDefine) in zip(pops, timeDefines):
             icon = "🌧"*(int(pop)//10)+"➖"*(10-int(pop)//10)
-            body += "`" + timeDefine[8:13].replace("T","日") + "時` " + icon + pop + "%\n"
+            body += "`" + timeDefine[8:13].replace("T","日") + "時` " + icon + " " + pop + "%\n"
+        temps = response['timeSeries'][2]['areas'][1]['temps']
+        tempDefines = response['timeSeries'][2]['timeDefines']
+        body += "> さいたまの予想気温\n"+tempDefines[0][8:13].replace("T00","日最低").replace("T09","日最高")+":"+temps[0]+"°, "+tempDefines[1][8:13].replace("T00","日最低").replace("T09","日最高")+":"+temps[1]+"°\n"
         response = requests.get("https://www.jma.go.jp/bosai/forecast/data/overview_forecast/110000.json").json()
-        if response['headlineText'] != "":
-            body += "> 埼玉県の天気概況\n" + response['headlineText'] + "\n"
+        if response['text'] != "":
+            body += "> 埼玉県の天気概況\n" + response['text'] + "\n"
         embed = discord.Embed(title=title, description=body, color=discord.Colour.from_rgb(163, 212, 255))
         await weatherChannel.send(embed=embed)
 
