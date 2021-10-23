@@ -13,6 +13,7 @@ from discord.ext import tasks
 from dotenv import load_dotenv
 
 import line
+import linebeta
 import twitter
 import narou
 import search
@@ -574,6 +575,8 @@ async def getData():
             try:
                 log = line.main(result)
                 await getLogChannel.send("LINE版処理完了\n" + log)
+                betalog = linebeta.main(result)
+                await getLogChannel.send("LINEbeta版処理完了\n" + betalog)
             except Exception as e:
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
         else:
