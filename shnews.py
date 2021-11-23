@@ -39,19 +39,21 @@ def main():
     news = requests.get('http://www.sakaehigashi.ed.jp/news/').content
     newsSoup = BeautifulSoup(news, 'html.parser')
     newsList = []
-    newsEntryList = newsSoup.find_all('article')
+    newsEntryList = newsSoup.find_all(class_='index-list')[0].find_all('a')
     for newsEntry in newsEntryList:
-        if newsEntry.find_all('a')[0].get('href') in latestEntry[0]:
+        link = 'http://www.sakaehigashi.ed.jp'+ newsEntry.get('href')
+        if link in latestEntry[0]:
             break
         else:
+            eachNewsPage = requests.get(link).content
+            eachNewsSoup = BeautifulSoup(eachNewsPage, 'html.parser')
             newsData = {}
-            title = newsEntry.find_all(class_='tit03')[0].text
-            date = newsEntry.find_all(class_='date')[0].text
-            category = newsEntry.find_all(class_='blog-footer')[0].find_all('a')[0].text
-            body = newsEntry.find_all(class_='entry')[0].text.replace("\n", "")
+            title = eachNewsSoup.find_all(class_='tit03')[0].text
+            date = eachNewsSoup.find_all(class_='date')[0].text
+            category = eachNewsSoup.find_all(class_='blog-footer')[0].find_all('a')[0].text
+            body = eachNewsSoup.find_all(class_='entry')[0].text.replace("\n", "")
             if len(body) > 100:
                 body = body[0:300] + "..."
-            link = "https://www.sakaehigashi.ed.jp" + newsEntry.find_all('a')[0].get('href')
             images = []
             for imageArea in newsEntry.find_all('img'):
                 images.append("https://www.sakaehigashi.ed.jp" + imageArea.get('src'))
