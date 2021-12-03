@@ -65,6 +65,60 @@
             }
         ]
     },
+    "channel": {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "xxl",
+        "spacing": "sm",
+        "contents": [
+            {
+                "type": "text",
+                "text": "高校",
+                "size": "xl",
+                "color": "#007bff",
+                "weight": "bold"
+            }
+        ]
+    },
+    "prop": {
+        "type": "box",
+        "layout": "horizontal",
+        "contents": [
+            {
+                "type": "text",
+                "text": "",
+                "size": "sm",
+                "color": "#555555",
+                "flex": 1
+            },
+            {
+                "type": "text",
+                "text": "",
+                "size": "sm",
+                "color": "#111111",
+                "flex": 3,
+                "wrap": true
+            }
+        ]
+    },
+    "separate": {
+        "type": "separator",
+        "margin": "xxl"
+    },
+    "channelList": [
+        {
+            "name": "highCon",
+            "jpName": "高校連絡事項"
+        },
+        {
+            "name": "highStudy",
+            "jpName": "高校学習教材"
+        },
+        {
+            "name": "highSchoolNews",
+            "jpName": "高校学校通信"
+        }
+    ],
     "eachMenu": {
         "type": "box",
         "layout": "horizontal",
@@ -100,23 +154,5 @@
                 "weight": "bold"
             }
         ]
-    },
-    "separate": {
-        "type": "separator",
-        "margin": "xxl"
-    },
-    "channelList": [
-        {
-            "name": "highCon",
-            "jpName": "高校連絡事項"
-        },
-        {
-            "name": "highStudy",
-            "jpName": "高校学習教材"
-        },
-        {
-            "name": "highSchoolNews",
-            "jpName": "高校学校通信"
-        }
-    ]
+    }
 }

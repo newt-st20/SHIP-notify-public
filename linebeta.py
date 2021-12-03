@@ -14,62 +14,60 @@ LINE_BETA_CHANNEL_ACCESS_TOKEN = os.environ["LINE_BETA_CHANNEL_ACCESS_TOKEN"]
 def main(data):
     date = datetime.datetime.now().strftime("%y%m%d")
     getDatetime = datetime.datetime.now().strftime("%y/%m/%d") + " " + str(data['getTime'])
-    jsonOpen = open('json/push.json', 'r', encoding="utf-8_sig")
-    jsonLoad = json.load(jsonOpen)
-    jsonHead = jsonLoad['channelHead']
-    jsonData = jsonLoad['flexMessage']
-    eachMenu = jsonLoad['eachMenu']
-    jsonData['messages'][0]['contents']['body']['contents'][2]['text'] = "Fetch: " + getDatetime
-    separate = jsonLoad["separate"]
-    channelList = jsonLoad['channelList']
+    jsonTemplete = json.load(open('json/push.json', 'r', encoding="utf-8_sig"))
+    payload = jsonTemplete['flexMessage']
+    payload['messages'][0]['contents']['body']['contents'][2]['text'] = "Fetch: " + getDatetime
 
-    flag = False
+    notifyFlag = False
     altText = ""
-    for index, channel in enumerate(channelList):
-        channelData = data[channel['name']]
-        if len(channelData) != 0:
+    for i, channelInfo in enumerate(jsonTemplete['channelList']):
+        channel = data[channelInfo['name']]
+        if len(channel) != 0:
             channelflag = False
-            message = copy.deepcopy(jsonHead)
-            message['contents'][0]['text'] = channel['jpName']
-            props = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))['pageList'][index]['lineProps']
-            for a in channelData:
-                propsflag = True
-                for prop in props:
-                    jsonEachMenu = copy.deepcopy(eachMenu)
-                    jsonEachMenu["contents"][0]["text"] = prop if prop != "description" else "detail"
-                    if ("高２" in a[prop] or "高2" in a[prop] or "高３" in a[prop] or "高3" in a[prop]) and ("高１" not in a[prop] and "高1" not in a[prop]):
-                        propsflag = False
+            message = copy.deepcopy(jsonTemplete['channel'])
+            message['contents'][0]['text'] = channelInfo['jpName']
+            propNames = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))['pageList'][i]['lineProps']
+            for post in channel:
+                postFlag = True
+                eachPost = []
+                for propName in propNames:
+                    propJson = copy.deepcopy(jsonTemplete['prop'])
+                    propJson["contents"][0]["text"] = propName if propName != "description" else "detail"
+                    if ("高２" in post[propName] or "高2" in post[propName] or "高３" in post[propName] or "高3" in post[propName]) and ("高１" not in post[propName] and "高1" not in post[propName]):
+                        postFlag = False
                         break
-                    elif a[prop] == "" and prop == "folder":
-                        jsonEachMenu["contents"][1]["text"] = "(root)"
                     else:
-                        jsonEachMenu["contents"][1]["text"] = a[prop]
-                    message['contents'].append(jsonEachMenu)
-                if propsflag:
+                        if propName == "folder" and post[propName] == "":
+                            propJson["contents"][1]["text"] = "(root)"
+                        else:
+                            propJson["contents"][1]["text"] = post[propName]
+                        eachPost.append(propJson)
+                if postFlag:
                     channelflag = True
-                    flag = True
-                    message['contents'].append(separate)
+                    notifyFlag = True
+                    eachPost.append(jsonTemplete["separate"])
+                    message['contents'].extend(eachPost)
             if channelflag:
-                jsonData['messages'][0]['contents']['body']['contents'].append(message)
-                altText += "[" + channel['jpName'] + "]"
+                payload['messages'][0]['contents']['body']['contents'].append(message)
+                altText += "[" + channelInfo['jpName'] + "]"
     
-    jsonData['messages'][0]['altText'] = altText + "に更新がありました"
-    jsonData['messages'][0]['contents']['footer']['contents'][0]['action']['uri'] = "https://ship-assistant.web.app/log/"+data['logId']+"?utm_source=line_"+date+"&utm_medium=LINE"
+    payload['messages'][0]['altText'] = altText + "に更新がありました"
+    payload['messages'][0]['contents']['footer']['contents'][0]['action']['uri'] = "https://ship-assistant.web.app/log/"+data['logId']+"?utm_source=line_"+date+"&utm_medium=LINE"
 
     betaheaders = {
         'Authorization': 'Bearer ' + LINE_BETA_CHANNEL_ACCESS_TOKEN,
         'Content-type': 'application/json'
     }
     broadcastEndPoint = "https://api.line.me/v2/bot/message/broadcast"
-    print(jsonData)
-    if flag:
+    print(payload)
+    if notifyFlag:
         logMessage = ""
-        betaresponse = requests.post(broadcastEndPoint, json=jsonData, headers=betaheaders)
+        betaresponse = requests.post(broadcastEndPoint, json=payload, headers=betaheaders)
         if betaresponse.status_code != 200:
             logMessage += "\nSomething error happend on LINE beta. [error message]"+ betaresponse.text
         else:
             logMessage += "\nSend message succeed on LINE beta."
-        logMessage += "\n\njsonData length:" + str(len(str(jsonData)))
+        logMessage += "\n\npayload length:" + str(len(str(payload)))
         print(logMessage)
         return logMessage
     else:
