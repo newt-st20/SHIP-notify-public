@@ -19,6 +19,7 @@ import narou
 import search
 import shipcheck
 import shnews
+import pjsekai
 
 load_dotenv()
 
@@ -373,6 +374,13 @@ async def on_message(message):
                             await message.reply("操作が中断されました")
         else:
             await message.channel.send("このコマンドは存在しません")
+    if message.content == 'p!':
+        event = pjsekai.main()
+        if event[0] == "error":
+            await message.channel.send("error")
+        else:
+            embed = discord.Embed(title=event[1]["name"], description=event[0], color=discord.Colour.from_rgb(0, 255, 251))
+            await message.channel.send(embed=embed)
     if isinstance(message.channel, discord.DMChannel):
         userId = str(message.author.id)
         embed = discord.Embed(title="DMを受信しました", color=discord.Colour.from_rgb(256-int(userId[0:1])*2, 256-int(userId[2:4])*2, 256-int(userId[5:6])*2))
