@@ -1,5 +1,7 @@
 # SHIP-notify
+
 ## 概要
+
 [SHIP](https://ship.sakae-higashi.jp/)に新しいファイルが投稿された際に通知するシステム。
 
 PaaSとしてHerokuを使用。Discord.pyの<code>@tasks.loop</code>で600秒毎に現在時間を確認し、予め設定していた時間であればSHIPやその他このシステムで更新を取得しているプラットフォームへAPIリクエストやスクレイピングを行い、データベースと差があれば更新し各媒体での通知を行う。
@@ -8,11 +10,10 @@ SHIPのスクレイピングにはseleniumを使用。中高それぞれの「�
 
 データベースはFirebaseのFirestoreとStrageを使用。ファイルの保存に関しては無料枠の容量で抑えるため中学のページのものは保存を行っていない。
 
-## 再利用にあたって
-再利用(フォーク)などは基本自由としますが、一度連絡を入れてください。
-
 
 ## その他備考
+
 ### webDriver バージョン設定
+
 環境変数 <code>CHROMEDRIVER_VERSION</code> に[ここ](https://chromedriver.chromium.org/downloads)に記載されているバージョンをセットする。
 現在のバージョンは<code>99.0.4844.51</code>

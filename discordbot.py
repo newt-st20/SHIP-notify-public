@@ -13,7 +13,6 @@ from discord.ext import tasks
 from dotenv import load_dotenv
 
 import line
-import linebeta
 import twitter
 import narou
 import search
@@ -436,23 +435,22 @@ async def loop():
     nowHour = int(datetime.datetime.now().strftime("%H"))
     nowMinute = int(datetime.datetime.now().strftime("%M"))
     if nowMinute < 10:
-        if nowHour in hourList:
-            game = discord.Game("Getting SHIP data...")
-            await client.change_presence(status=discord.Status.dnd, activity=game)
-            await getLogChannel.send('SHIPデータの取得を開始します')
-            try:
-                start = time.time()
-                await getData()
-                elapsedTime = time.time() - start
-                await getLogChannel.send('SHIPデータ取得処理が完了しました。'+str(elapsedTime)+'[sec]')
-            except Exception as e:
-                await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
-            try:
-                await getNewsData()
-            except Exception as e:
-                await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
-            game = discord.Game("commands: sh!help")
-            await client.change_presence(status=discord.Status.online, activity=game)
+        game = discord.Game("Getting SHIP data...")
+        await client.change_presence(status=discord.Status.dnd, activity=game)
+        await getLogChannel.send('SHIPデータの取得を開始します')
+        try:
+            start = time.time()
+            await getData()
+            elapsedTime = time.time() - start
+            await getLogChannel.send('SHIPデータ取得処理が完了しました。'+str(elapsedTime)+'[sec]')
+        except Exception as e:
+            await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+        try:
+            await getNewsData()
+        except Exception as e:
+            await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShnewsUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+        game = discord.Game("commands: sh!help")
+        await client.change_presence(status=discord.Status.online, activity=game)
         if nowHour in narouHourList:
             try:
                 await getNarouData()
@@ -530,8 +528,6 @@ async def getData():
             try:
                 log = line.main(result)
                 await getLogChannel.send("LINE版処理完了\n" + log)
-                betalog = linebeta.main(result)
-                await getLogChannel.send("LINEbeta版処理完了\n" + betalog)
             except Exception as e:
                 await getLogChannel.send("LINE版での不具合:\n" + str(e))
         else:

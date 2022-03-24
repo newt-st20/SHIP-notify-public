@@ -4,5 +4,3 @@ Lib/
 Scripts/
 .env
 test.py
-codetest.py
-notice.py
