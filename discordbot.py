@@ -80,12 +80,7 @@ async def on_message(message):
             content += '\n`sh!file` idからSHIP上のファイルをダウンロードするためのリンクを返す。省略形は`-f`'
             content += '\n`sh!recently` SHIPの最近の更新を一覧表示。省略形は`-r`'
             content += '\n`sh!wiki` Wikipediaを検索'
-            content += '\n\n> 「小説家になろう」関連コマンド'
-            content += '\n`sh!nwhen` 更新を取得している日時の取得'
-            content += '\n`sh!nadd` 更新を通知する小説の追加'
-            content += '\n`sh!nremove` 更新を通知する小説の削除'
-            content += '\n`sh!nlist` 更新を通知している小説一覧を表示'
-            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2021/09/15", description=content, color=discord.Colour.from_rgb(190, 252, 3))
+            embed = discord.Embed(title="コマンド一覧 - lastupdate: 2022/03/24", description=content, color=discord.Colour.from_rgb(190, 252, 3))
             await message.channel.send(embed=embed)
         elif 'info' in message.content or '-i' in message.content:
             flag = False
@@ -277,54 +272,6 @@ async def on_message(message):
             await message.channel.send('にゃーん')
             wait_message = await client.wait_for("message", check=check)
             await message.channel.send(wait_message.content)
-        # なろうコマンド
-        elif 'nwhen' in message.content:
-            configChannel = client.get_channel(configCid)
-            messages = await configChannel.history().flatten()
-            whenGetNarouConfigMessage = ""
-            for msg in messages:
-                if "GET_NAROU_HOUR=" in msg.content:
-                    whenGetNarouConfigMessage = msg.content.lstrip("GET_NAROU_HOUR=")
-                    continue
-            hourList = [int(x) for x in whenGetNarouConfigMessage.split()]
-            await message.channel.send('現在毎日'+str(hourList)+'時に「小説家になろう」の更新を取得しています。')
-        elif 'nadd' in message.content:
-            if len(message.content.split()) == 2:
-                ncode = message.content.split()[1]
-                if len(ncode) == 7 and ncode[0] == 'n':
-                    result = narou.add(ncode)
-                    if result == "add":
-                        await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新を通知します")
-                    elif result == "already":
-                        await message.channel.send("https://ncode.syosetu.com/"+ncode+" の小説はすでにフォローされています")
-                    else:
-                        await message.channel.send(result)
-                else:
-                    await message.channel.send("これはncodeではありません。最初からやり直してください")
-            else:
-                await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'nremove' in message.content:
-            if len(message.content.split()) == 2:
-                ncode = message.content.split()[1]
-                if len(ncode) == 7 and ncode[0] == 'n':
-                    result = narou.remove(ncode)
-                    if result == "remove":
-                        await message.channel.send("このチャンネルで https://ncode.syosetu.com/"+ncode+" の小説の更新通知を解除します")
-                    else:
-                        await message.channel.send("この小説はまだフォローされていないか、存在しません"+result)
-                else:
-                    await message.channel.send("これはncodeではありません。最初からやり直してください")
-            else:
-                await message.channel.send("第2引数にncodeを指定してください。\n例) https://ncode.syosetu.com/n2267be のncode → n2267be")
-        elif 'nlist' in message.content:
-            result = narou.list()
-            body = ""
-            for eachData in result:
-                body += "`title` "+eachData['title']+" ( https://ncode.syosetu.com/" + eachData['ncode'] + " )\n"
-            if body == "":
-                await message.channel.send("このチャンネルでフォローされている小説はありません")
-            else:
-                await message.channel.send(body)
         elif message.author.guild_permissions.administrator:
             if message.content == 'sh!get':
                 await message.channel.send('SHIPデータの取得を開始します')
