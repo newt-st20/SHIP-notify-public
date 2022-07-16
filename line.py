@@ -15,24 +15,24 @@ LINE_BETA_CHANNEL_ACCESS_TOKEN = os.environ["LINE_BETA_CHANNEL_ACCESS_TOKEN"]
 def main(data):
     date = datetime.datetime.now().strftime("%y%m%d")
     getDatetime = datetime.datetime.now().strftime("%y/%m/%d") + " " + str(data['getTime'])
-    jsonTemplete = json.load(open('json/push.json', 'r', encoding="utf-8_sig"))
-    payload = jsonTemplete['flexMessage']
+    jsonTemplate = json.load(open('json/push.json', 'r', encoding="utf-8_sig"))
+    payload = jsonTemplate['flexMessage']
     payload['messages'][0]['contents']['body']['contents'][2]['text'] = "Fetch: " + getDatetime
 
     notifyFlag = False
     altText = ""
-    for i, channelInfo in enumerate(jsonTemplete['channelList']):
+    for i, channelInfo in enumerate(jsonTemplate['channelList']):
         channel = data[channelInfo['name']]
         if len(channel) != 0:
             channelflag = False
-            message = copy.deepcopy(jsonTemplete['channel'])
+            message = copy.deepcopy(jsonTemplate['channel'])
             message['contents'][0]['text'] = channelInfo['jpName']
             propNames = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))['pageList'][i]['lineProps']
             for post in channel:
                 postFlag = True
                 eachPost = []
                 for propName in propNames:
-                    propJson = copy.deepcopy(jsonTemplete['prop'])
+                    propJson = copy.deepcopy(jsonTemplate['prop'])
                     propJson["contents"][0]["text"] = propName if propName != "description" else "detail"
                     if ("高１" in post[propName] or "高1" in post[propName] or "高３" in post[propName] or "高3" in post[propName]) and ("高２" not in post[propName] and "高2" not in post[propName]):
                         postFlag = False
@@ -46,7 +46,7 @@ def main(data):
                 if postFlag:
                     channelflag = True
                     notifyFlag = True
-                    eachPost.append(jsonTemplete["separate"])
+                    eachPost.append(jsonTemplate["separate"])
                     message['contents'].extend(eachPost)
             if channelflag:
                 payload['messages'][0]['contents']['body']['contents'].append(message)

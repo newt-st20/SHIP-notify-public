@@ -37,7 +37,7 @@ weatherCid = 855709750704209921
 shnewsCid = 818480374334226443
 narouCid = 826094369467138108
 
-def isint(s):
+def isInt(s):
     try:
         int(s, 10)
     except ValueError:
@@ -84,7 +84,7 @@ async def on_message(message):
         elif 'info' in message.content or '-i' in message.content:
             flag = False
             if len(message.content.split()) == 2:
-                if isint(message.content.split()[1]):
+                if isInt(message.content.split()[1]):
                     idIntMessage = int(message.content.split()[1])
                     flag = True
             if flag == False:
@@ -93,7 +93,7 @@ async def on_message(message):
                     embed = discord.Embed(title="情報取得", description="情報を取得したいファイルのidを入力してください。idは通知チャンネル(" + conHighChannel.mention + ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(190, 252, 3))
                     await message.channel.send(embed=embed)
                     idMessage = await client.wait_for("message", check=check, timeout=60)
-                    if isint(idMessage.content) == False:
+                    if isInt(idMessage.content) == False:
                         if 'sh!' in idMessage.content:
                             await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                         else:
@@ -122,7 +122,7 @@ async def on_message(message):
         elif 'file' in message.content or '-f' in message.content:
             flag = False
             if len(message.content.split()) == 2:
-                if isint(message.content.split()[1]):
+                if isInt(message.content.split()[1]):
                     idIntMessage = int(message.content.split()[1])
                     flag = True
             if flag == False:
@@ -131,7 +131,7 @@ async def on_message(message):
                     embed = discord.Embed(title="ファイル取得", description="ダウンロードリンクを表示したいもののidを入力してください。idは通知チャンネル(" + conHighChannel.mention + ","+studyHighChannel.mention+")または`sh!recently`コマンドなどから確認できます。", color=discord.Colour.from_rgb(50, 168, 82))
                     await message.channel.send(embed=embed)
                     idMessage = await client.wait_for("message", check=check, timeout=60)
-                    if isint(idMessage.content) == False:
+                    if isInt(idMessage.content) == False:
                         if 'sh!' in idMessage.content:
                             await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                         else:
@@ -192,7 +192,7 @@ async def on_message(message):
             itemNameList = json.load(open('json/ship.json', 'r', encoding="utf-8_sig"))["pageList"]
             flag = False
             if len(message.content.split()) == 3:
-                if isint(message.content.split()[1]) and isint(message.content.split()[1]):
+                if isInt(message.content.split()[1]) and isInt(message.content.split()[1]):
                     typeIntMessage = int(message.content.split()[1])
                     howmanyIntMessage = int(message.content.split()[2])
                     flag = True
@@ -204,7 +204,7 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
                 try:
                     typeMessage = await client.wait_for("message", check=check, timeout=60)
-                    if isint(typeMessage.content) == False:
+                    if isInt(typeMessage.content) == False:
                         if 'sh!' in typeMessage.content:
                             await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                         else:
@@ -218,7 +218,7 @@ async def on_message(message):
                     await message.channel.send(str(data)+"件のデータが見つかりました。何件表示しますか？(最大30件まで)")
                     try:
                         howmanyMessage = await client.wait_for("message", check=check, timeout=60)
-                        if isint(howmanyMessage.content) == False:
+                        if isInt(howmanyMessage.content) == False:
                             if 'sh!' in howmanyMessage.content:
                                 await message.reply("❌別のコマンドが実行されたためこのセッションは終了しました。")
                             else:
@@ -309,7 +309,7 @@ async def on_message(message):
                     await message.channel.send("操作が中断されました")
             elif 'sh!delete-some-message' in message.content:
                 if len(message.content.split()) == 2:
-                    if isint(message.content.split()[1]):
+                    if isInt(message.content.split()[1]):
                         try:
                             await message.reply("⚠️これより"+str(int(message.content.split()[1]))+"件前までのメッセージを削除します。よろしいですか？")
                             agreeMessage = await client.wait_for("message", check=check, timeout=10)
@@ -437,14 +437,14 @@ async def loop():
     if nowMinute < 10:
         game = discord.Game("Getting SHIP data...")
         await client.change_presence(status=discord.Status.dnd, activity=game)
-        await getLogChannel.send('SHIPデータの取得を開始します')
-        try:
-            start = time.time()
-            await getData()
-            elapsedTime = time.time() - start
-            await getLogChannel.send('SHIPデータ取得処理が完了しました。'+str(elapsedTime)+'[sec]')
-        except Exception as e:
-            await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
+#        await getLogChannel.send('SHIPデータの取得を開始します')
+#        try:
+#            start = time.time()
+#            await getData()
+#            elapsedTime = time.time() - start
+#            await getLogChannel.send('SHIPデータ取得処理が完了しました。'+str(elapsedTime)+'[sec]')
+#        except Exception as e:
+#            await getLogChannel.send(advancedinfoRole.mention+'\n**failedToGetShipUpdate**\n[errorType]' + str(type(e))+'\n[errorMessage]' + str(e))
         try:
             await getNewsData()
         except Exception as e:
